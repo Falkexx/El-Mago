@@ -31,12 +31,14 @@ export class FirstMigration1731341972076 implements MigrationInterface {
             name: 'email',
             type: 'varchar',
             length: '60',
+            isUnique: true,
           },
 
           {
             name: 'cpfCnpj',
             type: 'varchar',
             length: '40',
+            isUnique: true,
           },
           {
             name: 'country',
@@ -52,15 +54,17 @@ export class FirstMigration1731341972076 implements MigrationInterface {
             name: 'discordUserName',
             type: 'varchar',
             length: '40',
+            isUnique: true,
           },
           {
             name: 'numberPhone',
             type: 'varchar',
             length: '40',
+            isUnique: true,
           },
           {
             name: 'age',
-            type: 'int',
+            type: 'numeric',
             precision: 150,
           },
           {
@@ -78,6 +82,11 @@ export class FirstMigration1731341972076 implements MigrationInterface {
           },
           {
             name: 'isBanned',
+            type: 'boolean',
+            default: false,
+          },
+          {
+            name: 'isDeleted',
             type: 'boolean',
             default: false,
           },

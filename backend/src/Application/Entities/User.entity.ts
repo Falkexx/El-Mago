@@ -14,10 +14,10 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 40 })
   name: string;
 
-  @Column({ type: 'varchar', length: 60 })
+  @Column({ type: 'varchar', length: 60, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 40 })
+  @Column({ type: 'varchar', length: 40, unique: true })
   cpfCnpj: string;
 
   @Column({ type: 'varchar', length: 20 })
@@ -26,10 +26,10 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 50 })
   password: string;
 
-  @Column({ type: 'varchar', length: 40 })
+  @Column({ type: 'varchar', length: 40, unique: true })
   discordUserName: string;
 
-  @Column({ type: 'varchar', length: 40 })
+  @Column({ type: 'varchar', length: 40, unique: true })
   numberPhone: string;
 
   @Column({ type: 'int', precision: 150 })
@@ -46,6 +46,9 @@ export class UserEntity {
 
   @Column({ type: 'boolean', default: false })
   isBanned: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isDeleted: boolean;
 }
 
 export class UserUpdateEntity {
