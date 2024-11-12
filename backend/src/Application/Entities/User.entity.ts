@@ -26,7 +26,7 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 20, nullable: true, default: null })
   country: string | null;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 250 })
   password: string;
 
   @Column({
