@@ -17,23 +17,23 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 60, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 40, unique: true })
-  cpfCnpj: string;
+  @Column({ type: 'varchar', length: 40, unique: true, nullable: true })
+  cpfCnpj: string | null;
 
-  @Column({ type: 'varchar', length: 20 })
-  country: string;
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  country: string | null;
 
   @Column({ type: 'varchar', length: 50 })
   password: string;
 
-  @Column({ type: 'varchar', length: 40, unique: true })
-  discordUserName: string;
+  @Column({ type: 'varchar', length: 40, unique: true, nullable: true })
+  discordUserName: string | null;
 
   @Column({ type: 'varchar', length: 40, unique: true })
   numberPhone: string;
 
-  @Column({ type: 'int', precision: 150 })
-  age: number;
+  @Column({ type: 'int', precision: 150, nullable: true })
+  age: number | null;
 
   @Column({ type: 'varchar', length: 20 })
   role: 'ADMIN' | 'AFFILIATE' | 'USER'; // default: user
