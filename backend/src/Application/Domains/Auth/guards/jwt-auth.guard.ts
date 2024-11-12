@@ -1,3 +1,4 @@
+import { PayloadType } from '#types';
 import {
   CanActivate,
   ExecutionContext,
@@ -21,7 +22,11 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token);
+      const payload: PayloadType = await this.jwtService.verifyAsync(token);
+
+      if (payload.isBanned) {
+        throw new UnauthorizedException('banned user');
+      }
 
       request['user'] = payload;
     } catch {

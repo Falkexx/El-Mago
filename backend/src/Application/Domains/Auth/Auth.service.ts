@@ -59,6 +59,7 @@ export class AuthService {
     const payload: PayloadType = {
       sub: user.id,
       roles: [user.role],
+      isBanned: user.isBanned,
     };
 
     const token = this.jwtService.sign(payload);

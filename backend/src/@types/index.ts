@@ -10,4 +10,5 @@ export type PaginationResult = {
 export type PayloadType = {
   sub: string;
   roles: string[];
+  isBanned: boolean;
 };
