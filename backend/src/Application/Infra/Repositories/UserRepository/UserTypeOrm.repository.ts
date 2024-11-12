@@ -11,7 +11,7 @@ import { splitKeyAndValue } from '#utils';
 import { PaginationProps, PaginationResult } from '#types';
 
 @Injectable()
-export class UserRepository implements IUserRepositoryContract {
+export class UserTypeOrmRepository implements IUserRepositoryContract {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
