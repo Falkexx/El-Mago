@@ -5,10 +5,10 @@ export class UserEntity {
   @PrimaryColumn('varchar')
   id: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, nullable: true, default: null })
   firstName: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, nullable: true, default: null })
   lastName: string;
 
   @Column({ type: 'varchar', length: 60, unique: true })
