@@ -15,5 +15,6 @@ import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRe
     },
     UserService,
   ],
+  exports: [UserService],
 })
 export class UserModule {}

@@ -7,6 +7,8 @@ import {
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { CreateUserDto } from './dtos/CreateUser.dto';
 import { v4 as uuid_v4 } from 'uuid';
+import { ROLE } from 'src/@metadata/roles';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -30,19 +32,22 @@ export class UserService {
       throw new UnauthorizedException('email in used');
     }
 
+    const salt = await bcrypt.genSalt(12);
+
+    const hashedPassword = await bcrypt.hash(userDto.password, salt);
+
     const userEntity = Object.assign(new UserEntity(), {
       id: uuid_v4(),
-      firstName: userDto.firstName,
-      lastName: userDto.lastName,
-      name: userDto.firstName + ' ' + userDto.lastName,
+      firstName: null,
+      lastName: null,
       email: userDto.email,
       cpfCnpj: null,
       country: null,
-      password: userDto.password, // tem que criptografar
+      password: hashedPassword,
       discordUserName: null,
       numberPhone: null,
       age: null,
-      role: 'USER',
+      role: ROLE.USER,
       createdAt: new Date(),
       updatedAt: new Date(),
       isBanned: false,
