@@ -25,7 +25,9 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
 
   async create(entity: UserEntity): Promise<UserEntity> {
     try {
-      const userCreated = await this.userRepository.create(entity);
+      const userTypeOrmEntity = await this.userRepository.create(entity);
+
+      const userCreated = await this.userRepository.save(userTypeOrmEntity);
 
       return userCreated;
     } catch (error) {
@@ -38,7 +40,11 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
   async getBy(unqRef: UserEntityUniqueRefs): Promise<UserEntity | null> {
     const [key, value] = splitKeyAndValue(unqRef);
 
-    const user = await this.userRepository.findOne({ where: { [key]: value } });
+    console.log(key, value);
+
+    const user = await this.userRepository.findOneBy({ [key]: value });
+
+    console.log(user);
 
     return user ?? null;
   }
