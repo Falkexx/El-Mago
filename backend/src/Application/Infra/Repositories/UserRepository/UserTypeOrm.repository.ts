@@ -32,7 +32,6 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
       return userCreated;
     } catch (error) {
       console.log(error);
-      console.log(error);
       throw new InternalServerErrorException();
     }
   }
@@ -40,11 +39,7 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
   async getBy(unqRef: UserEntityUniqueRefs): Promise<UserEntity | null> {
     const [key, value] = splitKeyAndValue(unqRef);
 
-    console.log(key, value);
-
     const user = await this.userRepository.findOneBy({ [key]: value });
-
-    console.log(user);
 
     return user ?? null;
   }
