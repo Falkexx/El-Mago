@@ -11,37 +11,52 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 20 })
   lastName: string;
 
-  @Column({ type: 'varchar', length: 40 })
-  name: string;
-
   @Column({ type: 'varchar', length: 60, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 40, unique: true, nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 40,
+    unique: true,
+    nullable: true,
+    default: null,
+  })
   cpfCnpj: string | null;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true, default: null })
   country: string | null;
 
   @Column({ type: 'varchar', length: 50 })
   password: string;
 
-  @Column({ type: 'varchar', length: 40, unique: true, nullable: true })
+  @Column({
+    type: 'varchar',
+    length: 40,
+    unique: true,
+    nullable: true,
+    default: null,
+  })
   discordUserName: string | null;
 
-  @Column({ type: 'varchar', length: 40, unique: true })
-  numberPhone: string;
+  @Column({
+    type: 'varchar',
+    length: 40,
+    unique: true,
+    nullable: true,
+    default: null,
+  })
+  numberPhone: string | null;
 
-  @Column({ type: 'int', precision: 150, nullable: true })
+  @Column({ type: 'numeric', precision: 150, nullable: true, default: null })
   age: number | null;
 
   @Column({ type: 'varchar', length: 20 })
   role: 'ADMIN' | 'AFFILIATE' | 'USER'; // default: user
 
-  @Column({ type: 'timestamptz', default: new Date() })
+  @Column({ type: 'timestamptz' })
   createdAt: Date;
 
-  @Column({ type: 'timestamptz', default: new Date(), update: true })
+  @Column({ type: 'timestamptz', update: true })
   updatedAt: Date;
 
   @Column({ type: 'boolean', default: false })
