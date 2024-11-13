@@ -1,12 +1,19 @@
-import {useTranslations} from 'next-intl';
-import {Link} from '@/i18n/routing';
- 
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
+import Header from "@/app/ui/Header";
+
 export default function HomePage() {
-  const t = useTranslations('HomePage');
+  const t = useTranslations("HomePage");
+
   return (
-    <div>
-      <h1 className='text-primary-800'>{t('title')} vamooos deu tudo certop</h1>
-      <Link href="/about">{t('about')}</Link>
+    <div className="px-20 fontDefault">
+      <Header />
+
+      <section>
+        <main>
+
+        </main>
+      </section>
     </div>
   );
 }
