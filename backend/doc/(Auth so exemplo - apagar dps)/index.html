@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Documentation</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>API Documentation</h1>
+      <p>Comprehensive guide to using the API endpoints.</p>
+    </header>
+
+    <!-- Sumário à esquerda -->
+    <nav>
+      <ul>
+        <li><a href="#authentication">Authentication</a></li>
+        <li><a href="#get-users">GET /api/users</a></li>
+        <li><a href="#create-user">POST /api/users</a></li>
+      </ul>
+    </nav>
+
+    <!-- Conteúdo principal -->
+    <main>
+      <section id="authentication">
+        <h2>Authentication</h2>
+        <h3>GET /v1/auth/signUp</h3>
+        <p>
+          Endpint que cadastra o usuário. O usuário não deve ter email repedito
+          e a senha deve conter 8 caracteres com um especial uma letra maúscula
+          com minúscula e um número.
+        </p>
+        <h4>Requisição</h4>
+        <button onclick="copyToClipboard('#auth-sign-in')">Copy cURL</button>
+        <pre id="auth-sign-in"><code>
+{
+  "email": "jhon@gmail.com",
+  "password": "#Minhasenha123"
+}
+      </code></pre>
+
+        <h4>Resposta</h4>
+        <pre id="create-user-body"><code>          
+{
+  "user": {
+      "id": "54eef479-7e5e-4e41-871e-4ebe0d045fb1",
+      "firstName": null,
+      "lastName": null,
+      "email": "thalles@gmail.com",
+      "cpfCnpj": null,
+      "country": null,
+      "discordUserName": null,
+      "numberPhone": null,
+      "age": null,
+      "role": "USER",
+      "createdAt": "2024-11-13T00:57:16.210Z",
+      "updatedAt": "2024-11-13T00:57:16.210Z",
+      "isBanned": false,
+      "isDeleted": false
+  },
+  "accessToken": "eyJhbGciOiJIUzI1N..."
+}
+          </code></pre>
+      </section>
+
+      <!-------------------------------------------------------->
+
+      <section id="endpoints">
+        <article id="get-users">
+          <h3>POST /v1/auth/signIn</h3>
+          <p>Se autenticar na plataforma.</p>
+          <p>
+            A o usuário deve já estar cadastrado, e a senha deve deve conter 8
+            caracteres com um especial uma letra maúscula com minúscula e um
+            número.
+          </p>
+
+          <h4>Request body:</h4>
+          <pre id="auth-sign-in"><code>
+            {
+              "email": "jhon@gmail.com",
+              "password": "#Minhasenha123"
+            }
+                  </code></pre>
+
+          <h4>Response Example:</h4>
+          <button onclick="copyToClipboard('#auth-sign-up')">Copy Body</button>
+          <pre id="auth-sign-up"><code>
+{
+  "user": {
+      "id": "54eef479-7e5e-4e41-871e-4ebe0d045fb1",
+      "firstName": null,
+      "lastName": null,
+      "email": "thalles@gmail.com",
+      "cpfCnpj": null,
+      "country": null,
+      "discordUserName": null,
+      "numberPhone": null,
+      "age": null,
+      "role": "USER",
+      "createdAt": "2024-11-13T00:57:16.210Z",
+      "updatedAt": "2024-11-13T00:57:16.210Z",
+      "isBanned": false,
+      "isDeleted": false
+  },
+  "accessToken": "eyJhbGciOiJIUzI1N..."
+}
+        </code></pre>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2024 API Documentation</p>
+    </footer>
+
+    <script>
+      function copyToClipboard(element) {
+        const text = document.querySelector(element).innerText.trim();
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            alert('Copied to clipboard!');
+          })
+          .catch((err) => {
+            alert('Failed to copy: ' + err);
+          });
+      }
+    </script>
+  </body>
+</html>

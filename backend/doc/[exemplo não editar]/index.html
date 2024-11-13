@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Documentation</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>API Documentation</h1>
+      <p>Comprehensive guide to using the API endpoints.</p>
+    </header>
+
+    <!-- Sumário à esquerda -->
+    <nav>
+      <ul>
+        <li><a href="#authentication">Authentication</a></li>
+        <li><a href="#get-users">GET /api/users</a></li>
+        <li><a href="#create-user">POST /api/users</a></li>
+      </ul>
+    </nav>
+
+    <!-- Conteúdo principal -->
+    <main>
+      <section id="authentication">
+        <h2>Authentication</h2>
+        <p>All requests to the API must include an authorization token.</p>
+        <button onclick="copyToClipboard('#auth-curl')">Copy cURL</button>
+        <pre id="auth-curl"><code>
+      curl -X GET https://api.example.com/resource \
+      -H "Authorization: Bearer YOUR_TOKEN"
+      </code></pre>
+      </section>
+
+      <section id="endpoints">
+        <article id="get-users">
+          <h3>GET /api/users</h3>
+          <p>Sign in authentication</p>
+          <h4>Response Example:</h4>
+          <button onclick="copyToClipboard('#get-users-body')">
+            Copy Body
+          </button>
+          <pre id="get-users-body"><code>
+{
+  "data": [
+    {"id": 1, "name": "John Doe"},
+    {"id": 2, "name": "Jane Smith"}
+  ]
+}
+        </code></pre>
+          <p>Example cURL request to get users:</p>
+          <button onclick="copyToClipboard('#get-users-curl')">
+            Copy cURL
+          </button>
+          <pre id="get-users-curl"><code>
+        curl -X GET https://api.example.com/api/users \
+        -H "Authorization: Bearer YOUR_TOKEN"
+        </code></pre>
+        </article>
+
+        <article id="create-user">
+          <h3>POST /api/users</h3>
+          <p>Create a new user.</p>
+          <h4>Request Example:</h4>
+          <button onclick="copyToClipboard('#create-user-body')">
+            Copy Body
+          </button>
+          <pre id="create-user-body"><code>
+        {
+          "name": "New User",
+          "email": "newuser@example.com"
+        }
+        </code></pre>
+          <p>Example cURL request to create a user:</p>
+          <button onclick="copyToClipboard('#create-user-curl')">
+            Copy cURL
+          </button>
+          <pre id="create-user-curl"><code>
+        curl -X POST https://api.example.com/api/users \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer YOUR_TOKEN" \
+        -d '{"name": "New User", "email": "newuser@example.com"}'
+        </code></pre>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2024 API Documentation</p>
+    </footer>
+
+    <script>
+      function copyToClipboard(element) {
+        const text = document.querySelector(element).innerText.trim();
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            alert('Copied to clipboard!');
+          })
+          .catch((err) => {
+            alert('Failed to copy: ' + err);
+          });
+      }
+    </script>
+  </body>
+</html>
