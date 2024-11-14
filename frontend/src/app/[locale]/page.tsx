@@ -6,7 +6,7 @@ export default function HomePage() {
   const t = useTranslations("HomePage");
 
   return (
-    <div className="px-20 fontDefault">
+    <div className="fontDefault">
       <section>
         <main>
 

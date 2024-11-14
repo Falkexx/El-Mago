@@ -8,7 +8,7 @@ import ShoppingCartBtn from "@/app/components/ShoppingCartBtn";
 
 function Header() {
   return (
-    <header className="bg-[#111111} w-full py-2">
+    <header className="bg-[#111111] text-white w-full py-2">
       <nav className="w-full md:flex md:flex-row md:justify-between md:items-center">
         <section className="w-2/4 md:flex md:flex-row md:items-center md:justify-between">
           <div>
