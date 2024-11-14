@@ -7,8 +7,6 @@ export default function HomePage() {
 
   return (
     <div className="px-20 fontDefault">
-      <Header />
-
       <section>
         <main>
 
