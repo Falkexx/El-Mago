@@ -9,12 +9,15 @@ import envelopeIcon from "@/midias/envelopeIcon.svg";
 import lockIcon from "@/midias/lockIcon.svg"; 
 import eyeOffIcon from "@/midias/eyeOffIcon.svg"; 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+
+  const t = useTranslations("LoginPage");
 
   const handleTogglePassword = () => {
     setShowPassword((prev) => !prev);
@@ -27,7 +30,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#111111] text-foreground flex flex-col items-center">
+    <div className="md:min-h-screen bg-[#111111] text-foreground flex flex-col items-center">
       <main className="flex items-center justify-center flex-1 w-full">
         <div className="bg-[#1a1a1a] rounded-[24px] p-8 shadow-lg w-[504px] max-w-[90%] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-[#43434A]/30">
           <div className="flex justify-center items-center mb-4 pb-2">
@@ -44,7 +47,7 @@ const LoginPage: React.FC = () => {
                 letterSpacing: "-0.02em",
               }}
             >
-              Login
+              {t("login")}
             </button>
             <button
               onClick={() => setActiveTab("register")}
@@ -59,7 +62,7 @@ const LoginPage: React.FC = () => {
                 letterSpacing: "-0.02em",
               }}
             >
-              Register
+              {t("register")}
             </button>
           </div>
           <div className="flex mb-4">
@@ -79,7 +82,7 @@ const LoginPage: React.FC = () => {
             <div className="mb-4 relative">
               <input
                 type="email"
-                placeholder="Email"
+                placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-[#2c2c2c] text-white rounded border border-gray-600 focus:outline-none focus:border-purple-500"
@@ -90,7 +93,7 @@ const LoginPage: React.FC = () => {
             <div className="mb-4 relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder={t("passwordPlaceholder")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-2 bg-[#2c2c2c] text-white rounded border border-gray-600 focus:outline-none focus:border-purple-500"
@@ -109,34 +112,34 @@ const LoginPage: React.FC = () => {
             <div className="flex items-center justify-between mb-6 text-sm text-gray-400">
               <label className="flex items-center">
                 <input type="checkbox" className="mr-2 accent-purple-500" />
-                Remember me
+                {t("rememberme")}
               </label>
-              <a href="#" className="text-purple-400 hover:text-purple-500">Forgot Your Password?</a>
+              <a href="#" className="text-purple-400 hover:text-purple-500">{t("forgotPassword")}</a>
             </div>
 
             <button
               type="submit"
               className="w-full py-3 bg-purple-500 hover:bg-purple-600 text-white rounded font-semibold transition-colors duration-300"
             >
-              {activeTab === "login" ? "Log In" : "Register"}
+              {activeTab === "login" ? t("login") : t("register")}
             </button>
           </form>
 
           <div className="flex items-center my-6">
             <div className="flex-grow border-t border-gray-600"></div>
-            <span className="px-2 text-gray-400">or</span>
+            <span className="px-2 text-gray-400">{t("or")}</span>
             <div className="flex-grow border-t border-gray-600"></div>
           </div>
 
           <div className="flex justify-center gap-4">
             <Link href="/">
-              <Image src={facebookIcon} alt="Facebook" className="w-12 h-12" />
+              <Image src={facebookIcon} alt={t("loginWith") + " Facebook"} className="w-12 h-12" />
             </Link>
             <Link href="/">
-              <Image src={googleIcon} alt="Google" className="w-12 h-12" />
+              <Image src={googleIcon} alt={t("loginWith") + " Google"} className="w-12 h-12" />
             </Link>
             <Link href="/">
-              <Image src={discordIcon} alt="Discord" className="w-12 h-12" />
+              <Image src={discordIcon} alt={t("loginWith") + " Discord"} className="w-12 h-12" />
             </Link>
           </div>
         </div>
