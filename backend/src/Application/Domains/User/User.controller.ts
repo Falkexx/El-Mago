@@ -20,8 +20,6 @@ export class UserController {
       { exposeUnsetFields: false },
     );
 
-    console.log(result);
-
     return result;
   }
 }
