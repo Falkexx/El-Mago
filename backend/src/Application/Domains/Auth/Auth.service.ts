@@ -60,6 +60,7 @@ export class AuthService {
       sub: user.id,
       roles: [user.role],
       isBanned: user.isBanned,
+      softDeleted: user.softDeleted,
     };
 
     const token = this.jwtService.sign(payload);

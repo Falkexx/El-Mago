@@ -24,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
     try {
       const payload: PayloadType = await this.jwtService.verifyAsync(token);
 
-      if (payload.isBanned) {
+      if (payload.isBanned || payload.softDeleted) {
         throw new UnauthorizedException('banned user');
       }
 
