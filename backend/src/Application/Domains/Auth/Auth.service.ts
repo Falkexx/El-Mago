@@ -20,10 +20,9 @@ export class AuthService {
     const token = await this.generateToken(user);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ..._user } = user;
 
     return {
-      user: _user,
+      user,
       accessToken: token,
     };
   }
@@ -47,10 +46,9 @@ export class AuthService {
     const token = await this.generateToken(user);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ..._user } = user;
 
     return {
-      user: _user,
+      user,
       accessToken: token,
     };
   }

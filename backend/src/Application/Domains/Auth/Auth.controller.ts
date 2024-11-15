@@ -3,6 +3,8 @@ import { CreateUserDto } from '../User/dtos/CreateUser.dto';
 import { AuthService } from './Auth.service';
 import { AuthDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { plainToInstance } from 'class-transformer';
+import { UserEntity } from 'src/Application/Entities/User.entity';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -10,12 +12,24 @@ export class AuthController {
 
   @Post('signUp')
   async signUp(@Body() userDto: CreateUserDto) {
-    return this.authService.signUp(userDto);
+    const result = plainToInstance(
+      UserEntity,
+      await this.authService.signUp(userDto),
+      { exposeUnsetFields: true },
+    );
+
+    return result;
   }
 
   @Post('signIn')
   async signIn(@Body() authDto: AuthDto) {
-    return this.authService.sinIn(authDto);
+    const result = plainToInstance(
+      UserEntity,
+      await this.authService.sinIn(authDto),
+      { exposeUnsetFields: true },
+    );
+
+    return result;
   }
 
   @Get('protected')
