@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('user')
@@ -27,6 +28,7 @@ export class UserEntity {
   country: string | null;
 
   @Column({ type: 'varchar', length: 250 })
+  @Exclude()
   password: string;
 
   @Column({
@@ -63,7 +65,7 @@ export class UserEntity {
   isBanned: boolean;
 
   @Column({ type: 'boolean', default: false })
-  isDeleted: boolean;
+  softDeleted: boolean;
 }
 
 export class UserUpdateEntity {

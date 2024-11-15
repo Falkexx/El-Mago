@@ -15,6 +15,7 @@ import { env } from '#utils';
       signOptions: {
         expiresIn: '24h',
       },
+      global: true,
     }),
     UserModule,
   ],
