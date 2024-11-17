@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
+import { AffiliateEntity } from './Affiliate.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -66,6 +67,9 @@ export class UserEntity {
 
   @Column({ type: 'boolean', default: false })
   softDeleted: boolean;
+
+  @OneToOne(() => AffiliateEntity, (affiliate) => affiliate.user)
+  affiliate: AffiliateEntity | null;
 }
 
 export class UserUpdateEntity {
