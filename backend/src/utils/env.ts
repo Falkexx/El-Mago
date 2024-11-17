@@ -38,6 +38,13 @@ const envSchema = z.object({
       message:
         'A senha deve ter 8 carecteres, um especial um maúsculo e um número no mínimo',
     }),
+  BACKEND_BASE_URL: z.string().url(),
+  BACKEND_PORT: z
+    .string()
+    .refine((val) => !isNaN(parseInt(val, 10)), {
+      message: 'POSTGRES_PORT must be a valid number',
+    })
+    .transform((val) => parseInt(val, 10)),
 });
 
 export const env = envSchema.parse(process.env);
