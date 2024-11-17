@@ -11,15 +11,16 @@ import { PaginationProps, PaginationResult } from '#types';
 import { splitKeyAndValue } from '#utils';
 
 @Injectable()
-export class AffiliateRepository implements IAffiliateRepositoryContract {
+export class AffiliateTypeOrmRepository
+  implements IAffiliateRepositoryContract
+{
   constructor(
     @InjectRepository(AffiliateEntity)
     private readonly affiliateRepository: Repository<AffiliateEntity>,
   ) {}
   async create(entity: AffiliateEntity): Promise<AffiliateEntity> {
     try {
-      const affiliateTypeOrmEntity =
-        await this.affiliateRepository.create(entity);
+      const affiliateTypeOrmEntity = this.affiliateRepository.create(entity);
 
       const affiliateCreated = await this.affiliateRepository.save(
         affiliateTypeOrmEntity,
