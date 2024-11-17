@@ -31,6 +31,13 @@ const envSchema = z.object({
     })
     .transform((val) => parseInt(val, 10)),
   REDIS_PASSWORD: z.string(),
+  ADMIN_EMAIL: z.string().email(),
+  ADMIN_PASSWORD: z
+    .string()
+    .regex(/^(?=.*[A-Z])(?=.*[!#@$%&])(?=.*[0-9])(?=.*[a-z]).{8,100}$/, {
+      message:
+        'A senha deve ter 8 carecteres, um especial um maúsculo e um número no mínimo',
+    }),
 });
 
 export const env = envSchema.parse(process.env);
