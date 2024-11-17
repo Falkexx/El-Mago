@@ -1,5 +1,6 @@
-import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './User.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('affiliate')
 export class AffiliateEntity {
@@ -40,6 +41,8 @@ export class AffiliateEntity {
   isSoftDelete: boolean;
 
   @OneToOne(() => UserEntity, (user) => user.affiliate)
+  @JoinColumn()
+  @Exclude()
   user: UserEntity;
 }
 
