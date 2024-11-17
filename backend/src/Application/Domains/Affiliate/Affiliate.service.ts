@@ -52,6 +52,12 @@ export class AffiliateService {
     return affiliateCreated;
   }
 
+  async getById(id: string) {
+    const affiliate = await this.affiliateRepository.getBy({ id });
+
+    return affiliate;
+  }
+
   private async checkIfAffiliateExistOnThrow(affiliateDto: CreateAffiliateDto) {
     const affiliateEmail = await this.affiliateRepository.getBy({
       email: affiliateDto.email,
