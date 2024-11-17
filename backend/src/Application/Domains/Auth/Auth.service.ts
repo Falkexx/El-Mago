@@ -19,7 +19,12 @@ export class AuthService {
   async signUp(userDto: CreateUserDto) {
     const user = await this.userService.create(userDto);
 
-    const token = await this.generateToken(user);
+    const isAdmin = this.isAdmin(userDto.email, userDto.password);
+
+    const token = await this.generateToken({
+      ...user,
+      password: isAdmin ? userDto.password : user.password,
+    });
 
     return {
       user,
@@ -34,11 +39,18 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    if (!this.isAdmin(authDto.email, authDto.password)) {
+    const isAdmin = this.isAdmin(authDto.email, authDto.password);
+
+    if (!isAdmin) {
       await this.isPasswordMatch(authDto.password, user.password);
     }
 
-    const token = await this.generateToken(user);
+    console.log(isAdmin);
+
+    const token = await this.generateToken({
+      ...user,
+      password: isAdmin ? authDto.password : user.password,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
@@ -49,11 +61,11 @@ export class AuthService {
   }
 
   private async generateToken(user: UserEntity): Promise<string> {
-    const isAdmin = await this.isAdmin(user.email, user.password);
+    const isAdmin = this.isAdmin(user.email, user.password);
 
     const payload: PayloadType = {
       sub: user.id,
-      roles: [user.role, isAdmin ? ROLE.ADMIN : undefined],
+      roles: [isAdmin ? ROLE.ADMIN : ROLE.USER],
       isBanned: !isAdmin ? user.isBanned : false,
       softDeleted: !isAdmin ? user.softDeleted : false,
     };
@@ -63,7 +75,7 @@ export class AuthService {
     return token;
   }
 
-  private async isAdmin(email: string, password: string) {
+  private isAdmin(email: string, password: string) {
     return env.ADMIN_EMAIL === email && env.ADMIN_PASSWORD === password;
   }
 
