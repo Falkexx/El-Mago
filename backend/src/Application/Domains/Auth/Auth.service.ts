@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto/auth.dto';
 import { UserEntity } from 'src/Application/Entities/User.entity';
 import * as bcrypt from 'bcrypt';
+import { env } from '#utils';
+import { ROLE } from 'src/@metadata/roles';
 
 @Injectable()
 export class AuthService {
@@ -18,8 +20,6 @@ export class AuthService {
     const user = await this.userService.create(userDto);
 
     const token = await this.generateToken(user);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
     return {
       user,
@@ -34,13 +34,8 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const isThePasswordCorrect = await bcrypt.compare(
-      authDto.password,
-      user.password,
-    );
-
-    if (!isThePasswordCorrect) {
-      throw new UnauthorizedException();
+    if (!this.isAdmin(authDto.email, authDto.password)) {
+      await this.isPasswordMatch(authDto.password, user.password);
     }
 
     const token = await this.generateToken(user);
@@ -54,15 +49,29 @@ export class AuthService {
   }
 
   private async generateToken(user: UserEntity): Promise<string> {
+    const isAdmin = await this.isAdmin(user.email, user.password);
+
     const payload: PayloadType = {
       sub: user.id,
-      roles: [user.role],
-      isBanned: user.isBanned,
-      softDeleted: user.softDeleted,
+      roles: [user.role, isAdmin ? ROLE.ADMIN : undefined],
+      isBanned: !isAdmin ? user.isBanned : false,
+      softDeleted: !isAdmin ? user.softDeleted : false,
     };
 
     const token = this.jwtService.sign(payload);
 
     return token;
+  }
+
+  private async isAdmin(email: string, password: string) {
+    return env.ADMIN_EMAIL === email && env.ADMIN_PASSWORD === password;
+  }
+
+  private async isPasswordMatch(password: string, hashedPassword: string) {
+    const isThePasswordCorrect = await bcrypt.compare(password, hashedPassword);
+
+    if (!isThePasswordCorrect) {
+      throw new UnauthorizedException();
+    }
   }
 }
