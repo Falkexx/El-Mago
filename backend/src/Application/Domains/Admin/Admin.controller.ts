@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CreateAffiliateDto } from '../Affiliate/dtos';
 import { AffiliateService } from '../Affiliate/Affiliate.service';
@@ -12,6 +13,7 @@ import { ApiResponse } from '#types';
 import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { env } from '#utils';
 import { plainToInstance } from 'class-transformer';
+import { GenericPaginationDto } from 'src/utils/validators';
 
 @Controller({ path: 'admin', version: '1' })
 export class AdminController {
@@ -60,6 +62,28 @@ export class AdminController {
         '/v1/admin/affiliate/id/' +
         result.id,
       meta: null,
+    };
+  }
+
+  // GET /my-entities?page=1&limit=5&search=test&filters[status]=active&filters[category]=tech
+
+  @Get('affiliate/many')
+  async getMany(
+    @Query() paginationDto: GenericPaginationDto,
+  ): Promise<ApiResponse<AffiliateEntity[]>> {
+    const result =
+      await this.affiliateService.findWithPaginationAndFilters(paginationDto);
+
+    return {
+      data: result.data,
+      message: 'success',
+      status: 200,
+      meta: {
+        page: result.page,
+        per_page: result.limit,
+        total: result.total,
+        order: result.order ?? 'DESC',
+      },
     };
   }
 }

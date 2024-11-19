@@ -10,6 +10,7 @@ import { CreateAffiliateDto } from './dtos';
 import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { shortId, uuidV4 } from '#utils';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
+import { GenericPaginationDto } from 'src/utils/validators';
 
 @Injectable()
 export class AffiliateService {
@@ -102,5 +103,9 @@ export class AffiliateService {
         'affiliate already exist with game nick name',
       );
     }
+  }
+
+  async findWithPaginationAndFilters(paginationDto: GenericPaginationDto) {
+    return this.affiliateRepository.getWithPaginationAndFilters(paginationDto);
   }
 }

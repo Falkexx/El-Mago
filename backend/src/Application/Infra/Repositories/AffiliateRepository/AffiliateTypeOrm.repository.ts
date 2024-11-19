@@ -7,8 +7,10 @@ import {
 } from 'src/Application/Entities/Affiliate.entity';
 import { Repository } from 'typeorm';
 import { IAffiliateRepositoryContract } from './IAffiliate.repository-contract';
-import { PaginationProps, PaginationResult } from '#types';
+import { PaginationResult } from '#types';
 import { splitKeyAndValue } from '#utils';
+import { GenericPaginationDto } from 'src/utils/validators';
+import { TABLE } from 'src/@metadata/tables';
 
 @Injectable()
 export class AffiliateTypeOrmRepository
@@ -18,6 +20,7 @@ export class AffiliateTypeOrmRepository
     @InjectRepository(AffiliateEntity)
     private readonly affiliateRepository: Repository<AffiliateEntity>,
   ) {}
+
   async create(entity: AffiliateEntity): Promise<AffiliateEntity> {
     try {
       const affiliateTypeOrmEntity = this.affiliateRepository.create(entity);
@@ -92,24 +95,48 @@ export class AffiliateTypeOrmRepository
     }
   }
 
-  async getMany(
-    pagination: PaginationProps,
-  ): Promise<{ data: AffiliateEntity[]; pagination: PaginationResult }> {
-    const [data, total] = await this.affiliateRepository.findAndCount({
-      skip: (pagination.skip - 1) * pagination.take,
-      take: pagination.take,
-    });
-
-    return {
-      data,
-      pagination: {
-        total,
-        ...pagination,
-      },
-    };
-  }
-
   getAll(): Promise<AffiliateEntity[]> {
     return this.affiliateRepository.find();
+  }
+
+  async getWithPaginationAndFilters(
+    paginationDto: GenericPaginationDto,
+  ): Promise<PaginationResult<AffiliateEntity[]>> {
+    const { page, limit, search, filters, order } = paginationDto;
+
+    const queryBuilder = this.affiliateRepository.createQueryBuilder(
+      TABLE.affiliate,
+    );
+    if (search) {
+      queryBuilder.andWhere(
+        `SIMILARITY(${TABLE.affiliate}.name, :search) > 0.3`,
+        {
+          search: `%${search}`,
+        },
+      );
+    }
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        queryBuilder.andWhere(`${TABLE.affiliate}.${key} = :${key}`, {
+          [key]: value,
+        });
+      });
+    }
+
+    queryBuilder.orderBy(`${TABLE.affiliate}.createdAt`, order || 'DESC');
+
+    const [affiliates, total] = await queryBuilder
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
+
+    return {
+      data: affiliates,
+      page,
+      limit,
+      total,
+      order,
+    };
   }
 }
