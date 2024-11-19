@@ -1,8 +1,9 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
+import { TABLE } from 'src/@metadata/tables';
 
-@Entity('affiliate')
+@Entity(TABLE.affiliate)
 export class AffiliateEntity {
   @PrimaryColumn('varchar')
   id: string;
