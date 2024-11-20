@@ -53,6 +53,7 @@ export class UserService {
       isBanned: false,
       isDeleted: false,
       softDeleted: false,
+      affiliate: null,
     } as UserEntity);
 
     const userCreated = await this.userRepository.create(userEntity);

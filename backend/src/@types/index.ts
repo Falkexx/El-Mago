@@ -1,10 +1,13 @@
-export type PaginationProps = {
-  skip: number;
-  take: number;
-};
+export class PaginationProps {
+  page: number;
+  limit: number;
+  sortBy?: string;
+  order?: 'ASC' | 'DESC';
+}
 
-export type PaginationResult = {
+export type PaginationResult<D> = {
   total: number;
+  data: D;
 } & PaginationProps;
 
 export type PayloadType = {
@@ -15,3 +18,16 @@ export type PayloadType = {
 };
 
 export type Auth = { id: string };
+
+export interface ApiResponse<T> {
+  status: number;
+  message: string;
+  data: T;
+  meta?: {
+    total?: number;
+    page?: number;
+    per_page?: number;
+    order: 'ASC' | 'DESC';
+  };
+  href?: string;
+}

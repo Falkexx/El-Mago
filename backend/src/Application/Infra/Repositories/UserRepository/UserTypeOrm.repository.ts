@@ -8,7 +8,9 @@ import {
 import { Repository } from 'typeorm';
 import { IUserRepositoryContract } from './IUserRepository.contract';
 import { splitKeyAndValue } from '#utils';
-import { PaginationProps, PaginationResult } from '#types';
+import { PaginationResult } from '#types';
+import { GenericPaginationDto } from 'src/utils/validators';
+import { TABLE } from 'src/@metadata/tables';
 
 @Injectable()
 export class UserTypeOrmRepository implements IUserRepositoryContract {
@@ -94,20 +96,40 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
     return this.userRepository.find();
   }
 
-  async getMany(
-    pagination: PaginationProps,
-  ): Promise<{ data: UserEntity[]; pagination: PaginationResult }> {
-    const [data, total] = await this.userRepository.findAndCount({
-      skip: (pagination.skip - 1) * pagination.take,
-      take: pagination.take,
-    });
+  async getWithPaginationAndFilters(
+    paginationDto: GenericPaginationDto,
+  ): Promise<PaginationResult<UserEntity[]>> {
+    const { page, limit, search, filters, order } = paginationDto;
+
+    const queryBuilder = this.userRepository.createQueryBuilder(TABLE.user);
+
+    if (search) {
+      queryBuilder.andWhere(`SIMILARITY(${TABLE.user}.name, :search) > 0.3`, {
+        search: `%${search}`,
+      });
+    }
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        queryBuilder.andWhere(`${TABLE.user}.${key} = :${key}`, {
+          [key]: value,
+        });
+      });
+    }
+
+    queryBuilder.orderBy(`${TABLE.user}.createdAt`, order || 'DESC');
+
+    const [users, total] = await queryBuilder
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
 
     return {
-      data,
-      pagination: {
-        total,
-        ...pagination,
-      },
+      data: users,
+      page,
+      limit,
+      total,
+      order,
     };
   }
 }

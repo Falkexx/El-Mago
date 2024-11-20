@@ -1,4 +1,5 @@
-import { PaginationProps, PaginationResult } from '#types';
+import { PaginationResult } from '#types';
+import { GenericPaginationDto } from 'src/utils/validators';
 
 export interface IBaseRepositoryContract<
   Entity,
@@ -10,8 +11,8 @@ export interface IBaseRepositoryContract<
   update(unqRef: UniqueEntityRefs, updateEntity: UpdateEntity): Promise<Entity>;
   delete(unqRef: UniqueEntityRefs): Promise<void>;
   softDelete(unqRef: UniqueEntityRefs): Promise<'success' | 'fail'>;
-  getMany(
-    pagination: PaginationProps,
-  ): Promise<{ data: Entity[]; pagination: PaginationResult }>;
   getAll(): Promise<Entity[]>;
+  getWithPaginationAndFilters(
+    paginationDto: GenericPaginationDto,
+  ): Promise<PaginationResult<Entity[]>>;
 }

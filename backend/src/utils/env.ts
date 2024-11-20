@@ -31,6 +31,31 @@ const envSchema = z.object({
     })
     .transform((val) => parseInt(val, 10)),
   REDIS_PASSWORD: z.string(),
+  ADMIN_EMAIL: z.string().email(),
+  ADMIN_PASSWORD: z
+    .string()
+    .regex(/^(?=.*[A-Z])(?=.*[!#@$%&])(?=.*[0-9])(?=.*[a-z]).{8,100}$/, {
+      message:
+        'A senha deve ter 8 carecteres, um especial um maúsculo e um número no mínimo',
+    }),
+  BACKEND_BASE_URL: z.string().url(),
+  BACKEND_PORT: z
+    .string()
+    .refine((val) => !isNaN(parseInt(val, 10)), {
+      message: 'POSTGRES_PORT must be a valid number',
+    })
+    .transform((val) => parseInt(val, 10)),
+
+  DATABASE_LOG: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val.toLowerCase() === 'true' || val.toLowerCase() === 'false',
+      {
+        message: "DATABASE_LOG must be 'true' or 'false'",
+      },
+    )
+    .transform((val) => val.toLowerCase() === 'true'),
 });
 
 export const env = envSchema.parse(process.env);
