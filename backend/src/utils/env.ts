@@ -45,6 +45,17 @@ const envSchema = z.object({
       message: 'POSTGRES_PORT must be a valid number',
     })
     .transform((val) => parseInt(val, 10)),
+
+  DATABASE_LOG: z
+    .string()
+    .optional()
+    .refine(
+      (val) => val.toLowerCase() === 'true' || val.toLowerCase() === 'false',
+      {
+        message: "DATABASE_LOG must be 'true' or 'false'",
+      },
+    )
+    .transform((val) => val.toLowerCase() === 'true'),
 });
 
 export const env = envSchema.parse(process.env);

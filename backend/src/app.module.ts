@@ -20,7 +20,7 @@ import { AdminModule } from './Application/Domains/Admin/Admin.module';
       migrations: [`${__dirname}/migrations/{.ts,*js}`],
       migrationsRun: true,
       synchronize: false,
-      logging: 'all',
+      logging: env.DATABASE_LOG,
     }),
 
     AuthModule,
