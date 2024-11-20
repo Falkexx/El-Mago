@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateAffiliateDto } from '../Affiliate/dtos';
 import { AffiliateService } from '../Affiliate/Affiliate.service';
@@ -14,12 +15,17 @@ import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { env } from '#utils';
 import { plainToInstance } from 'class-transformer';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { JwtAuthGuard } from '../Auth/guards/jwt-auth.guard';
+import { RoleGuard } from '../Auth/guards/role.guard';
+import { ROLE, RolesDecorator } from 'src/utils/role';
 
 @Controller({ path: 'admin', version: '1' })
 export class AdminController {
   constructor(private readonly affiliateService: AffiliateService) {}
 
   @Post('affiliate')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN)
   async createAffiliate(
     @Body() affiliateDto: CreateAffiliateDto,
   ): Promise<ApiResponse<AffiliateEntity>> {
@@ -43,6 +49,8 @@ export class AdminController {
   }
 
   @Get('affiliate/id/:id')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN)
   async getAffiliate(
     @Param('id') id: string,
   ): Promise<ApiResponse<AffiliateEntity | null>> {
@@ -68,6 +76,8 @@ export class AdminController {
   // GET /my-entities?page=1&limit=5&search=test&filters[status]=active&filters[category]=tech
 
   @Get('affiliate/many')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN)
   async getMany(
     @Query() paginationDto: GenericPaginationDto,
   ): Promise<ApiResponse<AffiliateEntity[]>> {
@@ -85,5 +95,12 @@ export class AdminController {
         order: result.order ?? 'DESC',
       },
     };
+  }
+
+  @Get('test')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN)
+  onlyAdminCanAccess() {
+    return 'allow access';
   }
 }
