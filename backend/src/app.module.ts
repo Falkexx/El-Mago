@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { env } from './utils';
 import { UserModule } from './Application/Domains/User/User.module';
 import { AuthModule } from './Application/Domains/Auth/Auth.module';
 import { AdminModule } from './Application/Domains/Admin/Admin.module';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { AdminModule } from './Application/Domains/Admin/Admin.module';
       migrations: [`${__dirname}/migrations/{.ts,*js}`],
       migrationsRun: true,
       synchronize: false,
-      logging: 'all',
+      logging: env.DATABASE_LOG,
     }),
 
     AuthModule,
@@ -28,6 +29,15 @@ import { AdminModule } from './Application/Domains/Admin/Admin.module';
     AdminModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true, // Transforma os parâmetros automaticamente
+        whitelist: true, // Remove campos não validados
+      }),
+    },
+    AppService,
+  ],
 })
 export class AppModule {}

@@ -6,13 +6,16 @@ import { User } from '../Auth/decorators/User.decorator';
 import { PayloadType } from '#types';
 import { plainToInstance } from 'class-transformer';
 import { UserEntity } from 'src/Application/Entities/User.entity';
+import { RoleGuard } from '../Auth/guards/role.guard';
+import { ROLE, RolesDecorator } from 'src/utils/role';
 
 @Controller({ path: 'user', version: '1' })
 export class UserController {
   constructor(private readonly updateUserService: UpdateUserService) {}
 
   @Patch()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.USER)
   async updateUser(@User() user: PayloadType, @Body() userDto: UpdateUserDto) {
     const result = plainToInstance(
       UserEntity,
