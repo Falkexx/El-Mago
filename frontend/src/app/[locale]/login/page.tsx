@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { Link } from "@/i18n/routing";
-import facebookIcon from "@/midias/facebookIcon.svg";
-import googleIcon from "@/midias/googleIcon.svg";
-import discordIcon from "@/midias/discordIcon.svg";
-import envelopeIcon from "@/midias/envelopeIcon.svg";
-import lockIcon from "@/midias/lockIcon.svg";
-import eyeOffIcon from "@/midias/eyeOffIcon.svg";
+import facebookIcon from "@/midias/Icons/facebookIcon.svg";
+import googleIcon from "@/midias/Icons/googleIcon.svg";
+import discordIcon from "@/midias/Icons/discordIcon.svg";
+import envelopeIcon from "@/midias/Icons/envelopeIcon.svg";
+import lockIcon from "@/midias/Icons/lockIcon.svg";
+import eyeOffIcon from "@/midias/Icons/eyeOffIcon.svg";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
