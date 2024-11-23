@@ -8,6 +8,7 @@ import { env } from '#utils';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableVersioning();
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(env.BACKEND_PORT ?? 3000);
 }
