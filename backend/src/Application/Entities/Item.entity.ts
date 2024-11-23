@@ -17,6 +17,12 @@ export class ItemEntity {
   id: string;
 
   @Column({ type: 'varchar' })
+  name: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  description: string | null;
+
+  @Column({ type: 'varchar' })
   type: ItemType;
 
   @Column({ type: 'int', nullable: true })
@@ -24,9 +30,6 @@ export class ItemEntity {
 
   @Column({ type: 'boolean' })
   isInfinite: boolean;
-
-  @Column({ type: 'varchar' })
-  name: string;
 
   @Column({ type: 'decimal', precision: 5 })
   price: number;
@@ -37,6 +40,12 @@ export class ItemEntity {
   @OneToOne(() => ImageEntity, (image) => image.item)
   @JoinColumn()
   image: ImageEntity;
+
+  @Column({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamptz', update: true })
+  updatedAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.items)
   user: UserEntity;
