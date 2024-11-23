@@ -45,8 +45,6 @@ export class AuthService {
       await this.isPasswordMatch(authDto.password, user.password);
     }
 
-    console.log(isAdmin);
-
     const token = await this.generateToken({
       ...user,
       password: isAdmin ? authDto.password : user.password,
