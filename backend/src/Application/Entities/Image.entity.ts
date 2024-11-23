@@ -28,6 +28,9 @@ export class ImageEntity {
   @Column({ type: 'timestamptz', update: true })
   updatedAt: Date;
 
+  @Column({ type: 'boolean', default: false })
+  softDeleted: boolean;
+
   @OneToOne(() => ItemEntity, (item) => item.image)
   item: ItemEntity;
 }
