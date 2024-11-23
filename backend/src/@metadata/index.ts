@@ -3,3 +3,8 @@ export enum ItemType {
   UNIQUE = 'UNIQUE',
   LEGENDARY = 'LEGENDARY',
 }
+
+export enum STORAGE_PROVIDER {
+  S3 = 'S3',
+  FIRE_STORAGE = 'FIRE_STORAGE',
+}
