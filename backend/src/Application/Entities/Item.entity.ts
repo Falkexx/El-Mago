@@ -48,6 +48,9 @@ export class ItemEntity {
   @Column({ type: 'timestamptz', update: true })
   updatedAt: Date;
 
+  @Column({ type: 'varchar', array: true })
+  tags: string[];
+
   @ManyToOne(() => UserEntity, (user) => user.items)
   @Exclude()
   user: UserEntity;

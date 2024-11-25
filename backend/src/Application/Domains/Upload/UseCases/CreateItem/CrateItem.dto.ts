@@ -1,5 +1,7 @@
 import { Transform } from 'class-transformer';
 import {
+  ArrayMinSize,
+  IsArray,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -29,6 +31,18 @@ export class CreateItemBodyDto {
   @IsNumber()
   @Min(0)
   price: number;
+
+  @Transform(({ value }) => {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @ArrayMinSize(1)
+  tags: string[];
 
   @IsNotEmpty()
   @IsString()

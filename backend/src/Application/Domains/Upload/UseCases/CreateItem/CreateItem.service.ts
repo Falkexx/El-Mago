@@ -66,6 +66,7 @@ export class CreateItemService {
       createdAt: new Date(),
       updatedAt: new Date(),
       user: user,
+      tags: createItemDto.tags,
     } as ItemEntity);
 
     const itemCreated = await this.itemRepository.create(itemEntity);
