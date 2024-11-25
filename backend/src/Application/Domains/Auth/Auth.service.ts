@@ -63,7 +63,7 @@ export class AuthService {
 
     const payload: PayloadType = {
       sub: user.id,
-      roles: [isAdmin ? ROLE.ADMIN : ROLE.USER],
+      roles: [isAdmin ? ROLE.ADMIN : user.role],
       isBanned: !isAdmin ? user.isBanned : false,
       isDeleted: !isAdmin ? user.isDeleted : false,
     };
