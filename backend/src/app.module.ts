@@ -8,6 +8,7 @@ import { AuthModule } from './Application/Domains/Auth/Auth.module';
 import { AdminModule } from './Application/Domains/Admin/Admin.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ItemModule } from './Application/Domains/Upload/Item.module';
+import { CategoryModule } from './Application/Domains/Category/Category.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ItemModule } from './Application/Domains/Upload/Item.module';
     UserModule,
     AdminModule,
     ItemModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [

@@ -29,7 +29,6 @@ export class CategoryUpdateEntity {
   description: Pick<CategoryEntity, 'description'>;
   isDeleted: Pick<CategoryEntity, 'isDeleted'> | boolean;
   updatedAt: Pick<CategoryEntity, 'updatedAt'>;
-  // isDeleted: Pick<CategoryEntity, 'isDeleted'>;
 }
 
 export type CategoryUniqueRefs =
