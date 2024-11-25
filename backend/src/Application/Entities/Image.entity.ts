@@ -30,7 +30,7 @@ export class ImageEntity {
   updatedAt: Date;
 
   @Column({ type: 'boolean', default: false })
-  softDeleted: boolean;
+  isDeleted: boolean;
 
   @OneToOne(() => ItemEntity, (item) => item.image)
   item: ItemEntity;
@@ -42,6 +42,7 @@ export class ImageUpdateEntity {
   url: string;
   bucket: string;
   storageProvider: string;
+  isDeleted: boolean;
 }
 
 export type ImageUniqueRef = { id: string } | { url: string };

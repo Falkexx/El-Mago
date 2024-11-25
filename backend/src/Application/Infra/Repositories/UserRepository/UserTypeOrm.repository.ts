@@ -85,7 +85,13 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      await this.userRepository.delete({ [key]: value });
+      const user = await this.userRepository.findOne({ [key]: value });
+
+      const newUser = Object.assign(user, {
+        isDeleted: true,
+      } as UserUpdateEntity);
+
+      await this.userRepository.save(newUser);
       return 'success';
     } catch {
       return 'fail';

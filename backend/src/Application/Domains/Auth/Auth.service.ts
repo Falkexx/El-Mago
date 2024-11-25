@@ -65,7 +65,7 @@ export class AuthService {
       sub: user.id,
       roles: [isAdmin ? ROLE.ADMIN : ROLE.USER],
       isBanned: !isAdmin ? user.isBanned : false,
-      softDeleted: !isAdmin ? user.softDeleted : false,
+      isDeleted: !isAdmin ? user.isDeleted : false,
     };
 
     const token = this.jwtService.sign(payload);

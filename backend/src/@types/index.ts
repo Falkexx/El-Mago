@@ -14,7 +14,7 @@ export type PayloadType = {
   sub: string;
   roles: string[];
   isBanned: boolean;
-  softDeleted: boolean;
+  isDeleted: boolean;
 };
 
 export type Auth = { id: string };

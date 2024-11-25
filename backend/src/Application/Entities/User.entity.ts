@@ -67,7 +67,7 @@ export class UserEntity {
   isBanned: boolean;
 
   @Column({ type: 'boolean', default: false })
-  softDeleted: boolean;
+  isDeleted: boolean;
 
   @OneToOne(() => AffiliateEntity, (affiliate) => affiliate.user)
   affiliate: AffiliateEntity | null;
@@ -85,6 +85,7 @@ export class UserUpdateEntity {
   numberPhone: string;
   role: 'ADMIN' | 'AFFILIATE' | 'USER'; // default: user
   isBanned: boolean;
+  isDeleted: boolean;
 }
 
 export type UserEntityUniqueRefs =
