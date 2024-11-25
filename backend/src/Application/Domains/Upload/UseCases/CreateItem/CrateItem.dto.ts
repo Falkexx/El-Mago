@@ -47,6 +47,10 @@ export class CreateItemBodyDto {
   @IsNotEmpty()
   @IsString()
   description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  categoryId: string;
 }
 
 export class CreateItemImageDto {

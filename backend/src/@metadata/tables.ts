@@ -3,4 +3,5 @@ export enum TABLE {
   affiliate = 'affiliate',
   item = 'item',
   image = 'image',
+  category = 'category',
 }

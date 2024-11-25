@@ -1,0 +1,41 @@
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { ItemEntity } from './Item.entity';
+
+@Entity('category')
+export class CategoryEntity {
+  @PrimaryColumn({ type: 'varchar' })
+  id: string;
+
+  @Column({ type: 'varchar', unique: true, length: 150 })
+  name: string;
+
+  @Column({ type: 'varchar', nullable: true, length: 150 })
+  description: string | null;
+
+  @Column({ type: 'varchar', nullable: true, length: 150 })
+  html: string;
+
+  @Column({ type: 'varchar', default: false })
+  isDeleted: boolean;
+
+  @Column({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamptz', update: true })
+  updatedAt: Date;
+
+  @OneToMany(() => ItemEntity, (item) => item.Category)
+  Items: ItemEntity[];
+}
+
+export class CategoryUpdateEntity {
+  description: Pick<CategoryEntity, 'description'>;
+  html: Pick<CategoryEntity, 'html'>;
+  isDeleted: Pick<CategoryEntity, 'isDeleted'> | boolean;
+  updatedAt: Pick<CategoryEntity, 'updatedAt'>;
+  // isDeleted: Pick<CategoryEntity, 'isDeleted'>;
+}
+
+export type CategoryUniqueRefs =
+  | Pick<CategoryEntity, 'id'>
+  | Pick<CategoryEntity, 'name'>;

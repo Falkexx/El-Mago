@@ -8,6 +8,8 @@ import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { ImageEntity } from 'src/Application/Entities/Image.entity';
 import { ItemTypeOrmRepository } from './ItemRepository/ItemTypeOrm.repository';
 import { ImageTypeormRepository } from './ImageRepository/ImageTypeOrm.repository';
+import { CategoryTypeOrmRepository } from './Category/CategoryTypeorm.repository';
+import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { ImageTypeormRepository } from './ImageRepository/ImageTypeOrm.repositor
       AffiliateEntity,
       ItemEntity,
       ImageEntity,
+      CategoryEntity,
     ]),
   ],
   providers: [
@@ -23,6 +26,7 @@ import { ImageTypeormRepository } from './ImageRepository/ImageTypeOrm.repositor
     AffiliateTypeOrmRepository,
     ItemTypeOrmRepository,
     ImageTypeormRepository,
+    CategoryTypeOrmRepository,
   ],
   exports: [TypeOrmModule],
 })

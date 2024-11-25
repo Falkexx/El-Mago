@@ -3,13 +3,18 @@ import { CreateItemDto } from './CrateItem.dto';
 import { shortId } from '#utils';
 import { ItemType } from 'src/@metadata';
 import { ImageEntity } from 'src/Application/Entities/Image.entity';
-import { Inject, UnauthorizedException } from '@nestjs/common';
+import {
+  Inject,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { Auth } from '#types';
 import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
 import { IIMageRepositoryContract } from 'src/Application/Infra/Repositories/ImageRepository/IImage.repository-contract';
 import { ROLE } from 'src/@metadata/roles';
+import { ICategoryRepositoryContract } from 'src/Application/Infra/Repositories/Category/ICategory.repository-contract';
 
 export class CreateItemService {
   constructor(
@@ -19,6 +24,8 @@ export class CreateItemService {
     private readonly itemRepository: IItemRepositoryContract,
     @Inject(KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT)
     private readonly imageRepository: IIMageRepositoryContract,
+    @Inject(KEY_INJECTION.CATEGORY_REPOSITORY)
+    private readonly categoryRepository: ICategoryRepositoryContract,
   ) {}
 
   async execute(auth: Auth, createItemDto: CreateItemDto) {
@@ -32,6 +39,14 @@ export class CreateItemService {
       throw new UnauthorizedException('only admin must be create common item');
     }
 
+    const category = await this.categoryRepository.getBy({
+      id: createItemDto.categoryId,
+    });
+
+    if (!category) {
+      throw new NotFoundException('category not found');
+    }
+
     const imageId = shortId();
     const imageEntity = Object.assign(new ImageEntity(), {
       id: imageId,
@@ -39,7 +54,7 @@ export class CreateItemService {
       bucket: 's3/bucket-name',
       createdAt: new Date(),
       mimeType: createItemDto.image.mimetype,
-      softDeleted: false,
+      isDeleted: false,
       storageProvider: 'S3',
       updatedAt: new Date(),
       url:
@@ -67,6 +82,7 @@ export class CreateItemService {
       updatedAt: new Date(),
       user: user,
       tags: createItemDto.tags,
+      Category: category,
     } as ItemEntity);
 
     const itemCreated = await this.itemRepository.create(itemEntity);

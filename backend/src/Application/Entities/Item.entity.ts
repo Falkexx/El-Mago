@@ -11,6 +11,7 @@ import { ItemType } from 'src/@metadata';
 import { TABLE } from 'src/@metadata/tables';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
+import { CategoryEntity } from './Category.entity';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -54,6 +55,9 @@ export class ItemEntity {
   @ManyToOne(() => UserEntity, (user) => user.items)
   @Exclude()
   user: UserEntity;
+
+  @ManyToOne(() => CategoryEntity, (category) => category.Items)
+  Category: CategoryEntity;
 }
 
 export class ItemUpdateEntity {

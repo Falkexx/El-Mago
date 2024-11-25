@@ -6,6 +6,7 @@ import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRe
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
 import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/ImageRepository/ImageTypeOrm.repository';
 import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRepository/ItemTypeOrm.repository';
+import { CategoryTypeOrmRepository } from 'src/Application/Infra/Repositories/Category/CategoryTypeorm.repository';
 
 @Module({
   imports: [RepositoriesModule],
@@ -22,6 +23,10 @@ import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRe
     {
       provide: KEY_INJECTION.ITEM_REPOSITORY_CONTRACT,
       useClass: ItemTypeOrmRepository,
+    },
+    {
+      provide: KEY_INJECTION.CATEGORY_REPOSITORY,
+      useClass: CategoryTypeOrmRepository,
     },
     CreateItemService,
   ],
