@@ -45,8 +45,6 @@ export class AuthService {
       await this.isPasswordMatch(authDto.password, user.password);
     }
 
-    console.log(isAdmin);
-
     const token = await this.generateToken({
       ...user,
       password: isAdmin ? authDto.password : user.password,
@@ -65,9 +63,9 @@ export class AuthService {
 
     const payload: PayloadType = {
       sub: user.id,
-      roles: [isAdmin ? ROLE.ADMIN : ROLE.USER],
+      roles: [isAdmin ? ROLE.ADMIN : user.role],
       isBanned: !isAdmin ? user.isBanned : false,
-      softDeleted: !isAdmin ? user.softDeleted : false,
+      isDeleted: !isAdmin ? user.isDeleted : false,
     };
 
     const token = this.jwtService.sign(payload);

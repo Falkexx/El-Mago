@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { AffiliateEntity } from './Affiliate.entity';
+import { ItemEntity } from './Item.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -66,10 +67,13 @@ export class UserEntity {
   isBanned: boolean;
 
   @Column({ type: 'boolean', default: false })
-  softDeleted: boolean;
+  isDeleted: boolean;
 
   @OneToOne(() => AffiliateEntity, (affiliate) => affiliate.user)
   affiliate: AffiliateEntity | null;
+
+  @OneToMany(() => ItemEntity, (items) => items.user)
+  items: ItemEntity[];
 }
 
 export class UserUpdateEntity {
@@ -81,6 +85,7 @@ export class UserUpdateEntity {
   numberPhone: string;
   role: 'ADMIN' | 'AFFILIATE' | 'USER'; // default: user
   isBanned: boolean;
+  isDeleted: boolean;
 }
 
 export type UserEntityUniqueRefs =
