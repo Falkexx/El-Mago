@@ -12,6 +12,7 @@ import { shortId } from '#utils';
 import { Auth } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { ROLE } from 'src/@metadata/roles';
+import { GenericPaginationDto } from 'src/utils/validators';
 
 @Injectable()
 export class CategoryService {
@@ -49,5 +50,9 @@ export class CategoryService {
       await this.categoryRepository.create(categoryEntity);
 
     return categoryCreated;
+  }
+
+  async findWithPaginationAndFilters(paginationDto: GenericPaginationDto) {
+    return this.categoryRepository.getWithPaginationAndFilters(paginationDto);
   }
 }
