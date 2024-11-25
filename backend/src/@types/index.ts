@@ -17,7 +17,7 @@ export type PayloadType = {
   isDeleted: boolean;
 };
 
-export type Auth = { id: string };
+export type Auth = { id: string; roles: string[] };
 
 export interface ApiResponse<T> {
   status: number;

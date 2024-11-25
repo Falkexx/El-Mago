@@ -25,7 +25,10 @@ export class ItemController {
   ): Promise<ApiResponse<ItemEntity>> {
     const result = plainToInstance(
       ItemEntity,
-      await this.createItemService.execute({ id: payload.sub }, itemDto),
+      await this.createItemService.execute(
+        { id: payload.sub, roles: payload.roles },
+        itemDto,
+      ),
       { exposeUnsetFields: false },
     );
 
