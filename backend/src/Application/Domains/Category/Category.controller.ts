@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { CategoryService } from './Category.service';
 import { ApiResponse, PayloadType } from '#types';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';
@@ -7,6 +7,7 @@ import { CreateCategoryDto } from './dtos/CreateCategory.dto';
 import { JwtAuthGuard } from '../Auth/guards/jwt-auth.guard';
 import { RoleGuard } from '../Auth/guards/role.guard';
 import { ROLE, RolesDecorator } from 'src/utils/role';
+import { GenericPaginationDto } from 'src/utils/validators';
 
 @Controller({ path: 'category', version: '1' })
 export class CategoryController {
@@ -29,6 +30,26 @@ export class CategoryController {
       message: 'success',
       status: 201,
       href: 'not implemented',
+    };
+  }
+
+  @Get('many')
+  async many(
+    @Query() paginationDto: GenericPaginationDto,
+  ): Promise<ApiResponse<CategoryEntity[]>> {
+    const result =
+      await this.categoryService.findWithPaginationAndFilters(paginationDto);
+    return {
+      data: result.data,
+      message: 'success',
+      status: 200,
+      href: '',
+      meta: {
+        order: result.order,
+        page: result.page,
+        per_page: result.limit,
+        total: result.total,
+      },
     };
   }
 }
