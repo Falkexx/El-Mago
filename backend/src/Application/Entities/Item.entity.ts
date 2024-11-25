@@ -10,6 +10,7 @@ import { ImageEntity } from './Image.entity';
 import { ItemType } from 'src/@metadata';
 import { TABLE } from 'src/@metadata/tables';
 import { UserEntity } from './User.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -48,6 +49,7 @@ export class ItemEntity {
   updatedAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.items)
+  @Exclude()
   user: UserEntity;
 }
 

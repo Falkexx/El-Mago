@@ -1,0 +1,75 @@
+import { ItemEntity } from 'src/Application/Entities/Item.entity';
+import { CreateItemDto } from './CrateItem.dto';
+import { shortId } from '#utils';
+import { ItemType } from 'src/@metadata';
+import { ImageEntity } from 'src/Application/Entities/Image.entity';
+import { Inject, UnauthorizedException } from '@nestjs/common';
+import { KEY_INJECTION } from 'src/@metadata/keys';
+import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
+import { Auth } from '#types';
+import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
+import { IIMageRepositoryContract } from 'src/Application/Infra/Repositories/ImageRepository/IImage.repository-contract';
+import { ROLE } from 'src/@metadata/roles';
+
+export class CreateItemService {
+  constructor(
+    @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
+    private readonly userRepository: IUserRepositoryContract,
+    @Inject(KEY_INJECTION.ITEM_REPOSITORY_CONTRACT)
+    private readonly itemRepository: IItemRepositoryContract,
+    @Inject(KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT)
+    private readonly imageRepository: IIMageRepositoryContract,
+  ) {}
+
+  async execute(auth: Auth, createItemDto: CreateItemDto) {
+    const user = await this.userRepository.getBy({ id: auth.id });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    if (user.role !== ROLE.ADMIN && createItemDto.type === ItemType.COMMON) {
+      throw new UnauthorizedException('only admin must be create common item');
+    }
+
+    const imageId = shortId();
+    const imageEntity = Object.assign(new ImageEntity(), {
+      id: imageId,
+      name: createItemDto.image.originalname,
+      bucket: 's3/bucket-name',
+      createdAt: new Date(),
+      mimeType: createItemDto.image.mimetype,
+      softDeleted: false,
+      storageProvider: 'S3',
+      updatedAt: new Date(),
+      url:
+        'http://aws.s3.el-mago/s3/bucket-name/' +
+        createItemDto.image.originalname +
+        '-' +
+        imageId,
+      item: undefined,
+    } as ImageEntity);
+
+    const imageCrated = await this.imageRepository.create(imageEntity);
+
+    const itemEntity = Object.assign(new ItemEntity(), {
+      id: shortId(),
+      name: createItemDto.name,
+      description: createItemDto.description,
+      type: createItemDto.type,
+      amount:
+        createItemDto.type !== ItemType.COMMON ? createItemDto.amount : null,
+      isInfinite: createItemDto.type === ItemType.COMMON,
+      price: createItemDto.price,
+      softDeleted: false,
+      image: imageCrated,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      user: user,
+    } as ItemEntity);
+
+    const itemCreated = await this.itemRepository.create(itemEntity);
+
+    return itemCreated;
+  }
+}
