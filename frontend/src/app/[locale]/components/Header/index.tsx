@@ -2,9 +2,9 @@ import Image from "next/image";
 import Logo from "@/midias/logo.svg";
 
 import { Link } from "@/i18n/routing";
-import CurrencyBtn from "@/app/[locale]/components/CurrencyBtn";
-import MyAccountBtn from "@/app/[locale]/components/MyAccountBtn";
-import ShoppingCartBtn from "@/app/[locale]/components/ShoppingCartBtn";
+import CurrencyBtn from "@/app/[locale]/components/Ui/Buttons/CurrencyBtn";
+import MyAccountBtn from "@/app/[locale]/components/Ui/Buttons/MyAccountBtn";
+import ShoppingCartBtn from "@/app/[locale]/components/Ui/Buttons/ShoppingCartBtn";
 
 function Header() {
 
@@ -22,7 +22,7 @@ function Header() {
           <div className="fontDefault">
             <ul className="md:w-full md:flex md:flex-row md:gap-4">
               <li>
-                <Link href="/Home">Home</Link>
+                <Link href="/">Home</Link>
               </li>
 
               <li>

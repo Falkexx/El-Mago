@@ -3,22 +3,23 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import "@/app/globals.css";
-import Header from "./Header";
+import Header from "./components/Header";
 
 export default async function LocaleLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: { locale: any };
 }) {
-  const { locale }: any = params;
+  const locale = params?.locale; // Garantir que params existe antes de acessar locale
 
-  // Certifique-se de validar o locale de forma segura
-  if (!routing.locales.includes(locale)) {
+  // Validação do locale
+  if (!locale || !routing.locales.includes(locale)) {
     notFound();
   }
 
+  // Obtém mensagens com base no locale
   const messages = await getMessages(locale);
 
   return (

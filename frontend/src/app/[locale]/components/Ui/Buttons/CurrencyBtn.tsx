@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import nookies from "nookies";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import arrowDonw from '@/midias/Icons/arrow-down.svg'
+import arrowDonw from "@/midias/Icons/arrow-down.svg";
 
 interface FlagInfo {
   flagUrl: string;
@@ -29,11 +29,11 @@ const Flags: FlagInfo[] = [
 function CurrencyBtn() {
   const locale = useLocale();
   const router = useRouter();
+  const pathname = usePathname();
   const [selectedFlag, setSelectedFlag] = useState<FlagInfo>(
     Flags.find((flag) => flag.locale === locale) || Flags[0]
   );
   const [isOpen, setIsOpen] = useState(false);
-  const [pathName, setPathName] = useState<string>("");
 
   // Sincronizar a bandeira selecionada com o locale atual
   useEffect(() => {
@@ -42,11 +42,6 @@ function CurrencyBtn() {
       setSelectedFlag(matchingFlag);
     }
   }, [locale]);
-
-  // Obter o pathName no cliente
-  useEffect(() => {
-    setPathName(window.location.pathname);
-  }, []);
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
@@ -61,7 +56,7 @@ function CurrencyBtn() {
     });
 
     // Montar a nova URL com o novo idioma
-    const segments = pathName.split("/").filter(Boolean); // Dividir e limpar segmentos
+    const segments = pathname.split("/").filter(Boolean); // Dividir e limpar segmentos
     if (Flags.some((f) => f.locale === segments[0])) {
       segments[0] = flag.locale; // Substituir o locale na rota
     } else {
@@ -70,6 +65,7 @@ function CurrencyBtn() {
 
     // Redirecionar para a nova URL
     const newPath = `/${segments.join("/")}`;
+    console.log("Nova url:", newPath);
     router.push(newPath);
   };
 
