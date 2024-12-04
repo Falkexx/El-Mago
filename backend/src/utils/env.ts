@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { STORAGE_PROVIDER } from 'src/@metadata';
 
 import { z } from 'zod';
 
@@ -58,6 +59,12 @@ const envSchema = z.object({
     .transform((val) => val.toLowerCase() === 'true'),
   AWS_S3_ACCESS_KEY_ID: z.string(),
   AWS_S3_SECRET_ACCESS_KEY_ID: z.string(),
+  STORAGE_PROVIDER: z
+    .string()
+    .transform((val) => val.toUpperCase())
+    .refine((val) => Object.values(STORAGE_PROVIDER).includes(val as any), {
+      message: `O valor deve ser um dos seguintes: ${Object.values(STORAGE_PROVIDER).join(', ')}`,
+    }),
 });
 
 export const env = envSchema.parse(process.env);

@@ -6,7 +6,7 @@ export enum ItemType {
 
 export enum STORAGE_PROVIDER {
   S3 = 'S3',
-  FIRE_STORAGE = 'FIRE_STORAGE',
+  LOCAL = 'LOCAL',
 }
 
 export enum BUCKET_NAME {
