@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ItemController } from './Item.controller';
-import { CreateItemService } from './UseCases/CreateItem/CreateItem.service';
+import { CreateItemService } from '../Item/UseCases/CreateItem/CreateItem.service';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';

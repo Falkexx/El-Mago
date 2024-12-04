@@ -1,8 +1,8 @@
 import { Controller, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateItem } from './UseCases/CreateItem/CreateItem.decorator';
-import { CreateItemDto } from './UseCases/CreateItem/CrateItem.dto';
-import { CreateItemService } from './UseCases/CreateItem/CreateItem.service';
+import { CreateItem } from '../Item/UseCases/CreateItem/CreateItem.decorator';
+import { CreateItemDto } from '../Item/UseCases/CreateItem/CrateItem.dto';
+import { CreateItemService } from '../Item/UseCases/CreateItem/CreateItem.service';
 import { JwtAuthGuard } from '../Auth/guards/jwt-auth.guard';
 import { RoleGuard } from '../Auth/guards/role.guard';
 import { User } from '../Auth/decorators/User.decorator';
