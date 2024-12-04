@@ -16,6 +16,7 @@ import { IIMageRepositoryContract } from 'src/Application/Infra/Repositories/Ima
 import { ROLE } from 'src/@metadata/roles';
 import { ICategoryRepositoryContract } from 'src/Application/Infra/Repositories/Category/ICategory.repository-contract';
 import { StorageService } from 'src/Application/Infra/Storage/Storage.service';
+import { env } from 'process';
 
 export class CreateItemService {
   constructor(
@@ -52,7 +53,7 @@ export class CreateItemService {
     const imageId = shortId();
 
     const imageUploadResult = await this.storageService.upload({
-      bucket: 'item-images-bucket-teste',
+      bucket: env.PUBLIC_IMAGES_BUCKET_NAME,
       file: createItemDto.image,
       mimetype: createItemDto.image.mimetype,
       name: generateImageId(createItemDto.image.originalname),
