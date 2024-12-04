@@ -3,7 +3,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import "@/app/globals.css";
-import Header from "./Header";
+import Header from "./components/Header";
 
 export default async function LocaleLayout({
   children,
