@@ -15,8 +15,8 @@ import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { env } from '#utils';
 import { plainToInstance } from 'class-transformer';
 import { GenericPaginationDto } from 'src/utils/validators';
-import { JwtAuthGuard } from '../Auth/guards/jwt-auth.guard';
-import { RoleGuard } from '../Auth/guards/role.guard';
+import { JwtAuthGuard } from '../../../@guards/jwt-auth.guard';
+import { RoleGuard } from '../../../@guards/role.guard';
 import { ROLE, RolesDecorator } from 'src/utils/role';
 
 @Controller({ path: 'admin', version: '1' })

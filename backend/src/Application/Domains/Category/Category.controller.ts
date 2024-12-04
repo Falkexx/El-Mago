@@ -4,8 +4,8 @@ import { ApiResponse, PayloadType } from '#types';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 import { User } from '../Auth/decorators/User.decorator';
 import { CreateCategoryDto } from './dtos/CreateCategory.dto';
-import { JwtAuthGuard } from '../Auth/guards/jwt-auth.guard';
-import { RoleGuard } from '../Auth/guards/role.guard';
+import { JwtAuthGuard } from '../../../@guards/jwt-auth.guard';
+import { RoleGuard } from '../../../@guards/role.guard';
 import { ROLE, RolesDecorator } from 'src/utils/role';
 import { GenericPaginationDto } from 'src/utils/validators';
 

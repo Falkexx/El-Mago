@@ -1,12 +1,12 @@
 import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
 import { UpdateUserService } from './UpdateUser/UpdateUser.service';
 import { UpdateUserDto } from './UpdateUser/UpdateUser.dto';
-import { JwtAuthGuard } from '../Auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../@guards/jwt-auth.guard';
 import { User } from '../Auth/decorators/User.decorator';
 import { PayloadType } from '#types';
 import { plainToInstance } from 'class-transformer';
 import { UserEntity } from 'src/Application/Entities/User.entity';
-import { RoleGuard } from '../Auth/guards/role.guard';
+import { RoleGuard } from '../../../@guards/role.guard';
 import { ROLE, RolesDecorator } from 'src/utils/role';
 
 @Controller({ path: 'user', version: '1' })
