@@ -1,7 +1,7 @@
 import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { CreateItemDto } from './CrateItem.dto';
-import { shortId } from '#utils';
-import { ItemType } from 'src/@metadata';
+import { generateImageId, shortId } from '#utils';
+import { BUCKET_NAME, ItemType } from 'src/@metadata';
 import { ImageEntity } from 'src/Application/Entities/Image.entity';
 import {
   Inject,
@@ -15,6 +15,8 @@ import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/Item
 import { IIMageRepositoryContract } from 'src/Application/Infra/Repositories/ImageRepository/IImage.repository-contract';
 import { ROLE } from 'src/@metadata/roles';
 import { ICategoryRepositoryContract } from 'src/Application/Infra/Repositories/Category/ICategory.repository-contract';
+import { S3Service } from 'src/Application/Infra/Storage/Providers/S3.service';
+import { ManagedUpload } from 'aws-sdk/clients/s3';
 
 export class CreateItemService {
   constructor(
@@ -26,6 +28,7 @@ export class CreateItemService {
     private readonly imageRepository: IIMageRepositoryContract,
     @Inject(KEY_INJECTION.CATEGORY_REPOSITORY)
     private readonly categoryRepository: ICategoryRepositoryContract,
+    private readonly s3Service: S3Service,
   ) {}
 
   async execute(auth: Auth, createItemDto: CreateItemDto) {
@@ -48,21 +51,27 @@ export class CreateItemService {
     }
 
     const imageId = shortId();
+
+    const uploadResult: ManagedUpload.SendData = await this.s3Service.upload({
+      file: createItemDto.image,
+      bucket: BUCKET_NAME.ITEM_IMAGE_BUCKET,
+      mimetype: createItemDto.image.mimetype,
+      name: generateImageId(createItemDto.image.originalname),
+    });
+
+    console.log(uploadResult);
+
     const imageEntity = Object.assign(new ImageEntity(), {
       id: imageId,
       name: createItemDto.image.originalname,
-      bucket: 's3/bucket-name',
-      createdAt: new Date(),
+      bucket: uploadResult.Bucket,
       mimeType: createItemDto.image.mimetype,
       isDeleted: false,
       storageProvider: 'S3',
       updatedAt: new Date(),
-      url:
-        'http://aws.s3.el-mago/s3/bucket-name/' +
-        createItemDto.image.originalname +
-        '-' +
-        imageId,
+      url: uploadResult.Location,
       item: undefined,
+      createdAt: new Date(),
     } as ImageEntity);
 
     const imageCrated = await this.imageRepository.create(imageEntity);
