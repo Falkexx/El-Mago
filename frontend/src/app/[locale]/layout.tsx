@@ -10,15 +10,16 @@ export default async function LocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: { locale: any };
 }) {
-  const { locale }: any = params;
+  const locale = params?.locale; // Garantir que params existe antes de acessar locale
 
-  // Certifique-se de validar o locale de forma segura
-  if (!routing.locales.includes(locale)) {
+  // Validação do locale
+  if (!locale || !routing.locales.includes(locale)) {
     notFound();
   }
 
+  // Obtém mensagens com base no locale
   const messages = await getMessages(locale);
 
   return (
