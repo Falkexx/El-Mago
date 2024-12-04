@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import Header from "@/app/ui/Header";
+import Header from "@/app/[locale]/Header";
 
 export default function HomePage() {
   const t = useTranslations("HomePage");
@@ -8,9 +8,7 @@ export default function HomePage() {
   return (
     <div className="fontDefault">
       <section>
-        <main>
-
-        </main>
+        <main></main>
       </section>
     </div>
   );
