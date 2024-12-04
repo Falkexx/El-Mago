@@ -13,5 +13,10 @@
     "passwordPlaceholder": "Password",
     "or": "or",
     "loginWith": "Log in with"
+  },
+
+  "Navbar": {
+    "MyAccount": "My Account",
+    "Cart":"Cart"
   }
 }
