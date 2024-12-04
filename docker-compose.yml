@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  postgres:
+  el-mago-postgres:
+    container_name: el-mago-postgres
     image: postgres:15-alpine
-    container_name: postgres-db
 
     environment:
       - POSTGRES_USER=user
@@ -13,14 +13,25 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - el-mago-network
 
-  redis:
+  el-mago-redis:
     image: redis:7-alpine
-    container_name: redis-cache
+    container_name: el-mago-bank-redis
+    command: >
+      --requirepass ${REDIS_PASSWORD}
+
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - el-mago-network
+
+networks:
+  el-mago-network:
+    driver: bridge
 
 volumes:
   postgres_data:
