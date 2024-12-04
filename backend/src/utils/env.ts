@@ -56,6 +56,8 @@ const envSchema = z.object({
       },
     )
     .transform((val) => val.toLowerCase() === 'true'),
+  AWS_S3_ACCESS_KEY_ID: z.string(),
+  AWS_S3_SECRET_ACCESS_KEY_ID: z.string(),
 });
 
 export const env = envSchema.parse(process.env);
