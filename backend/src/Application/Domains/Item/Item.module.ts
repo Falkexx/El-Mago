@@ -7,9 +7,10 @@ import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositor
 import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/ImageRepository/ImageTypeOrm.repository';
 import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRepository/ItemTypeOrm.repository';
 import { CategoryTypeOrmRepository } from 'src/Application/Infra/Repositories/Category/CategoryTypeorm.repository';
+import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
 
 @Module({
-  imports: [RepositoriesModule],
+  imports: [RepositoriesModule, StorageModule],
   controllers: [ItemController],
   providers: [
     {
