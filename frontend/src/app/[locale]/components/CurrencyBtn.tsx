@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import nookies from "nookies";
 import Image from "next/image";
 import { useLocale } from "next-intl";
 import arrowDonw from '@/midias/Icons/arrow-down.svg'
+
 
 interface FlagInfo {
   flagUrl: string;
@@ -34,6 +35,8 @@ function CurrencyBtn() {
   );
   const [isOpen, setIsOpen] = useState(false);
   const [pathName, setPathName] = useState<string>("");
+  const pathnameURL = usePathname()
+
 
   // Sincronizar a bandeira selecionada com o locale atual
   useEffect(() => {
@@ -45,7 +48,8 @@ function CurrencyBtn() {
 
   // Obter o pathName no cliente
   useEffect(() => {
-    setPathName(window.location.pathname);
+    setPathName(pathnameURL);
+
   }, []);
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
