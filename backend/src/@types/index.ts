@@ -31,3 +31,24 @@ export interface ApiResponse<T> {
   };
   href?: string;
 }
+
+export type FileType = 'IMAGE' | 'VIDEO' | 'AUDIO';
+
+export type StorageResult = {
+  /**
+   * URL of the uploaded object.
+   */
+  Location: string;
+  /**
+   * ETag of the uploaded object.
+   */
+  ETag: string;
+  /**
+   * Bucket to which the object was uploaded.
+   */
+  Bucket: string;
+  /**
+   * Key to which the object was uploaded.
+   */
+  Key: string;
+};
