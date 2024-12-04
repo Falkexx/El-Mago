@@ -22,7 +22,7 @@ function Header() {
           <div className="fontDefault">
             <ul className="md:w-full md:flex md:flex-row md:gap-4">
               <li>
-                <Link href="/Home">Home</Link>
+                <Link href="/">Home</Link>
               </li>
 
               <li>
