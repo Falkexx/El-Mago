@@ -2,9 +2,9 @@ import Image from "next/image";
 import Logo from "@/midias/logo.svg";
 
 import { Link } from "@/i18n/routing";
-import CurrencyBtn from "@/app/[locale]/components/CurrencyBtn";
-import MyAccountBtn from "@/app/[locale]/components/MyAccountBtn";
-import ShoppingCartBtn from "@/app/[locale]/components/ShoppingCartBtn";
+import CurrencyBtn from "@/app/[locale]/components/Buttons/CurrencyBtn";
+import MyAccountBtn from "@/app/[locale]/components/Buttons/MyAccountBtn";
+import ShoppingCartBtn from "@/app/[locale]/components/Buttons/ShoppingCartBtn";
 
 function Header() {
 
