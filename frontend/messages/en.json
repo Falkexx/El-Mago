@@ -1,7 +1,21 @@
 {
   "HomePage": {
-    "title": "Hello world!",
-    "about": "Go to the about page"
+    "title": "Olá mundo!",
+    "about": "Vá para a página sobre",
+
+    "cardSecTitle":"Diablo IV Products and Services",
+    "cardSecSubtitle":"Lorem ipsum dolor sit amet. Sit sint deserunt sit neque quibusdam qui laboriosam nemo qui reiciendis",
+    
+    "cardContentDescriptionGold": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+    "cardContentDescriptionItem": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+    "cardContentDescriptionBoosting": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+    "cardContentDescriptionBuild": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+
+    "cardContentBtnGold":"Buy Gold",
+    "cardContentBtnItem":"Buy Items",
+    "cardContentBtnBoosting": "Hire Boosting Service",
+    "cardContentBtnBuild": "Hire Build Service"
+
   },
 
   "LoginPage": {
@@ -18,5 +32,8 @@
   "Navbar": {
     "MyAccount": "My Account",
     "Cart":"Cart"
-  }
+  },
+
+  "Hero": {}
+
 }
