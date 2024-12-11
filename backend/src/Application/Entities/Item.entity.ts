@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryColumn,
 } from 'typeorm';
@@ -12,6 +13,7 @@ import { TABLE } from 'src/@metadata/tables';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { CategoryEntity } from './Category.entity';
+import { OrderItemEntity } from './Order/OrderItem.entity';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -58,6 +60,9 @@ export class ItemEntity {
 
   @ManyToOne(() => CategoryEntity, (category) => category.Items)
   Category: CategoryEntity;
+
+  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.item)
+  OrderItems: OrderItemEntity[];
 }
 
 export class ItemUpdateEntity {

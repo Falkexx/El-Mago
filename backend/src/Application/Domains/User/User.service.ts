@@ -55,6 +55,7 @@ export class UserService {
       softDeleted: false,
       affiliate: null,
       items: [],
+      orders: [],
     } as UserEntity);
 
     const userCreated = await this.userRepository.create(userEntity);

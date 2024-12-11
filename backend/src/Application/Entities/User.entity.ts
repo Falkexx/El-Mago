@@ -2,6 +2,7 @@ import { Exclude } from 'class-transformer';
 import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { AffiliateEntity } from './Affiliate.entity';
 import { ItemEntity } from './Item.entity';
+import { OrderEntity } from './Order/Order.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -74,6 +75,9 @@ export class UserEntity {
 
   @OneToMany(() => ItemEntity, (items) => items.user)
   items: ItemEntity[];
+
+  @OneToMany(() => OrderEntity, (order) => order.user)
+  orders: OrderEntity[];
 }
 
 export class UserUpdateEntity {
