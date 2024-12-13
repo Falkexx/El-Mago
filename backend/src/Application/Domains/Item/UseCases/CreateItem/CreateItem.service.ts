@@ -90,7 +90,7 @@ export class CreateItemService {
       updatedAt: new Date(),
       user: user,
       tags: createItemDto.tags,
-      Category: category,
+      Categories: [category],
     } as ItemEntity);
 
     const itemCreated = await this.itemRepository.create(itemEntity);

@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -58,8 +60,9 @@ export class ItemEntity {
   @Exclude()
   user: UserEntity;
 
-  @ManyToOne(() => CategoryEntity, (category) => category.Items)
-  Category: CategoryEntity;
+  @ManyToMany(() => CategoryEntity, (category) => category.Items)
+  @JoinTable()
+  Categories: CategoryEntity[];
 
   @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.item)
   OrderItems: OrderItemEntity[];
