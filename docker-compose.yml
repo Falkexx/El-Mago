@@ -1,38 +1,6 @@
 version: "3.8"
 
 services:
-  el-mago-backend:
-    container_name: el-mago-backend
-    deploy:
-      resources:
-        limits:
-          cpus: "3"
-          memory: "3G"
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    volumes:
-      - ./backend:/backend/app # Mapeia o diretório do código local para o container
-      - /app/node_modules # Garante que node_modules do container não seja sobrescrito
-
-    command: >
-      sh -c "if [ \"$NODE_ENV\" = \"production\" ]; then
-      npm run start;
-      else
-      npm run start:dev;
-      fi"
-    ports:
-      - 3000:3000
-
-    env_file: ./.env
-    environment:
-      NODE_ENV: ${NODE_ENV}
-    networks:
-      - el-mago-network
-    depends_on:
-      - el-mago-postgres
-      - el-mago-redis
-
   el-mago-postgres:
     container_name: el-mago-postgres
     image: postgres:15-alpine
@@ -51,8 +19,13 @@ services:
   el-mago-redis:
     image: redis:7-alpine
     container_name: el-mago-bank-redis
+    env_file:
+      - path: "./backend/.env"
+        required: true
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     command: >
-      --requirepass ${REDIS_PASSWORD}
+      --requirepass pass
 
     ports:
       - "6379:6379"
