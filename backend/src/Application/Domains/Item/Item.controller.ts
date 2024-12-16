@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,12 +20,16 @@ import { plainToInstance } from 'class-transformer';
 import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { AssignCategoryUseCase } from './UseCases/AssinCategory/AsssignCategory.usecase';
 import { AssignCategoryDto } from './UseCases/AssinCategory/AssignCategory.dto';
+import { GenericPaginationDto } from 'src/utils/validators';
+import { GetManyItemsUseCase } from './UseCases/GetMany/GetManyItems.usecase';
 
 @Controller({ path: 'item', version: '1' })
 export class ItemController {
   constructor(
     private readonly createItemService: CreateItemService,
+
     private readonly assignCategoryUseCase: AssignCategoryUseCase,
+    private readonly getManyItemsUseCase: GetManyItemsUseCase,
   ) {}
 
   @Post()
@@ -56,6 +62,12 @@ export class ItemController {
   async assignCategory(@Body() assignCategory: AssignCategoryDto) {
     const result = await this.assignCategoryUseCase.execute(assignCategory);
 
+    return result;
+  }
+
+  @Get('many')
+  getManyItems(@Query() pagination: GenericPaginationDto) {
+    const result = this.getManyItemsUseCase.execute(pagination);
     return result;
   }
 }

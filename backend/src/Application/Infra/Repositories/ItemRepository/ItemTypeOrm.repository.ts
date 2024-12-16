@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -110,13 +114,32 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
 
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
-        queryBuilder.andWhere(`${TABLE.item}.${key} = :${key}`, {
-          [key]: value,
-        });
+        if (key !== 'categories') {
+          queryBuilder.andWhere(`${TABLE.item}.${key} = :${key}`, {
+            [key]: value,
+          });
+        }
       });
     }
 
-    queryBuilder.orderBy(`${TABLE.item}.createdAt`, order || 'DESC');
+    if (filters) {
+      try {
+        const categoriesList = JSON.parse(filters.categories);
+
+        queryBuilder.andWhere('category.id IN (:...categoryIds)', {
+          categoryIds: categoriesList,
+        });
+      } catch {
+        throw new BadRequestException(
+          'error to put parameter list, see the doc',
+        );
+      }
+    }
+
+    queryBuilder
+      .orderBy(`${TABLE.item}.createdAt`, order || 'DESC')
+      .leftJoin(`${TABLE.item}.Categories`, 'category')
+      .addSelect(['category.id', 'category.name']);
 
     try {
       const [items, total] = await queryBuilder
@@ -136,6 +159,7 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
       throw new InternalServerErrorException();
     }
   }
+
   async getOptimized<
     Fields extends keyof ItemEntity,
     Relations extends keyof ItemEntity,

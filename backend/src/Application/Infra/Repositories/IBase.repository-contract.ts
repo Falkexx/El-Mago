@@ -12,7 +12,7 @@ export interface IBaseRepositoryContract<
   delete(unqRef: UniqueEntityRefs): Promise<void>;
   softDelete(unqRef: UniqueEntityRefs): Promise<'success' | 'fail'>;
   getAll(): Promise<Entity[]>;
-  getWithPaginationAndFilters(
+  getWithPaginationAndFilters<R extends keyof Entity>(
     paginationDto: GenericPaginationDto,
   ): Promise<PaginationResult<Entity[]>>;
 }

@@ -9,6 +9,7 @@ import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRe
 import { CategoryTypeOrmRepository } from 'src/Application/Infra/Repositories/Category/CategoryTypeorm.repository';
 import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
 import { AssignCategoryUseCase } from './UseCases/AssinCategory/AsssignCategory.usecase';
+import { GetManyItemsUseCase } from './UseCases/GetMany/GetManyItems.usecase';
 
 @Module({
   imports: [RepositoriesModule, StorageModule],
@@ -33,6 +34,7 @@ import { AssignCategoryUseCase } from './UseCases/AssinCategory/AsssignCategory.
     CreateItemService,
 
     AssignCategoryUseCase,
+    GetManyItemsUseCase,
   ],
 })
 export class ItemModule {}
