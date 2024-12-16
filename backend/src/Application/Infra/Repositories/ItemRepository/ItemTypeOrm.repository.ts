@@ -7,10 +7,11 @@ import {
   ItemUpdateEntity,
 } from 'src/Application/Entities/Item.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
-import { PaginationResult } from '#types';
+import { PaginationResult, SelectFieldsWithRelations } from '#types';
 import { IItemRepositoryContract } from './IItem.repository-contract';
 import { splitKeyAndValue } from '#utils';
 import { TABLE } from 'src/@metadata/tables';
+import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 
 @Injectable()
 export class ItemTypeOrmRepository implements IItemRepositoryContract {
@@ -134,5 +135,62 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
       console.error(error);
       throw new InternalServerErrorException();
     }
+  }
+  async getOptimized<
+    Fields extends keyof ItemEntity,
+    Relations extends keyof ItemEntity,
+  >(
+    where: ItemUniquePrams,
+    fields: [],
+    relations?: [],
+  ): Promise<SelectFieldsWithRelations<ItemEntity, Fields, Relations>[]> {
+    const items = await this.itemRepository.find({
+      where: { ...where },
+      select: fields,
+      relations: relations ?? [],
+    });
+
+    return items;
+  }
+
+  async getOneOptimized<
+    Fields extends keyof ItemEntity,
+    Relations extends keyof ItemEntity,
+  >(
+    where: ItemUniquePrams,
+    fields: Fields[],
+    relations?: Relations[],
+  ): Promise<SelectFieldsWithRelations<ItemEntity, Fields, Relations>> {
+    const items = await this.itemRepository.findOne({
+      where: { ...where },
+      select: fields,
+      relations: relations ?? [],
+    });
+
+    return items;
+  }
+
+  async pushCategory(
+    unqRef: ItemUniquePrams,
+    category: CategoryEntity,
+  ): Promise<ItemEntity> {
+    const [key, value] = splitKeyAndValue(unqRef);
+
+    const item = await this.itemRepository.findOne({
+      where: { [key]: value },
+      relations: ['Categories'],
+    });
+
+    const isCategoryAlreadyAdded = item.Categories.some(
+      (_cat_) => _cat_.id === category.id,
+    );
+
+    if (!isCategoryAlreadyAdded) {
+      item.Categories.push(category);
+
+      return this.itemRepository.save(item);
+    }
+
+    return item;
   }
 }
