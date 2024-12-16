@@ -1,5 +1,3 @@
-import { env } from '#utils';
-
 export enum ItemType {
   COMMON = 'COMMON',
   UNIQUE = 'UNIQUE',
