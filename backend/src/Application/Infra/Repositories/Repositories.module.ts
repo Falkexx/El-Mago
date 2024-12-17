@@ -10,6 +10,9 @@ import { ItemTypeOrmRepository } from './ItemRepository/ItemTypeOrm.repository';
 import { ImageTypeormRepository } from './ImageRepository/ImageTypeOrm.repository';
 import { CategoryTypeOrmRepository } from './Category/CategoryTypeorm.repository';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';
+import { CartTypeOrmRepository } from './CartRepository/CartTypeOrm.repository';
+import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';
+import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 
 @Module({
   imports: [
@@ -19,6 +22,8 @@ import { CategoryEntity } from 'src/Application/Entities/Category.entity';
       ItemEntity,
       ImageEntity,
       CategoryEntity,
+      CartEntity,
+      CartItemEntity,
     ]),
   ],
   providers: [
@@ -27,6 +32,7 @@ import { CategoryEntity } from 'src/Application/Entities/Category.entity';
     ItemTypeOrmRepository,
     ImageTypeormRepository,
     CategoryTypeOrmRepository,
+    CartTypeOrmRepository,
   ],
   exports: [TypeOrmModule],
 })
