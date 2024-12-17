@@ -34,6 +34,8 @@ export class CartEntity {
   user: UserEntity;
 }
 
-export type CartUpdateEntity = Pick<CartEntity, 'items' | 'updatedAt'>;
+export type CartUpdateEntity =
+  | Pick<CartEntity, 'items'>
+  | Pick<CartEntity, 'updatedAt'>;
 
 export type CartUniqueRef = Pick<CartEntity, 'id'> | Pick<CartEntity, 'userId'>;

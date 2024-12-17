@@ -13,11 +13,17 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { splitKeyAndValue } from '#utils';
+import {
+  CartItemEntity,
+  UpdateCartItemEntity,
+} from 'src/Application/Entities/Cart/CartItem.entity';
 
 export class CartTypeOrmRepository implements ICartRepositoryContract {
   constructor(
     @InjectRepository(CartEntity)
     private readonly cartRepository: Repository<CartEntity>,
+    @InjectRepository(CartItemEntity)
+    private readonly cartItemRepository: Repository<CartItemEntity>,
   ) {}
 
   create(entity: CartEntity): Promise<CartEntity> {
@@ -54,7 +60,7 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
     try {
       const [key, value] = splitKeyAndValue(unqRef);
 
-      const cartToUpdate = await this.cartRepository.findOne({
+      const cartToUpdate = await this.cartItemRepository.findOne({
         where: { [key]: value },
       });
 
@@ -106,6 +112,42 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('internal server error');
+    }
+  }
+
+  async addCartItem(cartItem: CartItemEntity): Promise<CartItemEntity> {
+    try {
+      this.cartItemRepository.create(cartItem);
+
+      return this.cartItemRepository.save(cartItem);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async updateCartItem(
+    cartItemUnqRef: CartUniqueRef,
+    cartUpdate: UpdateCartItemEntity,
+  ): Promise<CartItemEntity> {
+    const [key, value] = splitKeyAndValue(cartItemUnqRef);
+
+    try {
+      const cartItemToUpdate = await this.cartItemRepository.findOne({
+        where: { [key]: value },
+      });
+
+      if (!cartItemToUpdate) {
+        throw new NotFoundException('Cart item not found');
+      }
+
+      const newCartItem = Object.assign(cartItemToUpdate, cartUpdate);
+
+      const result = await this.cartItemRepository.save(newCartItem);
+
+      return result;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
     }
   }
 }
