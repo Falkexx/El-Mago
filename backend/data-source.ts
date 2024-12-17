@@ -7,6 +7,8 @@ import { ImageEntity } from 'src/Application/Entities/Image.entity';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 import { OrderEntity } from 'src/Application/Entities/Order/Order.entity';
 import { OrderItemEntity } from 'src/Application/Entities/Order/OrderItem.entity';
+import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';
+import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres', // ou o banco de dados que você está usando
@@ -23,6 +25,8 @@ export const AppDataSource = new DataSource({
     CategoryEntity,
     OrderEntity,
     OrderItemEntity,
+    CartEntity,
+    CartItemEntity,
   ],
   migrations: ['./src/migrations/**/*.ts'],
   synchronize: false,

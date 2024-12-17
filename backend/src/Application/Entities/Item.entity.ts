@@ -16,6 +16,7 @@ import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { CategoryEntity } from './Category.entity';
 import { OrderItemEntity } from './Order/OrderItem.entity';
+import { CartItemEntity } from './Cart/CartItem.entity';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -66,6 +67,9 @@ export class ItemEntity {
 
   @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.item)
   OrderItems: OrderItemEntity[];
+
+  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.item)
+  CartItems: CartItemEntity[];
 }
 
 export class ItemUpdateEntity {

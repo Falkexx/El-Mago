@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
 import { AffiliateEntity } from './Affiliate.entity';
 import { ItemEntity } from './Item.entity';
 import { OrderEntity } from './Order/Order.entity';
+import { CartEntity } from './Cart/Cart.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -78,6 +79,9 @@ export class UserEntity {
 
   @OneToMany(() => OrderEntity, (order) => order.user)
   orders: OrderEntity[];
+
+  @OneToOne(() => CartEntity)
+  cart: CartEntity;
 }
 
 export class UserUpdateEntity {
