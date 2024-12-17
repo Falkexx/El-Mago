@@ -35,7 +35,10 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      const cart = await this.cartRepository.findOne({ [key]: value });
+      const cart = await this.cartRepository.findOne({
+        where: { [key]: value },
+        relations: ['items'],
+      });
 
       return cart ?? null;
     } catch (e) {

@@ -6,6 +6,7 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
 import { UpdateUserUseCase } from './UseCases/UpdateUser/UpdateUser.usecase';
 import { CartTypeOrmRepository } from 'src/Application/Infra/Repositories/CartRepository/CartTypeOrm.repository';
+import { GetCartUseCase } from './UseCases/GetCart/GetCart.usecase';
 
 @Module({
   imports: [RepositoriesModule],
@@ -21,6 +22,7 @@ import { CartTypeOrmRepository } from 'src/Application/Infra/Repositories/CartRe
     },
     UserService,
     UpdateUserUseCase,
+    GetCartUseCase,
   ],
   exports: [UserService],
 })

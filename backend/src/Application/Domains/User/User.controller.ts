@@ -1,4 +1,4 @@
-import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { UpdateUserUseCase } from './UseCases/UpdateUser/UpdateUser.usecase';
 import { UpdateUserDto } from './UseCases/UpdateUser/UpdateUser.dto';
 import { JwtAuthGuard } from '../../../@guards/jwt-auth.guard';
@@ -8,10 +8,14 @@ import { plainToInstance } from 'class-transformer';
 import { UserEntity } from 'src/Application/Entities/User.entity';
 import { RoleGuard } from '../../../@guards/role.guard';
 import { ROLE, RolesDecorator } from 'src/utils/role';
+import { GetCartUseCase } from './UseCases/GetCart/GetCart.usecase';
 
 @Controller({ path: 'user', version: '1' })
 export class UserController {
-  constructor(private readonly updateUserUseCase: UpdateUserUseCase) {}
+  constructor(
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly getCartUseCase: GetCartUseCase,
+  ) {}
 
   @Patch()
   @UseGuards(JwtAuthGuard, RoleGuard)
@@ -22,6 +26,15 @@ export class UserController {
       await this.updateUserUseCase.execute(user, userDto),
       { exposeUnsetFields: false },
     );
+
+    return result;
+  }
+
+  @Get('cart')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN, ROLE.USER)
+  async getCart(@User() payload: PayloadType) {
+    const result = await this.getCartUseCase.execute(payload);
 
     return result;
   }
