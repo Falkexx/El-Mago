@@ -5,6 +5,7 @@ import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositor
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
 import { UpdateUserService } from './UpdateUser/UpdateUser.service';
+import { CartTypeOrmRepository } from 'src/Application/Infra/Repositories/CartRepository/CartTypeOrm.repository';
 
 @Module({
   imports: [RepositoriesModule],
@@ -13,6 +14,10 @@ import { UpdateUserService } from './UpdateUser/UpdateUser.service';
     {
       provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
       useClass: UserTypeOrmRepository,
+    },
+    {
+      provide: KEY_INJECTION.CART_REPOSITORY,
+      useClass: CartTypeOrmRepository,
     },
     UserService,
     UpdateUserService,
