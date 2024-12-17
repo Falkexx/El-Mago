@@ -5,7 +5,7 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { PayloadType } from '#types';
 import { UserUpdateEntity } from 'src/Application/Entities/User.entity';
 
-export class UpdateUserService {
+export class UpdateUserUseCase {
   constructor(
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,

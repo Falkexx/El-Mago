@@ -4,7 +4,7 @@ import { UserController } from './User.controller';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
-import { UpdateUserService } from './UpdateUser/UpdateUser.service';
+import { UpdateUserUseCase } from './UseCases/UpdateUser/UpdateUser.usecase';
 import { CartTypeOrmRepository } from 'src/Application/Infra/Repositories/CartRepository/CartTypeOrm.repository';
 
 @Module({
@@ -20,7 +20,7 @@ import { CartTypeOrmRepository } from 'src/Application/Infra/Repositories/CartRe
       useClass: CartTypeOrmRepository,
     },
     UserService,
-    UpdateUserService,
+    UpdateUserUseCase,
   ],
   exports: [UserService],
 })
