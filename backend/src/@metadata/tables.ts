@@ -5,7 +5,8 @@ export enum TABLE {
   image = 'image',
   category = 'category',
   order = 'order',
-  order_item = 'order_item',
   cart = 'cart',
   cart_item = 'cart_item',
+  order_status = 'order_status',
+  order_item = 'order_item',
 }

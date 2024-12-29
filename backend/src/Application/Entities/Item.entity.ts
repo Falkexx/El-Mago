@@ -15,8 +15,8 @@ import { TABLE } from 'src/@metadata/tables';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { CategoryEntity } from './Category.entity';
-import { OrderItemEntity } from './Order/OrderItem.entity';
 import { CartItemEntity } from './Cart/CartItem.entity';
+import { OrderItem } from './order-item.entity';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -65,11 +65,11 @@ export class ItemEntity {
   @JoinTable()
   Categories: CategoryEntity[];
 
-  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.item)
-  OrderItems: OrderItemEntity[];
-
   @OneToMany(() => CartItemEntity, (cartItem) => cartItem.item)
   CartItems: CartItemEntity[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.Item)
+  OrderItem: OrderItem;
 }
 
 export class ItemUpdateEntity {

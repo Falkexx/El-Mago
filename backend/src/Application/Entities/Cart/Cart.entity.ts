@@ -23,7 +23,9 @@ export class CartEntity {
 
   //relations
 
-  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.cart)
+  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.cart, {
+    cascade: true,
+  })
   items: CartItemEntity[];
 
   @Column({ type: 'varchar', unique: true })

@@ -5,10 +5,11 @@ import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { ImageEntity } from 'src/Application/Entities/Image.entity';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';
-import { OrderEntity } from 'src/Application/Entities/Order/Order.entity';
-import { OrderItemEntity } from 'src/Application/Entities/Order/OrderItem.entity';
 import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';
 import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
+import { OrderEntity } from 'src/Application/Entities/Order.entity';
+import { OrderStatus } from 'src/Application/Entities/order-status.entity';
+import { OrderItem } from 'src/Application/Entities/order-item.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres', // ou o banco de dados que você está usando
@@ -23,10 +24,11 @@ export const AppDataSource = new DataSource({
     ItemEntity,
     ImageEntity,
     CategoryEntity,
-    OrderEntity,
-    OrderItemEntity,
     CartEntity,
     CartItemEntity,
+    OrderEntity,
+    OrderStatus,
+    OrderItem,
   ],
   migrations: ['./src/migrations/**/*.ts'],
   synchronize: false,
