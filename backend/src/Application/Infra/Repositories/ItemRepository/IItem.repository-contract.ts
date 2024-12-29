@@ -34,4 +34,6 @@ export type IItemRepositoryContract = IBaseRepositoryContract<
     unqRef: ItemUniquePrams,
     category: CategoryEntity,
   ): Promise<ItemEntity>;
+
+  getManyByIds(ids: string[]): Promise<ItemEntity[]>;
 };

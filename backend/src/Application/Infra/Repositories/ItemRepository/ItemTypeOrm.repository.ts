@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   ItemEntity,
   ItemUniquePrams,
@@ -216,5 +216,13 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
     }
 
     return item;
+  }
+
+  async getManyByIds(ids: string[]): Promise<ItemEntity[]> {
+    return this.itemRepository.find({
+      where: {
+        id: In(ids),
+      },
+    });
   }
 }
