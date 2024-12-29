@@ -12,6 +12,7 @@ import { CategoryModule } from './Application/Domains/Category/Category.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { Redis } from 'ioredis';
+import { OrderModule } from './Application/Domains/Order/Order.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { Redis } from 'ioredis';
     AdminModule,
     ItemModule,
     CategoryModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [
