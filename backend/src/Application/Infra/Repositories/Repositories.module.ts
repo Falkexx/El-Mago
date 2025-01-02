@@ -13,6 +13,9 @@ import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 import { CartTypeOrmRepository } from './CartRepository/CartTypeOrm.repository';
 import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';
 import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
+import { OrderEntity } from 'src/Application/Entities/Order.entity';
+import { SearchBuilderService } from './SearchBuilder.service';
+import { OrderTypeOrmRepository } from './OrderRepository/OrderTypeOrm.repository';
 
 @Module({
   imports: [
@@ -24,6 +27,7 @@ import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
       CategoryEntity,
       CartEntity,
       CartItemEntity,
+      OrderEntity,
     ]),
   ],
   providers: [
@@ -33,7 +37,9 @@ import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
     ImageTypeormRepository,
     CategoryTypeOrmRepository,
     CartTypeOrmRepository,
+    OrderTypeOrmRepository,
+    SearchBuilderService,
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, SearchBuilderService],
 })
 export class RepositoriesModule {}
