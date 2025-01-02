@@ -1,3 +1,5 @@
+import { Status } from 'src/@metadata';
+
 export class PaginationProps {
   page: number;
   limit: number;
@@ -62,3 +64,5 @@ export type SelectFieldsWithRelations<
 } & {
   [R in Relations]: Entity[R];
 };
+
+export type OrderStatusType = keyof typeof Status;
