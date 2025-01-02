@@ -52,6 +52,7 @@ export class OrderEntity {
   // relations
   @OneToMany(() => OrderStatus, (status) => status.order, {
     cascade: true,
+    eager: true,
   })
   status: OrderStatus[];
 
