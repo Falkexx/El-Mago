@@ -11,6 +11,9 @@ export class OrderItem {
   @Column({ type: 'varchar' })
   name: string;
 
+  @Column({ type: 'int', default: 1 })
+  quantity: number;
+
   @Column({ type: 'varchar' })
   description?: string;
 
