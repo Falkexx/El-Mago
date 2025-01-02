@@ -1,0 +1,42 @@
+commodities:
+query {
+  gameCategories {
+    meta {
+      pagination {
+        total
+        page
+        pageSize
+        pageCount
+      }
+    }
+    data  {
+      id
+      attributes {
+        name
+        type
+        servers {
+          data {
+            attributes {
+              name
+              commodities {
+                data {
+                  attributes {
+                    name
+                    original_price
+                  }
+                }
+              }
+              img {
+                data {
+                  attributes {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

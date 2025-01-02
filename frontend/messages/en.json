@@ -17,7 +17,6 @@
     "cardContentBtnBuild": "Hire Build Service"
 
   },
-
   "LoginPage": {
     "rememberme": "Remember me",
     "forgotPassword": "Forgot your password?",
@@ -25,15 +24,19 @@
     "register": "Register",
     "emailPlaceholder": "Email",
     "passwordPlaceholder": "Password",
+    "confirmPasswordPlaceholder": "Confirm Password",
     "or": "or",
-    "loginWith": "Log in with"
+    "loginWith": "Log in with",
+    "emailInvalid": "Invalid email address.",
+    "passwordMin": "Password must be at least 8 characters long.",
+    "passwordUppercase": "Password must contain at least one uppercase letter.",
+    "passwordLowercase": "Password must contain at least one lowercase letter.",
+    "passwordNumber": "Password must contain at least one number.",
+    "passwordSpecial": "Password must contain at least one special character.",
+    "passwordsDoNotMatch": "Passwords do not match."
   },
-
   "Navbar": {
     "MyAccount": "My Account",
-    "Cart":"Cart"
-  },
-
-  "Hero": {}
-
+    "Cart": "Cart"
+  }
 }

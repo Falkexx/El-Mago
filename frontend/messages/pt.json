@@ -24,10 +24,17 @@
     "register": "Registrar",
     "emailPlaceholder": "Email",
     "passwordPlaceholder": "Senha",
+    "confirmPasswordPlaceholder": "Confirmar Senha",
     "or": "ou",
-    "loginWith": "Entrar com"
+    "loginWith": "Entrar com",
+    "emailInvalid": "Endereço de email inválido.",
+    "passwordMin": "A senha deve ter pelo menos 8 caracteres.",
+    "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula.",
+    "passwordLowercase": "A senha deve conter pelo menos uma letra minúscula.",
+    "passwordNumber": "A senha deve conter pelo menos um número.",
+    "passwordSpecial": "A senha deve conter pelo menos um caractere especial.",
+    "passwordsDoNotMatch": "As senhas não coincidem."
   },
-
   "Navbar": {
     "MyAccount": "Minha  conta",
     "Cart":"Carrinho"

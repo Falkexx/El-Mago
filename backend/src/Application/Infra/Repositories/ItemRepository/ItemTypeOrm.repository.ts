@@ -1,16 +1,21 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   ItemEntity,
   ItemUniquePrams,
   ItemUpdateEntity,
 } from 'src/Application/Entities/Item.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
-import { PaginationResult } from '#types';
+import { PaginationResult, SelectFieldsWithRelations } from '#types';
 import { IItemRepositoryContract } from './IItem.repository-contract';
 import { splitKeyAndValue } from '#utils';
 import { TABLE } from 'src/@metadata/tables';
+import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 
 @Injectable()
 export class ItemTypeOrmRepository implements IItemRepositoryContract {
@@ -109,13 +114,32 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
 
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
-        queryBuilder.andWhere(`${TABLE.item}.${key} = :${key}`, {
-          [key]: value,
-        });
+        if (key !== 'categories') {
+          queryBuilder.andWhere(`${TABLE.item}.${key} = :${key}`, {
+            [key]: value,
+          });
+        }
       });
     }
 
-    queryBuilder.orderBy(`${TABLE.item}.createdAt`, order || 'DESC');
+    if (filters) {
+      try {
+        const categoriesList = JSON.parse(filters.categories);
+
+        queryBuilder.andWhere('category.id IN (:...categoryIds)', {
+          categoryIds: categoriesList,
+        });
+      } catch {
+        throw new BadRequestException(
+          'error to put parameter list, see the doc',
+        );
+      }
+    }
+
+    queryBuilder
+      .orderBy(`${TABLE.item}.createdAt`, order || 'DESC')
+      .leftJoin(`${TABLE.item}.Categories`, 'category')
+      .addSelect(['category.id', 'category.name']);
 
     try {
       const [items, total] = await queryBuilder
@@ -134,5 +158,71 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
       console.error(error);
       throw new InternalServerErrorException();
     }
+  }
+
+  async getOptimized<
+    Fields extends keyof ItemEntity,
+    Relations extends keyof ItemEntity,
+  >(
+    where: ItemUniquePrams,
+    fields: [],
+    relations?: [],
+  ): Promise<SelectFieldsWithRelations<ItemEntity, Fields, Relations>[]> {
+    const items = await this.itemRepository.find({
+      where: { ...where },
+      select: fields,
+      relations: relations ?? [],
+    });
+
+    return items;
+  }
+
+  async getOneOptimized<
+    Fields extends keyof ItemEntity,
+    Relations extends keyof ItemEntity,
+  >(
+    where: ItemUniquePrams,
+    fields: Fields[],
+    relations?: Relations[],
+  ): Promise<SelectFieldsWithRelations<ItemEntity, Fields, Relations>> {
+    const items = await this.itemRepository.findOne({
+      where: { ...where },
+      select: fields,
+      relations: relations ?? [],
+    });
+
+    return items;
+  }
+
+  async pushCategory(
+    unqRef: ItemUniquePrams,
+    category: CategoryEntity,
+  ): Promise<ItemEntity> {
+    const [key, value] = splitKeyAndValue(unqRef);
+
+    const item = await this.itemRepository.findOne({
+      where: { [key]: value },
+      relations: ['Categories'],
+    });
+
+    const isCategoryAlreadyAdded = item.Categories.some(
+      (_cat_) => _cat_.id === category.id,
+    );
+
+    if (!isCategoryAlreadyAdded) {
+      item.Categories.push(category);
+
+      return this.itemRepository.save(item);
+    }
+
+    return item;
+  }
+
+  async getManyByIds(ids: string[]): Promise<ItemEntity[]> {
+    return this.itemRepository.find({
+      where: {
+        id: In(ids),
+      },
+    });
   }
 }

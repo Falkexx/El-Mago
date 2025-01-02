@@ -65,6 +65,7 @@ const envSchema = z.object({
     .refine((val) => Object.values(STORAGE_PROVIDER).includes(val as any), {
       message: `O valor deve ser um dos seguintes: ${Object.values(STORAGE_PROVIDER).join(', ')}`,
     }),
+  PUBLIC_IMAGES_BUCKET_NAME: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

@@ -2,7 +2,10 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryColumn,
 } from 'typeorm';
@@ -12,6 +15,8 @@ import { TABLE } from 'src/@metadata/tables';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { CategoryEntity } from './Category.entity';
+import { CartItemEntity } from './Cart/CartItem.entity';
+import { OrderItem } from './order-item.entity';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -33,7 +38,7 @@ export class ItemEntity {
   @Column({ type: 'boolean' })
   isInfinite: boolean;
 
-  @Column({ type: 'decimal', precision: 5 })
+  @Column({ type: 'decimal', precision: 10, scale: 3 })
   price: number;
 
   @Column({ type: 'boolean', default: false })
@@ -56,8 +61,15 @@ export class ItemEntity {
   @Exclude()
   user: UserEntity;
 
-  @ManyToOne(() => CategoryEntity, (category) => category.Items)
-  Category: CategoryEntity;
+  @ManyToMany(() => CategoryEntity, (category) => category.Items)
+  @JoinTable()
+  Categories: CategoryEntity[];
+
+  @OneToMany(() => CartItemEntity, (cartItem) => cartItem.item)
+  CartItems: CartItemEntity[];
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.Item)
+  OrderItem: OrderItem;
 }
 
 export class ItemUpdateEntity {

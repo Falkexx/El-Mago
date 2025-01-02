@@ -6,12 +6,31 @@ import { env } from './utils';
 import { UserModule } from './Application/Domains/User/User.module';
 import { AuthModule } from './Application/Domains/Auth/Auth.module';
 import { AdminModule } from './Application/Domains/Admin/Admin.module';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ItemModule } from './Application/Domains/Item/Item.module';
 import { CategoryModule } from './Application/Domains/Category/Category.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { Redis } from 'ioredis';
+import { OrderModule } from './Application/Domains/Order/Order.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 3000,
+          limit: 10,
+        },
+      ],
+      storage: new ThrottlerStorageRedisService(
+        new Redis({
+          host: env.REDIS_HOST,
+          port: env.REDIS_PORT,
+          password: env.REDIS_PASSWORD,
+        }),
+      ),
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: env.POSTGRES_HOST,
@@ -31,9 +50,14 @@ import { CategoryModule } from './Application/Domains/Category/Category.module';
     AdminModule,
     ItemModule,
     CategoryModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({

@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
 import { ItemEntity } from './Item.entity';
 
 @Entity('category')
@@ -21,7 +21,7 @@ export class CategoryEntity {
   @Column({ type: 'timestamptz', update: true })
   updatedAt: Date;
 
-  @OneToMany(() => ItemEntity, (item) => item.Category)
+  @ManyToMany(() => ItemEntity, (item) => item.Categories)
   Items: ItemEntity[];
 }
 
