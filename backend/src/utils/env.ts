@@ -66,6 +66,11 @@ const envSchema = z.object({
       message: `O valor deve ser um dos seguintes: ${Object.values(STORAGE_PROVIDER).join(', ')}`,
     }),
   PUBLIC_IMAGES_BUCKET_NAME: z.string(),
+
+  // paypal
+  PAYPAL_BASE_URL: z.string(),
+  PAYPAL_CLIENT_ID: z.string(),
+  PAYPAL_SECRET: z.string(),
 });
 
 export const env = envSchema.parse(process.env);
