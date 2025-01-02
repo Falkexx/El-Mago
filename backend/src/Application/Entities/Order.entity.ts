@@ -50,7 +50,9 @@ export class OrderEntity {
   updatedAt: Date;
 
   // relations
-  @OneToMany(() => OrderStatus, (status) => status.order, { cascade: true })
+  @OneToMany(() => OrderStatus, (status) => status.order, {
+    cascade: true,
+  })
   status: OrderStatus[];
 
   @Column({ type: 'varchar' })
@@ -60,7 +62,10 @@ export class OrderEntity {
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.Order, { cascade: true })
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.Order, {
+    cascade: true,
+    eager: true,
+  })
   OrderItems: OrderItem[];
 }
 

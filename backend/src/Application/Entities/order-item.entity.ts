@@ -14,7 +14,7 @@ export class OrderItem {
   @Column({ type: 'varchar' })
   description?: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'decimal', precision: 10, scale: 3 })
   price: string;
 
   @Column({ type: 'varchar' })

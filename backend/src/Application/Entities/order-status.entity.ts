@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { OrderEntity } from './Order.entity';
 import { TABLE } from 'src/@metadata/tables';
-import { Status } from 'aws-sdk/clients/directconnect';
+import { OrderStatusType } from '#types';
 
 @Entity({ name: TABLE.order_status })
 export class OrderStatus {
@@ -13,7 +13,9 @@ export class OrderStatus {
 
   @Column({ type: 'varchar', nullable: true, default: null })
   description?: string | null;
-  status: Status;
+
+  @Column({ type: 'varchar', length: 50 })
+  status: OrderStatusType;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;

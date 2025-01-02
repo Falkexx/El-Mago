@@ -38,7 +38,7 @@ export class ItemEntity {
   @Column({ type: 'boolean' })
   isInfinite: boolean;
 
-  @Column({ type: 'decimal', precision: 5 })
+  @Column({ type: 'decimal', precision: 10, scale: 3 })
   price: number;
 
   @Column({ type: 'boolean', default: false })
