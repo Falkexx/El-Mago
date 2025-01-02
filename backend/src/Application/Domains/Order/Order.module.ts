@@ -8,6 +8,9 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { CartTypeOrmRepository } from 'src/Application/Infra/Repositories/CartRepository/CartTypeOrm.repository';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
 import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRepository/ItemTypeOrm.repository';
+import { PayOrderUseCase } from './UseCases/PayOrder/PayOrder.usecase';
+import { OrderTypeOrmRepository } from 'src/Application/Infra/Repositories/OrderRepository/OrderTypeOrm.repository';
+import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth.usecase';
 
 @Module({
   imports: [RepositoriesModule, PaypalModule],
@@ -25,9 +28,15 @@ import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRe
       provide: KEY_INJECTION.ITEM_REPOSITORY_CONTRACT,
       useClass: ItemTypeOrmRepository,
     },
+    {
+      provide: KEY_INJECTION.ORDER_REPOSITORY,
+      useClass: OrderTypeOrmRepository,
+    },
 
     OrderService,
     CreateOrderUseCase,
+    PayOrderUseCase,
+    GetOrderByAuthUseCase,
   ],
 })
 export class OrderModule {}
