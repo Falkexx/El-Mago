@@ -63,6 +63,9 @@ export class OrderEntity {
   @Column({ type: 'varchar', nullable: true, default: null })
   paymentUrl: string | null;
 
+  @Column({ type: 'varchar', nullable: true, default: null })
+  paymentId: string | null;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 

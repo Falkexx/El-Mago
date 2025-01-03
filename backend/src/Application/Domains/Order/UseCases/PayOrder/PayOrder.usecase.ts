@@ -102,6 +102,7 @@ export class PayOrderUseCase {
 
         const orderUpdateEntity = Object.assign(order, {
           paymentUrl: approveLink.href,
+          paymentId: createOrderResult.id,
         } as OrderEntity);
 
         orderUpdated = await this.orderRepository.update(
