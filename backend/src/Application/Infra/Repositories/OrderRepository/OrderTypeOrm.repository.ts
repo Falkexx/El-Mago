@@ -14,11 +14,14 @@ import {
 import { SearchBuilderService } from '../SearchBuilder.service';
 import { TABLE } from 'src/@metadata/tables';
 import { InjectRepository } from '@nestjs/typeorm';
+import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 
 export class OrderTypeOrmRepository implements IOrderRepositoryContract {
   constructor(
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
+    @InjectRepository(OrderStatus)
+    private readonly orderStatusRepository: Repository<OrderStatus>,
     private readonly dataSource: DataSource,
     private readonly searchBuilderService: SearchBuilderService,
   ) {}
@@ -125,5 +128,18 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
 
   async getOrderByUserId(userId: string): Promise<OrderEntity[]> {
     return this.orderRepository.find({ where: { userId: userId } });
+  }
+
+  async createOrderStatus(orderStatus: OrderStatus): Promise<OrderEntity> {
+    try {
+      const newStatus = this.orderStatusRepository.create(orderStatus);
+      const statusCreated = await this.orderStatusRepository.save(newStatus);
+      console.log(statusCreated);
+
+      return this.orderRepository.findOneBy({ id: orderStatus.order.id });
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
   }
 }

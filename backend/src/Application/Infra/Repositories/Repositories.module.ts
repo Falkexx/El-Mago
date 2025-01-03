@@ -16,6 +16,7 @@ import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { SearchBuilderService } from './SearchBuilder.service';
 import { OrderTypeOrmRepository } from './OrderRepository/OrderTypeOrm.repository';
+import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { OrderTypeOrmRepository } from './OrderRepository/OrderTypeOrm.repositor
       CartEntity,
       CartItemEntity,
       OrderEntity,
+      OrderStatus,
     ]),
   ],
   providers: [

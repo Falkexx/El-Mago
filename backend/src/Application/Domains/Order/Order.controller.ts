@@ -9,6 +9,7 @@ import { ROLE, RolesDecorator } from 'src/utils/role';
 import { PayOrderUseCase } from './UseCases/PayOrder/PayOrder.usecase';
 import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth.usecase';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecase';
 
 @Controller({ path: 'order', version: '1' })
 export class OrderController {
@@ -20,6 +21,7 @@ export class OrderController {
     private readonly getOrdersByAuth: GetOrderByAuthUseCase,
     private readonly createOrderUseCase: CreateOrderUseCase,
     private readonly payOrderUseCase: PayOrderUseCase,
+    private readonly getOrderById: GetOrderByIdUseCase,
   ) {}
 
   @Get('many')
@@ -44,5 +46,12 @@ export class OrderController {
   @RolesDecorator(ROLE.ADMIN, ROLE.USER)
   payOrder(@User() payload: PayloadType, @Param('orderId') orderId: string) {
     return this.payOrderUseCase.execute(payload, { orderId });
+  }
+
+  @Get('check/:id')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN, ROLE.USER, ROLE.AFFILIATE)
+  get(@User() payload: PayloadType, @Param('id') orderId: string) {
+    return this.getOrderById.execute(payload, orderId);
   }
 }

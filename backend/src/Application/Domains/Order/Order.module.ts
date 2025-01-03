@@ -11,6 +11,7 @@ import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRe
 import { PayOrderUseCase } from './UseCases/PayOrder/PayOrder.usecase';
 import { OrderTypeOrmRepository } from 'src/Application/Infra/Repositories/OrderRepository/OrderTypeOrm.repository';
 import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth.usecase';
+import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecase';
 
 @Module({
   imports: [RepositoriesModule, PaypalModule],
@@ -40,6 +41,7 @@ import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth
     CreateOrderUseCase,
     PayOrderUseCase,
     GetOrderByAuthUseCase,
+    GetOrderByIdUseCase,
   ],
 })
 export class OrderModule {}
