@@ -16,6 +16,7 @@ import { PayOrderDto } from './PayOrder.dto';
 import { PayloadType } from '#types';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { PayPalCreateOrderResponse } from 'src/@types/paypal';
+import { OrderEntity } from 'src/Application/Entities/Order.entity';
 
 export class PayOrderUseCase {
   constructor(
@@ -68,12 +69,14 @@ export class PayOrderUseCase {
     if (isCanceled) {
       throw new NotAcceptableException('order canceled');
     }
+
     const items = order.OrderItems.map((_item_) => {
       return {
         name: _item_.name,
         quantity: _item_.quantity,
         unit_amount: {
-          currency_code: _item_.currency,
+          // currency_code: _item_.currency,
+          currency_code: 'BRL',
           value: parseFloat(_item_.price).toFixed(2),
         },
         description: _item_.description,
@@ -81,27 +84,45 @@ export class PayOrderUseCase {
     });
 
     let createOrderResult: PayPalCreateOrderResponse;
-
+    let orderUpdated: OrderEntity;
     try {
-      createOrderResult = await this.paypalService.payOrder({
-        items,
-        orderId: order.id,
-        amount: {
-          currency_code: 'USD',
-          totalPrice,
-        },
-      });
+      if (!order.paymentUrl) {
+        createOrderResult = await this.paypalService.payOrder({
+          items,
+          orderId: order.id,
+          amount: {
+            currency_code: 'BRL',
+            totalPrice,
+          },
+        });
+
+        const approveLink = createOrderResult.links.find(
+          (_link_) => _link_.rel === 'approve',
+        );
+
+        const orderUpdateEntity = Object.assign(order, {
+          paymentUrl: approveLink.href,
+        } as OrderEntity);
+
+        orderUpdated = await this.orderRepository.update(
+          { id: order.id },
+          orderUpdateEntity,
+        );
+      }
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
     }
 
+    const paymentUrl = order.paymentUrl ?? orderUpdated.paymentUrl;
+
     return {
-      order,
+      order: { ...order, orderUpdated },
       links: {
-        href: createOrderResult.links[1].href,
-        method: createOrderResult.links[1].method,
-        rel: createOrderResult.links[1].rel,
+        href: paymentUrl,
+        method: 'GET',
+        rel: 'approve',
+        'Content-type': 'text/html',
       },
     };
   }

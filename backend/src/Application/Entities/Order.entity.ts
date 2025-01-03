@@ -60,6 +60,9 @@ export class OrderEntity {
   @Index()
   userId: string;
 
+  @Column({ type: 'varchar', nullable: true, default: null })
+  paymentUrl: string | null;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 
