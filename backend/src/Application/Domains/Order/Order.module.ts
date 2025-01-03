@@ -33,7 +33,10 @@ import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth
       useClass: OrderTypeOrmRepository,
     },
 
+    // services
     OrderService,
+
+    // use cases
     CreateOrderUseCase,
     PayOrderUseCase,
     GetOrderByAuthUseCase,

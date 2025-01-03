@@ -13,7 +13,10 @@ import { GenericPaginationDto } from 'src/utils/validators';
 @Controller({ path: 'order', version: '1' })
 export class OrderController {
   constructor(
+    // service
     private readonly orderService: OrderService,
+
+    // use cases
     private readonly getOrdersByAuth: GetOrderByAuthUseCase,
     private readonly createOrderUseCase: CreateOrderUseCase,
     private readonly payOrderUseCase: PayOrderUseCase,
