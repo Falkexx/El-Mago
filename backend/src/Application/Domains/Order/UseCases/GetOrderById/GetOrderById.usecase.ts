@@ -6,6 +6,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Status } from 'src/@metadata';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { PaypalService } from 'src/Application/Infra/Payment/Paypal/Paypal.service';
@@ -35,21 +36,25 @@ export class GetOrderByIdUseCase {
       throw new NotFoundException('order not found');
     }
 
-    const isPaid = order.status.find((_status_) => _status_.status === 'PAID');
-
-    const paypalOrder =
-      await this.paypalService.checkOrder('4CN72590V0448541W');
-    console.log(paypalOrder);
-
-    if (isPaid && paypalOrder.status === 'APPROVED') {
+    if (!order.paymentId) {
       return order;
     }
+
+    const isPaid = order.status.find(
+      (_status_) => _status_.status === Status.PAID,
+    );
+
+    if (isPaid) {
+      return order;
+    }
+
+    const paypalOrder = await this.paypalService.checkOrder(order.paymentId);
 
     if (paypalOrder.status === 'APPROVED') {
       const newOrderStatus = Object.assign(new OrderStatus(), {
         id: shortId(),
         order: order,
-        status: 'PAID',
+        status: Status.PAID,
         title: 'order is paid',
         description: 'paid successful',
         createdAt: new Date(),
