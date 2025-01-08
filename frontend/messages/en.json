@@ -41,6 +41,14 @@
     "description": "Lorem ipsum dolor sit amet. Sit sint deserunt sit neque quibusdam qui laboriosam nemo qui reiciendis"
   },
 
+  "Unauthorized_affiliates":{
+
+    "title":"You must be authenticated to register as an affiliate",
+    "siginBtn":"Sign In",
+    "signupBtn":"Sign Up"
+
+  },
+
   "FAQs": {
     "title": "Frequently Asked Questions",
     "discordTitle": "More Questions?",
