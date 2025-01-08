@@ -26,27 +26,27 @@ function Header() {
               </li>
 
               <li>
-                <Link href="/Gold">Gold</Link>
+                <Link href="/gold">Gold</Link>
               </li>
 
               <li>
-                <Link href="/Items">Items</Link>
+                <Link href="/items">Items</Link>
               </li>
 
               <li>
-                <Link href="/Carry Run">Carry Run</Link>
+                <Link href="/carry Run">Carry Run</Link>
               </li>
 
               <li>
-                <Link href="/Boosting">Boosting</Link>
+                <Link href="/boosting">Boosting</Link>
               </li>
 
               <li>
-                <Link href="/Build">Build</Link>
+                <Link href="/build">Build</Link>
               </li>
 
               <li>
-                <Link href="/Affiliate">Affiliate</Link>
+                <Link href="/affiliate">Affiliate</Link>
               </li>
             </ul>
           </div>
