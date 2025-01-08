@@ -15,6 +15,30 @@
     font-family: "Jost", serif;
     font-style: normal;
   }
+
+
+  .ctaBtn{
+    padding: 0.75rem 3rem; /* 12 x 0.25rem (left & right), 3 x 0.25rem (top & bottom) */
+    background-color: #8e33ff;
+    border-radius: 0.5rem; /* 8px */
+    box-shadow: 0px 8px 16px 0px rgba(125, 42, 232, 0.15);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.375rem; /* 1.5 x 0.25rem */
+  }
+
+  .ctaBtn_WithoutBg{
+
+    padding: 0.75rem 3rem; /* 12 x 0.25rem (left & right), 3 x 0.25rem (top & bottom) */
+    border-radius: 0.5rem; /* 8px */
+    box-shadow: 0px 8px 16px 0px rgba(125, 42, 232, 0.15);
+    border: 1px solid #8e33ff;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.375rem; /* 1.5 x 0.25rem */
+  }
 }
 
 @media (prefers-color-scheme: dark) {
