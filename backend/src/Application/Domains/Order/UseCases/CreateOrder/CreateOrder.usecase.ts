@@ -18,6 +18,8 @@ import { UserEntity } from 'src/Application/Entities/User.entity';
 import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
 import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
+import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
+import { Status } from 'src/@metadata';
 
 @Injectable()
 export class CreateOrderUseCase {
@@ -81,7 +83,7 @@ export class CreateOrderUseCase {
       const status = Object.assign(new OrderStatus(), {
         id: shortId(10),
         createdAt: new Date(),
-        status: 'PENDING',
+        status: Status.CREATED,
         title: 'Aguardando o pagamento',
         description: null,
       } as OrderStatus);
@@ -98,23 +100,16 @@ export class CreateOrderUseCase {
         OrderItems: itemsEntityList,
       } as OrderEntity);
 
-      const savedItemsList = await manager.save(order.OrderItems);
+      await manager.save(order.OrderItems);
 
-      const savedStatus = await manager.save(order.status);
+      await manager.save(order.status);
 
       const orderEntity = manager.create(OrderEntity, order);
       console.log(orderEntity);
 
       const savedOrder = await manager.save(OrderEntity, orderEntity);
-      // console.log(savedOrder);
 
-      // await manager.delete(CartItemEntity, { cart: { id: cart.id } });
-
-      // await manager.update(
-      //   CartEntity,
-      //   { id: cart.id },
-      //   { updatedAt: new Date() },
-      // );
+      await manager.delete(CartItemEntity, { cart: { id: cart.id } });
 
       return savedOrder;
     });

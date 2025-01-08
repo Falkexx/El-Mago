@@ -32,5 +32,5 @@ export class GenericPaginationDto {
   @IsString()
   @IsOptional()
   @IsIn(['ASC', 'DESC'], { message: 'Order must be ASC or DESC' })
-  order?: 'ASC' | 'DESC';
+  order?: 'ASC' | 'DESC' = 'DESC';
 }
