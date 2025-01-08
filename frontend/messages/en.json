@@ -35,6 +35,19 @@
     "passwordSpecial": "Password must contain at least one special character.",
     "passwordsDoNotMatch": "Passwords do not match."
   },
+
+  "Affiliates": {
+    "title": "Affiliates",
+    "description": "Lorem ipsum dolor sit amet. Sit sint deserunt sit neque quibusdam qui laboriosam nemo qui reiciendis"
+  },
+
+  "FAQs": {
+    "title": "Frequently Asked Questions",
+    "discordTitle": "More Questions?",
+    "discordDesc": "Join our Discord! There you can ask all your questions to our team or members of our community.",
+    "discoCTA": "Join Discord"
+  },
+
   "Navbar": {
     "MyAccount": "My Account",
     "Cart": "Cart"

@@ -35,11 +35,17 @@
     "passwordSpecial": "A senha deve conter pelo menos um caractere especial.",
     "passwordsDoNotMatch": "As senhas não coincidem."
   },
-  "Navbar": {
-    "MyAccount": "Minha  conta",
-    "Cart":"Carrinho"
+
+  "Affiliates": {
+    "title": "Afiliados",
+    "description": "Lorem ipsum dolor sit amet. Sit sint deserunt sit neque quibusdam qui laboriosam nemo qui reiciendis"
   },
 
-  "Hero": {}
+  "FAQs": {
+    "title": "Perguntas frequentes",
+    "discordTitle": "Mais Perguntas?",
+    "discordDesc": "Junte-se ao nosso Discord! Lá você pode fazer todas as suas perguntas para a nossa equipe ou membros da nossa comunidade.",
+    "discoCTA": "Entrar no Discord"
+  }
   
 }
