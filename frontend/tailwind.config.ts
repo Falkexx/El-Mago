@@ -11,6 +11,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        whiteDef: "#DEE2E6",
         primary: { // Primary Collors 
           50: '#FDEEFF',
           100: '#F5CCFF',

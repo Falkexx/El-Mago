@@ -1,7 +1,21 @@
 {
   "HomePage": {
-    "title": "Hello world!",
-    "about": "Go to the about page"
+    "title": "Olá mundo!",
+    "about": "Vá para a página sobre",
+
+    "cardSecTitle":"Diablo IV Products and Services",
+    "cardSecSubtitle":"Lorem ipsum dolor sit amet. Sit sint deserunt sit neque quibusdam qui laboriosam nemo qui reiciendis",
+    
+    "cardContentDescriptionGold": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+    "cardContentDescriptionItem": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+    "cardContentDescriptionBoosting": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+    "cardContentDescriptionBuild": "Lorem ipsum dolor sit amet. Sed animi quas vel inventore.",
+
+    "cardContentBtnGold":"Buy Gold",
+    "cardContentBtnItem":"Buy Items",
+    "cardContentBtnBoosting": "Hire Boosting Service",
+    "cardContentBtnBuild": "Hire Build Service"
+
   },
   "LoginPage": {
     "rememberme": "Remember me",
@@ -21,6 +35,19 @@
     "passwordSpecial": "Password must contain at least one special character.",
     "passwordsDoNotMatch": "Passwords do not match."
   },
+
+  "Affiliates": {
+    "title": "Affiliates",
+    "description": "Lorem ipsum dolor sit amet. Sit sint deserunt sit neque quibusdam qui laboriosam nemo qui reiciendis"
+  },
+
+  "FAQs": {
+    "title": "Frequently Asked Questions",
+    "discordTitle": "More Questions?",
+    "discordDesc": "Join our Discord! There you can ask all your questions to our team or members of our community.",
+    "discoCTA": "Join Discord"
+  },
+
   "Navbar": {
     "MyAccount": "My Account",
     "Cart": "Cart"
