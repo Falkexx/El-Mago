@@ -36,10 +36,6 @@ export class PaypalService {
     try {
       const orderDataValid = this.validateOrder(createOrder);
 
-      console.log(`${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}`);
-
-      console.log(orderDataValid);
-
       const response =
         await this.httpService.axiosRef<PayPalCreateOrderResponse>(
           `${env.PAYPAL_BASE_URL}/v2/checkout/orders`,
