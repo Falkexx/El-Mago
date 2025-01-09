@@ -61,6 +61,7 @@ export class UserService {
       items: [],
       orders: [],
       cart: null,
+      RequestAffiliate: null,
     } as UserEntity);
 
     const userCreated = await this.userRepository.create(userEntity);

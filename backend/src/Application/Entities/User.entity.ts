@@ -4,6 +4,7 @@ import { AffiliateEntity } from './Affiliate.entity';
 import { ItemEntity } from './Item.entity';
 import { CartEntity } from './Cart/Cart.entity';
 import { OrderEntity } from './Order.entity';
+import { RequestAffiliateEntity } from './Request-Affiliate.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -82,6 +83,9 @@ export class UserEntity {
 
   @OneToMany(() => OrderEntity, (order) => order.user)
   orders: OrderEntity[];
+
+  @OneToOne(() => RequestAffiliateEntity)
+  RequestAffiliate: RequestAffiliateEntity;
 }
 
 export class UserUpdateEntity {
