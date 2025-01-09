@@ -66,6 +66,15 @@ export class OrderEntity {
   @Column({ type: 'varchar', nullable: true, default: null })
   paymentId: string | null;
 
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  platform: 'PC' | 'XBOX' | null;
+
+  @Column({ type: 'varchar', length: 120 })
+  nickName: string;
+
+  @Column({ type: 'varchar', length: 120 })
+  battleTag: string;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 

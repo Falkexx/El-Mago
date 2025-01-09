@@ -26,6 +26,9 @@ export class OrderItem {
   @Column({ type: 'varchar' })
   itemId: string;
 
+  // @Column({ type: 'varchar', length: 120 })
+  // server: string;
+
   @ManyToOne(() => OrderEntity, (order) => order.OrderItems)
   Order: OrderEntity;
 
