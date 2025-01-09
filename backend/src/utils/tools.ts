@@ -1,7 +1,6 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs';
-import { FileType } from '#types';
 
 export function splitKeyAndValue(param: object) {
   const [key, value] = Object.entries(param)[0];
