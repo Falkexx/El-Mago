@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import "@/app/globals.css";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 export default async function LocaleLayout({
   children,
@@ -24,11 +25,12 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body className="px-32 bg-[#111111]">
+      <body className=" bg-[#111111] fontDefault">
         <Header />
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
         </NextIntlClientProvider>
+        <Footer/>
       </body>
     </html>
   );
