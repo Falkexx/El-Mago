@@ -20,6 +20,7 @@ import { OrderItem } from 'src/Application/Entities/order-item.entity';
 import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
 import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { Status } from 'src/@metadata';
+import { CreateOrderDto } from './CreateOrder.dto';
 
 @Injectable()
 export class CreateOrderUseCase {
@@ -34,7 +35,7 @@ export class CreateOrderUseCase {
     private readonly dataSource: DataSource,
   ) {}
 
-  async execute(payload: PayloadType) {
+  async execute(payload: PayloadType, createOrderDto: CreateOrderDto) {
     const user = await this.userRepository.getBy({ id: payload.sub });
 
     if (!user) {
@@ -59,13 +60,14 @@ export class CreateOrderUseCase {
     //   throw new NotAcceptableException('no have items in card');
     // }
 
-    return this.createOrderTransaction(user, cart, items);
+    return this.createOrderTransaction(user, cart, items, createOrderDto);
   }
 
   private async createOrderTransaction(
     user: UserEntity,
     cart: CartEntity,
     items: ItemEntity[],
+    createOrderDto: CreateOrderDto,
   ) {
     return await this.dataSource.transaction(async (manager) => {
       const itemsEntityList = items.map((_item_) => {
@@ -98,6 +100,9 @@ export class CreateOrderUseCase {
         user: user,
         status: [status],
         OrderItems: itemsEntityList,
+        battleTag: createOrderDto.battleTag,
+        nickName: createOrderDto.nickName,
+        platform: createOrderDto.platform ?? null,
       } as OrderEntity);
 
       await manager.save(order.OrderItems);

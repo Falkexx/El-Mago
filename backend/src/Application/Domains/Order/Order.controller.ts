@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { OrderService } from './Order.service';
 import { CreateOrderUseCase } from './UseCases/CreateOrder/CreateOrder.usecase';
 import { User } from '../Auth/decorators/User.decorator';
@@ -10,6 +18,7 @@ import { PayOrderUseCase } from './UseCases/PayOrder/PayOrder.usecase';
 import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth.usecase';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecase';
+import { CreateOrderDto } from './UseCases/CreateOrder/CreateOrder.dto';
 
 @Controller({ path: 'order', version: '1' })
 export class OrderController {
@@ -37,8 +46,11 @@ export class OrderController {
   @Post()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.ADMIN, ROLE.USER)
-  createOrder(@User() payload: PayloadType) {
-    return this.createOrderUseCase.execute(payload);
+  createOrder(
+    @User() payload: PayloadType,
+    @Body() createOrderDto: CreateOrderDto,
+  ) {
+    return this.createOrderUseCase.execute(payload, createOrderDto);
   }
 
   @Post('pay/:orderId')

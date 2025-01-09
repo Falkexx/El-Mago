@@ -60,3 +60,8 @@ export function getNextAction(value: keyof typeof Status) {
       return OrderAction.ORDER_COMPLETED;
   }
 }
+
+export enum PLATFORM {
+  PC = 'PC',
+  XBOX = 'XBOX',
+}
