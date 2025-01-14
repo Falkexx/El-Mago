@@ -119,12 +119,15 @@ export class RequestAffiliateTypeOrmRepository
     paginationDto: GenericPaginationDto,
   ): Promise<PaginationResult<RequestAffiliateEntity[]>> {
     try {
-      const queryBuilder = this.reqAffiliateRepo.createQueryBuilder();
+      const queryBuilder = this.reqAffiliateRepo.createQueryBuilder(
+        TABLE.affiliate_queue,
+      );
 
       return this.searchBuilder.search(
         paginationDto,
         TABLE.affiliate_queue,
         queryBuilder,
+        { createdField: 'createdAt', searchField: 'name' },
       );
     } catch (e) {
       console.error(e);
