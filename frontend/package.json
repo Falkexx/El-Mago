@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "gsap": "^3.12.5",
     "next": "15.0.3",
     "next-intl": "^3.25.1",
     "nookies": "^2.5.2",
