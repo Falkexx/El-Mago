@@ -1,7 +1,15 @@
 import { TABLE } from 'src/@metadata/tables';
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryColumn,
+  RelationId,
+} from 'typeorm';
 import { UserEntity } from './User.entity';
 import { RequireOnlyOne } from '#types';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: TABLE.affiliate_queue })
 export class RequestAffiliateEntity {
@@ -38,11 +46,14 @@ export class RequestAffiliateEntity {
   @Column({ type: 'varchar', length: 50, nullable: true, default: null })
   deletedAt: Date | null;
 
-  // relations
+  @RelationId(
+    (requestAffiliate: RequestAffiliateEntity) => requestAffiliate.User,
+  )
   userId: string;
 
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'userId' })
+  @Exclude()
   User: UserEntity;
 }
 
