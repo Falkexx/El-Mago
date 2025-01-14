@@ -10,6 +10,7 @@ import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
+import { GameServerEntity } from 'src/Application/Entities/GameServer.Entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres', // ou o banco de dados que você está usando
@@ -29,6 +30,7 @@ export const AppDataSource = new DataSource({
     OrderEntity,
     OrderStatus,
     OrderItem,
+    GameServerEntity,
   ],
   migrations: ['./src/migrations/**/*.ts'],
   synchronize: false,

@@ -9,4 +9,5 @@ export enum TABLE {
   cart_item = 'cart_item',
   order_status = 'order_status',
   order_item = 'order_item',
+  game_server = 'game_server',
 }

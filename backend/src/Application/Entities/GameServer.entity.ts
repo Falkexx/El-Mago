@@ -1,9 +1,9 @@
-import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, ManyToMany } from 'typeorm';
 import { ItemEntity } from './Item.entity';
 import { TABLE } from 'src/@metadata/tables';
 
-@Entity(TABLE.category)
-export class CategoryEntity {
+@Entity(TABLE.game_server)
+export class GameServerEntity {
   @PrimaryColumn({ type: 'varchar' })
   id: string;
 
@@ -22,16 +22,16 @@ export class CategoryEntity {
   @Column({ type: 'timestamptz', update: true })
   updatedAt: Date;
 
-  @ManyToMany(() => ItemEntity, (item) => item.Categories)
+  @ManyToMany(() => ItemEntity, (item) => item.GameServers)
   Items: ItemEntity[];
 }
 
-export class CategoryUpdateEntity {
-  description: Pick<CategoryEntity, 'description'>;
-  isDeleted: Pick<CategoryEntity, 'isDeleted'> | boolean;
-  updatedAt: Pick<CategoryEntity, 'updatedAt'>;
+export class GameServerUpdateEntity {
+  description: Pick<GameServerEntity, 'description'>;
+  isDeleted: Pick<GameServerEntity, 'isDeleted'> | boolean;
+  updatedAt: Pick<GameServerEntity, 'updatedAt'>;
 }
 
-export type CategoryUniqueRefs =
-  | Pick<CategoryEntity, 'id'>
-  | Pick<CategoryEntity, 'name'>;
+export type GameServerUniqueRefs =
+  | Pick<GameServerEntity, 'id'>
+  | Pick<GameServerEntity, 'name'>;

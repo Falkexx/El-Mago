@@ -17,6 +17,7 @@ import { Exclude } from 'class-transformer';
 import { CategoryEntity } from './Category.entity';
 import { CartItemEntity } from './Cart/CartItem.entity';
 import { OrderItem } from './order-item.entity';
+import { GameServerEntity } from './GameServer.Entity';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -67,6 +68,10 @@ export class ItemEntity {
 
   @OneToMany(() => CartItemEntity, (cartItem) => cartItem.item)
   CartItems: CartItemEntity[];
+
+  @ManyToMany(() => GameServerEntity, (gameServer) => gameServer.Items) // Relacionamento com GameServerEntity
+  @JoinTable()
+  GameServers: GameServerEntity[];
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.Item)
   OrderItem: OrderItem;
