@@ -17,6 +17,8 @@ import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { SearchBuilderService } from './SearchBuilder.service';
 import { OrderTypeOrmRepository } from './OrderRepository/OrderTypeOrm.repository';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
+import { GameServerTypeOrmRepository } from './GameServer/GameServerTypeorm.repository';
+import { GameServerEntity } from 'src/Application/Entities/GameServer.Entity';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { OrderStatus } from 'src/Application/Entities/order-status.entity';
       CartItemEntity,
       OrderEntity,
       OrderStatus,
+      GameServerEntity,
     ]),
   ],
   providers: [
@@ -41,6 +44,7 @@ import { OrderStatus } from 'src/Application/Entities/order-status.entity';
     CartTypeOrmRepository,
     OrderTypeOrmRepository,
     SearchBuilderService,
+    GameServerTypeOrmRepository,
   ],
   exports: [TypeOrmModule, SearchBuilderService],
 })
