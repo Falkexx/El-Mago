@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class ReqAffiliateDto {
   @IsString()
@@ -19,6 +19,12 @@ export class ReqAffiliateDto {
 
   @IsString()
   @IsNotEmpty()
+  @Matches(
+    /(?:\+?\d{2,3}[ ]{0,4})?(?:(?:\(0?\d{2}\)|0?\d{2})[ ]{0,4})?(?:9[ .-]?)?\d{4}[ .-]?\d{4}/,
+    {
+      message: 'examples: +55 (35) 9923212559 | +5535992321234',
+    },
+  )
   phoneNumber: string;
 
   @IsString()
