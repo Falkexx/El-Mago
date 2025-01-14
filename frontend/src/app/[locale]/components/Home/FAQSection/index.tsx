@@ -2,7 +2,7 @@ import { Link } from "@/i18n/routing";
 import { FaDiscord } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 
-import AccordeonCard from "../Ui/Cards/AccordeonCard";
+import AccordeonCard from "../../Ui/Cards/AccordeonCard";
 
 function index() {
   const t = useTranslations("FAQs");
@@ -43,8 +43,7 @@ function index() {
           <div className="h-full w-full flex flex-col justify-between">
             <article>
               <h1 className="text-black text-xl font-bold leading-8">
-              {t("discordTitle")}
-
+                {t("discordTitle")}
               </h1>
 
               <p className="text-[#6c757d] text-xs font-normal leading-4">

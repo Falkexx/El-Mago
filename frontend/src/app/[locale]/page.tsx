@@ -1,11 +1,11 @@
-import Hero from "./components/Hero";
+import Hero from "./components/Home/Hero";
 import HomeCard from "./components/Ui/Cards/HomeCard";
 import GoldIcon from "@/midias/Icons/CardIcons/gold.svg";
 import BoxIcon from "@/midias/Icons/CardIcons/box.svg";
 import FireManIcon from "@/midias/Icons/CardIcons/fireMan.svg";
 import SwordIcon from "@/midias/Icons/CardIcons/sword.svg";
-import AffiliateSec from "@/app/[locale]/components/AffiliateSection/index";
-import FAQSection from '@/app/[locale]/components/FAQSection'
+import AffiliateSec from "@/app/[locale]/components/Home/AffiliateSection/index";
+import FAQSection from "@/app/[locale]/components/Home/FAQSection";
 import { useTranslations } from "next-intl";
 
 export default function HomePage() {
@@ -95,7 +95,7 @@ export default function HomePage() {
 
       {/*FAQ SECTION*/}
       <section className="bg-white md:w-full md:px-32 md:py-20">
-        <FAQSection/>
+        <FAQSection />
       </section>
     </main>
   );

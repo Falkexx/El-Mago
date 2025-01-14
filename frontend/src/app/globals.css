@@ -15,6 +15,48 @@
     font-family: "Jost", serif;
     font-style: normal;
   }
+
+  .LabelDefault{
+
+    color: #f8f9fa;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 500; /* Medium */
+    line-height: 27px;
+
+  }
+
+  .InputDefault{
+
+    height: 2.75rem; /* 44px */
+    padding: 13px 1rem; /* py-[13px] e px-4 (1rem = 16px) */
+    background-color: #222222;
+    border-radius: 0.5rem; /* 8px */
+    border: 1px solid #495057;
+    outline: none;
+
+  }
+
+
+  .ctaBtn{
+    background-color: #8e33ff;
+    border-radius: 0.5rem; /* 8px */
+    box-shadow: 0px 8px 16px 0px rgba(125, 42, 232, 0.15);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.375rem; /* 1.5 x 0.25rem */
+  }
+
+  .ctaBtn_WithoutBg{
+
+    border-radius: 0.5rem; /* 8px */
+    box-shadow: 0px 8px 16px 0px rgba(125, 42, 232, 0.15);
+    border: 1px solid #8e33ff;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.375rem; /* 1.5 x 0.25rem */
+  }
 }
 
 @media (prefers-color-scheme: dark) {
