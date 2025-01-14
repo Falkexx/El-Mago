@@ -5,6 +5,8 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/AffiliateRepository/AffiliateTypeOrm.repository';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
+import { ReqAffiliateUseCase } from './ReqAffiliate/ReqAffiliate.usecase';
+import { RequestAffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/RequestAffiliate/RequestAffiliateTypeOrm.repository';
 
 @Module({
   imports: [RepositoriesModule],
@@ -18,7 +20,13 @@ import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositor
       provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
       useClass: UserTypeOrmRepository,
     },
+    {
+      provide: KEY_INJECTION.REQUEST_AFFILIATE_REPOSITORY,
+      useClass: RequestAffiliateTypeOrmRepository,
+    },
     AffiliateService,
+
+    ReqAffiliateUseCase,
   ],
   exports: [AffiliateService],
 })
