@@ -6,13 +6,14 @@ import {
 } from 'src/Application/Entities/Request-Affiliate.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { IRequestAffiliateRepositoryContract } from './IRequestAffiliate.repository-contract';
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { splitKeyAndValue } from '#utils';
-import { SearchBuilderService } from '../Repositories/SearchBuilder.service';
+import { SearchBuilderService } from '../SearchBuilder.service';
 import { TABLE } from 'src/@metadata/tables';
 
+@Injectable()
 export class RequestAffiliateTypeOrmRepository
   implements IRequestAffiliateRepositoryContract
 {
