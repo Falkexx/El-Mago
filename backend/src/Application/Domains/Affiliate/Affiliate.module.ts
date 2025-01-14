@@ -5,7 +5,7 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/AffiliateRepository/AffiliateTypeOrm.repository';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
-import { ReqAffiliateUseCase } from './ReqAffiliate/ReqAffiliate.usecase';
+import { ReqAffiliateUseCase } from './UseCases/ReqAffiliate/ReqAffiliate.usecase';
 import { RequestAffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/RequestAffiliate/RequestAffiliateTypeOrm.repository';
 import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
 

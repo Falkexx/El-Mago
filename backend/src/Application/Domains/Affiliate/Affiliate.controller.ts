@@ -1,6 +1,6 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { ReqAffiliateDto } from './ReqAffiliate/ReqAffiliate.dto';
-import { ReqAffiliateUseCase } from './ReqAffiliate/ReqAffiliate.usecase';
+import { ReqAffiliateDto } from './UseCases/ReqAffiliate/ReqAffiliate.dto';
+import { ReqAffiliateUseCase } from './UseCases/ReqAffiliate/ReqAffiliate.usecase';
 import { User } from '../Auth/decorators/User.decorator';
 import { ApiResponse, PayloadType } from '#types';
 import { JwtAuthGuard } from 'src/@guards/jwt-auth.guard';
