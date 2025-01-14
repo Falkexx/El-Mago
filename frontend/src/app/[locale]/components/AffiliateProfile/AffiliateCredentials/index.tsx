@@ -1,7 +1,7 @@
-import Change_Password from "../../Ui/Forms/Change_Password";
 import User_Identification_Credentials from "../../Ui/Forms/User_Identification_Credentials";
+import Change_Password from "../../Ui/Forms/Change_Password";
 
-function UserCredentials() {
+function index() {
   return (
     <section className="w-full mt-4 flex flex-col gap-4">
       <section className="flex flex-col gap-4">
@@ -23,4 +23,4 @@ function UserCredentials() {
   );
 }
 
-export default UserCredentials;
+export default index;
