@@ -11,7 +11,8 @@ import { ReqAffiliateDto } from './ReqAffiliate.dto';
 import { PayloadType } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { RequestAffiliateEntity } from 'src/Application/Entities/Request-Affiliate.entity';
-import { uuidV4 } from '#utils';
+import { env, uuidV4 } from '#utils';
+import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
 
 @Injectable()
 export class ReqAffiliateUseCase {
@@ -22,6 +23,7 @@ export class ReqAffiliateUseCase {
     private readonly affiliateRepository: IAffiliateRepositoryContract,
     @Inject(KEY_INJECTION.REQUEST_AFFILIATE_REPOSITORY)
     private readonly requestAffiliateRepository: IRequestAffiliateRepositoryContract,
+    private readonly mailService: NodemailerService,
   ) {}
 
   async execute(payload: PayloadType, reqAffiliateDto: ReqAffiliateDto) {
@@ -66,6 +68,22 @@ export class ReqAffiliateUseCase {
 
     const affiliateCreated =
       await this.requestAffiliateRepository.create(reqAffiliateEntity);
+
+    this.mailService.send({
+      name: user.firstName,
+      emails: [user.email],
+      htmlContent: ``,
+      subject: 'Request to be affiliate',
+      text: 'Você solicitou ser um affiliado na plataforma El-Mago. Aguarde sua aprovação',
+    });
+
+    this.mailService.send({
+      name: 'Admin from El-mago',
+      emails: [env.ADMIN_EMAIL],
+      htmlContent: ``,
+      subject: 'Se tornar um afiliado',
+      text: `O usuário ${user.firstName} com o email de ${user.email}, quer ser tornar um afiliado. Consulte a fila de espera para aprovar.`,
+    });
 
     return affiliateCreated;
   }

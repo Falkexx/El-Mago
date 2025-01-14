@@ -7,9 +7,10 @@ import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRe
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
 import { ReqAffiliateUseCase } from './ReqAffiliate/ReqAffiliate.usecase';
 import { RequestAffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/RequestAffiliate/RequestAffiliateTypeOrm.repository';
+import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
 
 @Module({
-  imports: [RepositoriesModule],
+  imports: [RepositoriesModule, MailModule],
   controllers: [AffiliateController],
   providers: [
     {
