@@ -8,6 +8,7 @@ import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositor
 import { ReqAffiliateUseCase } from './UseCases/ReqAffiliate/ReqAffiliate.usecase';
 import { RequestAffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/RequestAffiliate/RequestAffiliateTypeOrm.repository';
 import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
+import { ListAffiliatesOnHoldUseCase } from './UseCases/ListAffiliatesOnHold/ListAffiliatesOnHold.usecase';
 
 @Module({
   imports: [RepositoriesModule, MailModule],
@@ -28,6 +29,7 @@ import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
     AffiliateService,
 
     ReqAffiliateUseCase,
+    ListAffiliatesOnHoldUseCase,
   ],
   exports: [AffiliateService],
 })
