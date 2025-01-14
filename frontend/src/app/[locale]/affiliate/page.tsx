@@ -2,6 +2,7 @@ import Operation_steps from "../components/Affiliate/Operation_steps";
 import FinishOrder from "../components/Ui/Overlay/FinishOrder";
 import OrderOverlay from "../components/Ui/Overlay/OrderOverlay";
 import RegisterMarketplace from "../components/Ui/Overlay/RegisterMarketplage";
+import Approved_Affiliate_page from "@/app/[locale]/components/Affiliate/Aproved_Affiliate_page/index"
 
 function page() {
 
@@ -9,6 +10,9 @@ function page() {
 
     <main>
       <section className='px-32'>
+
+        {/*
+        
         <Operation_steps/>
 
         <OrderOverlay affiliateComission={8.90} battleTag="aiaiaiaiai#69" characterName="Japalol" classGame="items > Legendary" order="Tearveil Amulet of Plains Power" orderID={3} plataform="PC" server="Eternal - Hardcore" totalValue={22.22} key={1} />
@@ -16,6 +20,9 @@ function page() {
         <FinishOrder affiliateComission={8.90} orderID={3} totalValue={22.22} key={1}/>
 
         <RegisterMarketplace/>
+        */}
+
+        <Approved_Affiliate_page/>
       </section>
     </main>
   </section>;
