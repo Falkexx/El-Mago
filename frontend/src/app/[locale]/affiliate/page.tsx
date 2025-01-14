@@ -1,13 +1,12 @@
-import Affiliate_Unauthorized from '@/app/[locale]/components/Ui/Unauthorized/Affiliate_Unauthorized'
+import Operation_steps from "../components/Affiliate/Operation_steps";
+
 function page() {
 
   return <section>
 
     <main>
-
-
       <section className='px-32'>
-        <Affiliate_Unauthorized/>
+        <Operation_steps/>
       </section>
     </main>
   </section>;
