@@ -18,9 +18,9 @@ function index() {
           <h1 className="text-3xl font-bold leading-9">{t("title")}</h1>
 
           <div className="flex flex-row gap-6">
-            <Link href="/" className="h-11 ctaBtn">{t("siginBtn")}</Link>
+            <Link href="/" className="h-11 ctaBtn px-12 py-3">{t("siginBtn")}</Link>
 
-            <Link href="/" className="h-11 ctaBtn_WithoutBg">{t("signupBtn")}</Link>
+            <Link href="/" className="h-11 ctaBtn_WithoutBg px-12 py-3">{t("signupBtn")}</Link>
           </div>
         </article>
 
