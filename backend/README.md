@@ -1,11 +1,12 @@
 # Backend El mago
+
 Para executar o projeto é nescessário que tenha o node instalado e configurar o projeto como descrito abaixo.
 
 ## Configuração
 
-### Variáveis de ambiente 
+### Variáveis de ambiente
 
-As variáveis de ambiente são constantes que o sistema operacional da para que amplicações executem, nelas estã  informções como conexções entre bancos de dados e serviços terceiros como pagamentos e muito mais. Seu uso se deve ao fato principalmente para dar mais seguraça a aplicação impedindo que o credenciais importantes sejam exposas no projeto.
+As variáveis de ambiente são constantes que o sistema operacional da para que amplicações executem, nelas estã informções como conexções entre bancos de dados e serviços terceiros como pagamentos e muito mais. Seu uso se deve ao fato principalmente para dar mais seguraça a aplicação impedindo que o credenciais importantes sejam exposas no projeto.
 
 Antes de iniciar o projeto, na pasta root do backend crie um arquivo chamado **.env** esse arquivo tem que ter as propriedades abaixo. Caso venha a não passar alguma propriedade, a aplicação vai crachar automaticamente.
 
@@ -42,16 +43,19 @@ PUBLIC_IMAGES_BUCKET_NAME=
 AWS_S3_ACCESS_KEY_ID=
 AWS_S3_SECRET_ACCESS_KEY_ID=
 ```
+
 ### Banco de dados
+
 Para executar o banco de dados exsitem duas formas, a primeira instalando no sistema operacional o postgres e redis e a segunda é executando eles em forma de container no arquivo docker-compose.yml declarado na raiz do projeto.
 
 #### via docker
 
 ```terminal
-docker compose up -d 
+docker compose up -d
 ```
 
 ## Executando o projeto
+
 Para executar o projeto rode o comando para produção:
 
 ```terminal
@@ -62,4 +66,12 @@ E para desenvolvimento:
 
 ```terminal
 npm run start:dev
+```
+
+## CRIANDO MIGRATION
+
+Para criar um novo arquivo de Migration, rode o comando:
+
+```terminal
+npm run typeorm ./src/migrations/<nome-da-migration>
 ```
