@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Inject,
   Injectable,
   NotAcceptableException,
@@ -31,6 +32,10 @@ export class ReqAffiliateUseCase {
 
     if (!user) {
       throw new UnauthorizedException();
+    }
+
+    if (user.isBanned || user.isDeleted) {
+      throw new ForbiddenException('user deleted or banned');
     }
 
     const affiliate = await this.affiliateRepository.getBy({
