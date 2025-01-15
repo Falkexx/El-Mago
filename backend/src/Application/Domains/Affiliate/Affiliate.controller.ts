@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ReqAffiliateDto } from './UseCases/ReqAffiliate/ReqAffiliate.dto';
 import { ReqAffiliateUseCase } from './UseCases/ReqAffiliate/ReqAffiliate.usecase';
 import { User } from '../Auth/decorators/User.decorator';
@@ -10,12 +18,18 @@ import { plainToInstance } from 'class-transformer';
 import { RequestAffiliateEntity } from 'src/Application/Entities/Request-Affiliate.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { ListAffiliatesOnHoldUseCase } from './UseCases/ListAffiliatesOnHold/ListAffiliatesOnHold.usecase';
+import { ApproveAffiliateOnWaitingListDto } from './UseCases/ApproveAffiliateOnWaitingList/ApproveAffiliateOnWaitingList.dto';
+import {
+  ApproveAffiliateOnWaitingListUseCase,
+  ApproveAffiliateOnWaitingListUseCaseResult,
+} from './UseCases/ApproveAffiliateOnWaitingList/ApproveAffiliateOnWaitingList.usecase';
 
 @Controller({ path: 'affiliate', version: '1' })
 export class AffiliateController {
   constructor(
     private readonly reqAffiliateUseCase: ReqAffiliateUseCase,
     private readonly listAffiliatesOnHoldUseCase: ListAffiliatesOnHoldUseCase,
+    private readonly approveAffiliateOnWaitingListUseCase: ApproveAffiliateOnWaitingListUseCase,
   ) {}
 
   @Post('/request-to-become')
@@ -62,6 +76,24 @@ export class AffiliateController {
         per_page: listOfAffiliatesOnHold.limit,
         total: listOfAffiliatesOnHold.total,
       },
+    };
+  }
+
+  @Post('approve-affiliate-on-hold/:email')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN)
+  async approveAffiliateOnHold(
+    @Param() { email }: ApproveAffiliateOnWaitingListDto,
+  ): Promise<ApiResponse<ApproveAffiliateOnWaitingListUseCaseResult>> {
+    const result = await this.approveAffiliateOnWaitingListUseCase.execute({
+      email,
+    });
+
+    return {
+      data: result,
+      message: 'SUCCESS',
+      status: 201,
+      href: null,
     };
   }
 }

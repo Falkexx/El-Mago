@@ -38,7 +38,7 @@ export class RequestAffiliateEntity {
   country: string;
 
   @Column({ type: 'varchar', length: 20 })
-  status: 'PENDING' | 'APPROVE' | 'DECLINED';
+  status: 'PENDING' | 'APPROVED' | 'DECLINED';
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
