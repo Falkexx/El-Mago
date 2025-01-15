@@ -23,6 +23,8 @@ import {
   ApproveAffiliateOnWaitingListUseCase,
   ApproveAffiliateOnWaitingListUseCaseResult,
 } from './UseCases/ApproveAffiliateOnWaitingList/ApproveAffiliateOnWaitingList.usecase';
+import { RefuseAffiliateOnWaitingListUseCase } from './UseCases/RefuseAffiliateOnWaitingList/RefuseAffiliateOnWaitingList.usecase';
+import { RefuseAffiliateOnWaitingListDto } from './UseCases/RefuseAffiliateOnWaitingList/RefuseAffiliateOnWaitingList.dto';
 
 @Controller({ path: 'affiliate', version: '1' })
 export class AffiliateController {
@@ -30,6 +32,7 @@ export class AffiliateController {
     private readonly reqAffiliateUseCase: ReqAffiliateUseCase,
     private readonly listAffiliatesOnHoldUseCase: ListAffiliatesOnHoldUseCase,
     private readonly approveAffiliateOnWaitingListUseCase: ApproveAffiliateOnWaitingListUseCase,
+    private readonly refuseAffiliateOnWaitingListUseCase: RefuseAffiliateOnWaitingListUseCase,
   ) {}
 
   @Post('/request-to-become')
@@ -95,5 +98,18 @@ export class AffiliateController {
       status: 201,
       href: null,
     };
+  }
+
+  @Post('refuse-affiliate-on-hold/:email')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.ADMIN)
+  async refuseAffiliateOnHold(
+    @Param() { email }: RefuseAffiliateOnWaitingListDto,
+  ) {
+    const result = await this.refuseAffiliateOnWaitingListUseCase.execute({
+      email,
+    });
+
+    return result;
   }
 }

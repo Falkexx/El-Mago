@@ -10,6 +10,7 @@ import { RequestAffiliateTypeOrmRepository } from 'src/Application/Infra/Reposit
 import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
 import { ListAffiliatesOnHoldUseCase } from './UseCases/ListAffiliatesOnHold/ListAffiliatesOnHold.usecase';
 import { ApproveAffiliateOnWaitingListUseCase } from './UseCases/ApproveAffiliateOnWaitingList/ApproveAffiliateOnWaitingList.usecase';
+import { RefuseAffiliateOnWaitingListUseCase } from './UseCases/RefuseAffiliateOnWaitingList/RefuseAffiliateOnWaitingList.usecase';
 
 @Module({
   imports: [RepositoriesModule, MailModule],
@@ -32,6 +33,7 @@ import { ApproveAffiliateOnWaitingListUseCase } from './UseCases/ApproveAffiliat
     ReqAffiliateUseCase,
     ListAffiliatesOnHoldUseCase,
     ApproveAffiliateOnWaitingListUseCase,
+    RefuseAffiliateOnWaitingListUseCase,
   ],
   exports: [AffiliateService],
 })
