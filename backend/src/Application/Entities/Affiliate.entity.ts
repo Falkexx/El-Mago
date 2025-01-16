@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { TABLE } from 'src/@metadata/tables';
+import { RequireOnlyOne } from '#types';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -18,16 +19,16 @@ export class AffiliateEntity {
   email: string;
 
   @Column({ type: 'varchar', unique: true })
-  username: string;
+  battleTag: string;
 
   @Column({ type: 'varchar', unique: true })
-  numberPhone: string;
+  phoneNumber: string;
 
   @Column({ type: 'varchar', unique: true })
   cpfCnpj: string;
 
   @Column({ type: 'varchar', unique: true })
-  gameNickName: string;
+  characterName: string;
 
   @Column({ type: 'varchar', nullable: true })
   photo: string | null;
@@ -54,10 +55,9 @@ export class AffiliateUpdateEntity {
   numberPhone: string;
 }
 
-export type AffiliateEntityUniqueRefs =
-  | Pick<AffiliateEntity, 'id'>
-  | Pick<AffiliateEntity, 'email'>
-  | Pick<AffiliateEntity, 'username'>
-  | Pick<AffiliateEntity, 'numberPhone'>
-  | Pick<AffiliateEntity, 'cpfCnpj'>
-  | Pick<AffiliateEntity, 'gameNickName'>;
+export type AffiliateEntityUniqueRefs = RequireOnlyOne<
+  Pick<
+    AffiliateEntity,
+    'id' | 'email' | 'characterName' | 'shortId' | 'cpfCnpj'
+  >
+>;

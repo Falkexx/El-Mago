@@ -12,7 +12,7 @@ export class CreateAffiliateDto {
 
   @IsString()
   @IsNotEmpty()
-  username: string;
+  characterName: string;
 
   @IsString()
   @IsNotEmpty()
@@ -22,7 +22,7 @@ export class CreateAffiliateDto {
       message: 'examples: +55 (35) 9923212559 | +5535992321234',
     },
   )
-  numberPhone: string;
+  phoneNumber: string;
 
   @IsString()
   @IsNotEmpty()
@@ -30,7 +30,7 @@ export class CreateAffiliateDto {
 
   @IsString()
   @IsNotEmpty()
-  gameNickName: string;
+  battleTag: string;
 
   @IsString()
   @IsNotEmpty()
