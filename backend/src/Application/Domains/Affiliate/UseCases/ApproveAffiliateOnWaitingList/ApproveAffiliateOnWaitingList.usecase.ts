@@ -2,6 +2,7 @@ import {
   Inject,
   Injectable,
   NotAcceptableException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { IRequestAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/RequestAffiliate/IRequestAffiliate.repository-contract';
@@ -42,7 +43,7 @@ export class ApproveAffiliateOnWaitingListUseCase {
     });
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new NotFoundException('user not found');
     }
 
     const affiliateOnHold = await this.reqAffiliateRepository.getBy({
