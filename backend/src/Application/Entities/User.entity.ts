@@ -5,6 +5,7 @@ import { ItemEntity } from './Item.entity';
 import { CartEntity } from './Cart/Cart.entity';
 import { OrderEntity } from './Order.entity';
 import { RequestAffiliateEntity } from './Request-Affiliate.entity';
+import { ROLE } from 'src/@metadata/roles';
 
 @Entity('user')
 export class UserEntity {
@@ -58,7 +59,7 @@ export class UserEntity {
   age: number | null;
 
   @Column({ type: 'varchar', length: 20 })
-  role: 'ADMIN' | 'AFFILIATE' | 'USER'; // default: user
+  role: ROLE; // default: user
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -95,7 +96,7 @@ export class UserUpdateEntity {
   password: string;
   discord: string;
   numberPhone: string;
-  role: 'ADMIN' | 'AFFILIATE' | 'USER'; // default: user
+  role: ROLE; // default: user
   isBanned: boolean;
   isDeleted: boolean;
 }
