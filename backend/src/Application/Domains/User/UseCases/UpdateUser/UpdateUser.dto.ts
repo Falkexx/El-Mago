@@ -1,4 +1,13 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsAlpha,
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsPort,
+  IsString,
+} from 'class-validator';
+import { Languages } from 'src/@metadata';
 
 export class UpdateUserDto {
   @IsString()
@@ -30,4 +39,10 @@ export class UpdateUserDto {
   @IsNotEmpty()
   @IsOptional()
   numberPhone?: string;
+
+  @IsString({ each: true })
+  @IsEnum(Languages, { each: true })
+  @IsArray()
+  @IsOptional()
+  fluentLanguages?: Languages[];
 }

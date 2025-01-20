@@ -22,7 +22,7 @@ export class UserController {
 
   @Patch()
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @RolesDecorator(ROLE.USER)
+  @RolesDecorator(ROLE.USER, ROLE.AFFILIATE, ROLE.ADMIN)
   async updateUser(@User() user: PayloadType, @Body() userDto: UpdateUserDto) {
     const result = plainToInstance(
       UserEntity,

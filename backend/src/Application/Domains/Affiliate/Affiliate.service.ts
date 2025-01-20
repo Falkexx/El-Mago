@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Inject,
   Injectable,
   NotAcceptableException,
@@ -36,13 +37,15 @@ export class AffiliateService {
       shortId: shortId(),
       name: affiliateDto.name,
       email: affiliateDto.email,
-      username: affiliateDto.username,
-      numberPhone: affiliateDto.numberPhone,
+      battleTag: '',
+      discord: affiliateDto.discord,
+      phoneNumber: affiliateDto.phoneNumber,
       cpfCnpj: affiliateDto.cpfCnpj,
-      gameNickName: affiliateDto.gameNickName,
+      characterName: affiliateDto.characterName,
       photo: affiliateDto.photo ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      fluentLanguages: affiliateDto.fluentLanguages,
       isSoftDelete: false,
       user: user,
     } as AffiliateEntity);
@@ -60,48 +63,14 @@ export class AffiliateService {
   }
 
   private async checkIfAffiliateExistOnThrow(affiliateDto: CreateAffiliateDto) {
-    const affiliateEmail = await this.affiliateRepository.getBy({
-      email: affiliateDto.email,
-    });
+    const conficts =
+      await this.affiliateRepository.findConflictingFields(affiliateDto);
 
-    if (affiliateEmail) {
-      throw new NotAcceptableException('affiliate already exist with email');
-    }
-
-    const affiliateByUserName = await this.affiliateRepository.getBy({
-      username: affiliateDto.username,
-    });
-
-    if (affiliateByUserName) {
-      throw new NotAcceptableException('affiliate already exist with username');
-    }
-
-    const affiliateByNumberPhone = await this.affiliateRepository.getBy({
-      numberPhone: affiliateDto.numberPhone,
-    });
-
-    if (affiliateByNumberPhone) {
-      throw new NotAcceptableException(
-        'affiliate already exist with number phone',
-      );
-    }
-
-    const affiliateByCpfCnpj = await this.affiliateRepository.getBy({
-      cpfCnpj: affiliateDto.cpfCnpj,
-    });
-
-    if (affiliateByCpfCnpj) {
-      throw new NotAcceptableException('affiliate already exist with cpf cnpj');
-    }
-
-    const affiliateByGameNickName = await this.affiliateRepository.getBy({
-      gameNickName: affiliateDto.gameNickName,
-    });
-
-    if (affiliateByGameNickName) {
-      throw new NotAcceptableException(
-        'affiliate already exist with game nick name',
-      );
+    if (Object.keys(conficts).length > 0) {
+      throw new ConflictException({
+        conflicts: conficts,
+        message: 'Have conflict fields',
+      });
     }
   }
 

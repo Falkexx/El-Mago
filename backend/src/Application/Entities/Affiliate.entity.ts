@@ -2,6 +2,8 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { TABLE } from 'src/@metadata/tables';
+import { RequireOnlyOne } from '#types';
+import { Languages } from 'src/@metadata';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -18,16 +20,16 @@ export class AffiliateEntity {
   email: string;
 
   @Column({ type: 'varchar', unique: true })
-  username: string;
+  battleTag: string;
 
   @Column({ type: 'varchar', unique: true })
-  numberPhone: string;
+  phoneNumber: string;
 
   @Column({ type: 'varchar', unique: true })
   cpfCnpj: string;
 
   @Column({ type: 'varchar', unique: true })
-  gameNickName: string;
+  characterName: string;
 
   @Column({ type: 'varchar', nullable: true })
   photo: string | null;
@@ -40,6 +42,12 @@ export class AffiliateEntity {
 
   @Column({ type: 'boolean' })
   isSoftDelete: boolean;
+
+  @Column({ type: 'varchar', length: 50 })
+  discord: string;
+
+  @Column({ type: 'enum', array: true, enum: Languages })
+  fluentLanguages: string[];
 
   @OneToOne(() => UserEntity, (user) => user.affiliate)
   @JoinColumn()
@@ -54,10 +62,9 @@ export class AffiliateUpdateEntity {
   numberPhone: string;
 }
 
-export type AffiliateEntityUniqueRefs =
-  | Pick<AffiliateEntity, 'id'>
-  | Pick<AffiliateEntity, 'email'>
-  | Pick<AffiliateEntity, 'username'>
-  | Pick<AffiliateEntity, 'numberPhone'>
-  | Pick<AffiliateEntity, 'cpfCnpj'>
-  | Pick<AffiliateEntity, 'gameNickName'>;
+export type AffiliateEntityUniqueRefs = RequireOnlyOne<
+  Pick<
+    AffiliateEntity,
+    'id' | 'email' | 'characterName' | 'shortId' | 'cpfCnpj'
+  >
+>;

@@ -139,4 +139,40 @@ export class AffiliateTypeOrmRepository
       order,
     };
   }
+
+  async findConflictingFields(
+    data: Partial<AffiliateEntity>,
+  ): Promise<Partial<Record<keyof AffiliateEntity, string>>> {
+    const queryBuilder = this.affiliateRepository.createQueryBuilder(
+      TABLE.affiliate,
+    );
+
+    Object.keys(data).forEach((key) => {
+      queryBuilder.orWhere(`${TABLE.affiliate}."${key}" = :${key}`, {
+        [key]: data[key],
+      });
+    });
+
+    const result = await queryBuilder
+      .select([
+        `${TABLE.affiliate}.email`,
+        `${TABLE.affiliate}.battleTag`,
+        `${TABLE.affiliate}.phoneNumber`,
+        `${TABLE.affiliate}.cpfCnpj`,
+        `${TABLE.affiliate}.characterName`,
+      ])
+      .getOne();
+
+    const conflictFields: Partial<Record<keyof AffiliateEntity, string>> = {};
+
+    if (result) {
+      Object.keys(data).forEach((key) => {
+        if (result[key] === data[key]) {
+          conflictFields[key as keyof AffiliateEntity] = result[key];
+        }
+      });
+    }
+
+    return conflictFields;
+  }
 }
