@@ -61,6 +61,7 @@ export class UserService {
       items: [],
       orders: [],
       cart: null,
+      fluentLanguages: [],
       RequestAffiliate: null,
     } as UserEntity);
 

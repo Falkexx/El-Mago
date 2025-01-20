@@ -62,6 +62,7 @@ export class ReqAffiliateUseCase {
       characterName: reqAffiliateDto.characterName,
       phoneNumber: reqAffiliateDto.phoneNumber,
       cpf: reqAffiliateDto.cpf,
+      fluentLanguages: reqAffiliateDto.fluentLanguages,
       country: 'BRAZIL',
       createdAt: new Date(),
       deletedAt: null,

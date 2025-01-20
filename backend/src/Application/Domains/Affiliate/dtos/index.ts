@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  IsArray,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  Matches,
+} from 'class-validator';
+import { Languages } from 'src/@metadata';
 
 export class CreateAffiliateDto {
   @IsString()
@@ -35,4 +43,13 @@ export class CreateAffiliateDto {
   @IsString()
   @IsNotEmpty()
   photo: string;
+
+  @IsString()
+  @IsNotEmpty()
+  discord: string;
+
+  @IsString({ each: true })
+  @IsArray()
+  @IsEnum(Languages, { each: true })
+  fluentLanguages: string[];
 }

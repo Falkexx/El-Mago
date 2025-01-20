@@ -10,6 +10,7 @@ import {
 import { UserEntity } from './User.entity';
 import { RequireOnlyOne } from '#types';
 import { Exclude } from 'class-transformer';
+import { AffiliateOnHoldStatus } from 'src/@metadata';
 
 @Entity({ name: TABLE.affiliate_queue })
 export class RequestAffiliateEntity {
@@ -38,13 +39,19 @@ export class RequestAffiliateEntity {
   country: string;
 
   @Column({ type: 'varchar', length: 20 })
-  status: 'PENDING' | 'APPROVED' | 'DECLINED';
+  status: AffiliateOnHoldStatus;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
 
   @Column({ type: 'varchar', length: 50, nullable: true, default: null })
   deletedAt: Date | null;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  battleTag: string;
+
+  @Column({ type: 'varchar', array: true })
+  fluentLanguages: string[];
 
   @RelationId(
     (requestAffiliate: RequestAffiliateEntity) => requestAffiliate.User,

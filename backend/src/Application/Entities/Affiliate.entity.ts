@@ -3,6 +3,7 @@ import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
+import { Languages } from 'src/@metadata';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -41,6 +42,12 @@ export class AffiliateEntity {
 
   @Column({ type: 'boolean' })
   isSoftDelete: boolean;
+
+  @Column({ type: 'varchar', length: 50 })
+  discord: string;
+
+  @Column({ type: 'enum', array: true, enum: Languages })
+  fluentLanguages: string[];
 
   @OneToOne(() => UserEntity, (user) => user.affiliate)
   @JoinColumn()

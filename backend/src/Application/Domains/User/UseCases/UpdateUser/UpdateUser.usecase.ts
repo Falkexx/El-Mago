@@ -24,6 +24,7 @@ export class UpdateUserUseCase {
       country: userDto.country,
       discord: userDto.discord,
       numberPhone: userDto.numberPhone,
+      fluentLanguages: userDto.fluentLanguages,
     } as UserUpdateEntity);
 
     const userUpdated = await this.userRepository.update(

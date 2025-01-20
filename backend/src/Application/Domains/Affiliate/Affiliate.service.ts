@@ -38,12 +38,14 @@ export class AffiliateService {
       name: affiliateDto.name,
       email: affiliateDto.email,
       battleTag: '',
+      discord: affiliateDto.discord,
       phoneNumber: affiliateDto.phoneNumber,
       cpfCnpj: affiliateDto.cpfCnpj,
       characterName: affiliateDto.characterName,
       photo: affiliateDto.photo ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      fluentLanguages: affiliateDto.fluentLanguages,
       isSoftDelete: false,
       user: user,
     } as AffiliateEntity);
@@ -66,7 +68,7 @@ export class AffiliateService {
 
     if (Object.keys(conficts).length > 0) {
       throw new ConflictException({
-        data: conficts,
+        conflicts: conficts,
         message: 'Have conflict fields',
       });
     }

@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Inject,
   Injectable,
   NotAcceptableException,
@@ -17,6 +18,7 @@ import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { env, shortId, uuidV4 } from '#utils';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
+import { AffiliateOnHoldStatus } from 'src/@metadata';
 
 export type ApproveAffiliateOnWaitingListUseCaseResult = {
   affiliate: Omit<AffiliateEntity, 'user'>;
@@ -54,7 +56,16 @@ export class ApproveAffiliateOnWaitingListUseCase {
       throw new NotAcceptableException('affiliate is not on the waiting list');
     }
 
-    if (affiliateOnHold.status === 'APPROVED') {
+    await this.chekcIfAffiliateExistOnThrow({
+      battleTag: affiliateOnHold.battleTag,
+      characterName: affiliateOnHold.characterName,
+      cpfCnpj: affiliateOnHold.cpf,
+      email: affiliateOnHold.email,
+      discord: affiliateOnHold.discord,
+      phoneNumber: affiliateOnHold.phoneNumber,
+    });
+
+    if (affiliateOnHold.status === AffiliateOnHoldStatus.APPROVED) {
       throw new NotAcceptableException('affiliate already approved');
     }
 
@@ -71,6 +82,8 @@ export class ApproveAffiliateOnWaitingListUseCase {
       photo: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      discord: affiliateOnHold.discord,
+      fluentLanguages: affiliateOnHold.fluentLanguages,
       isSoftDelete: false,
       user: user,
     } as AffiliateEntity);
@@ -115,5 +128,20 @@ export class ApproveAffiliateOnWaitingListUseCase {
         affiliateOnHoldEntity,
       ),
     };
+  }
+
+  private async chekcIfAffiliateExistOnThrow(data: Partial<AffiliateEntity>) {
+    console.log(data);
+    const conflicts =
+      await this.affiliateRepository.findConflictingFields(data);
+
+    console.log(conflicts);
+
+    if (Object.keys(conflicts).length > 0) {
+      throw new ConflictException({
+        conflicts: conflicts,
+        message: 'Have conflict in this fileds',
+      });
+    }
   }
 }

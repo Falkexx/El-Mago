@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  Matches,
+} from 'class-validator';
+import { Languages } from 'src/@metadata';
 
 export class ReqAffiliateDto {
   @IsString()
@@ -30,4 +37,9 @@ export class ReqAffiliateDto {
   @IsString()
   @IsNotEmpty()
   cpf: string;
+
+  @IsString({ each: true })
+  @IsArray()
+  @IsEnum(Languages, { each: true })
+  fluentLanguages: string[];
 }
