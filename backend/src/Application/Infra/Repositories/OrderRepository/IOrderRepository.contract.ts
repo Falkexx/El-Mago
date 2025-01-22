@@ -7,10 +7,11 @@ import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 
 export type IOrderRepositoryContract = IBaseRepositoryContract<
   OrderEntity,
-  unknown,
+  Partial<OrderEntity>,
   OrderUniqueRefs
 > & {
   getOrderWithRelations(orderId: string): Promise<OrderEntity>;
   getOrderByUserId(userId: string): Promise<OrderEntity[]>;
   createOrderStatus(orderStatus: OrderStatus): Promise<OrderEntity>;
+  getorOrdersWithOutffiliate(): Promise<OrderEntity[]>;
 };

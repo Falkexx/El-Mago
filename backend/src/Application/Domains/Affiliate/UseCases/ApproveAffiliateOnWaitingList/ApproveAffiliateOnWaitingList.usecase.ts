@@ -19,9 +19,12 @@ import { env, shortId, uuidV4 } from '#utils';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
 import { AffiliateOnHoldStatus } from 'src/@metadata';
+import { ROLE } from 'src/@metadata/roles';
+import { UserEntity } from 'src/Application/Entities/User.entity';
 
 export type ApproveAffiliateOnWaitingListUseCaseResult = {
   affiliate: Omit<AffiliateEntity, 'user'>;
+  user: UserEntity;
   affiliateOnHold: RequestAffiliateEntity;
 };
 
@@ -101,6 +104,15 @@ export class ApproveAffiliateOnWaitingListUseCase {
       } as RequestAffiliateUpdateEntity,
     );
 
+    const userUpdated = await this.userRepository.update(
+      {
+        id: user.id,
+      },
+      {
+        role: ROLE.AFFILIATE,
+      },
+    );
+
     /**
      * Implement send mail service
      */
@@ -123,6 +135,7 @@ export class ApproveAffiliateOnWaitingListUseCase {
 
     return {
       affiliate: affiliateCreated,
+      user: userUpdated,
       affiliateOnHold: await this.reqAffiliateRepository.update(
         { id: affiliateOnHold.id },
         affiliateOnHoldEntity,

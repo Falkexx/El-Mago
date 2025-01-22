@@ -1,9 +1,17 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
 import { Languages } from 'src/@metadata';
+import { OrderEntity } from './Order.entity';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -48,6 +56,9 @@ export class AffiliateEntity {
 
   @Column({ type: 'enum', array: true, enum: Languages })
   fluentLanguages: string[];
+
+  @OneToMany(() => OrderEntity, (order) => order.Affiliate)
+  Orders: OrderEntity[];
 
   @OneToOne(() => UserEntity, (user) => user.affiliate)
   @JoinColumn()

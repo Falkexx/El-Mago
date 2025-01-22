@@ -8,7 +8,7 @@ import { IBaseRepositoryContract } from '../IBase.repository-contract';
 export interface IUserRepositoryContract
   extends IBaseRepositoryContract<
     UserEntity,
-    UserUpdateEntity,
+    Partial<UserUpdateEntity>,
     UserEntityUniqueRefs
   > {
   getByEmail(email: string): Promise<UserEntity | null>;

@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
@@ -10,6 +11,7 @@ import { UserEntity } from './User.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { OrderStatus } from './order-status.entity';
 import { OrderItem } from './order-item.entity';
+import { AffiliateEntity } from './Affiliate.entity';
 
 /**
  * Preciso criar a ordem, slavar as  informações dos items  no momento da compra com
@@ -77,6 +79,15 @@ export class OrderEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
+
+  @ManyToOne(() => AffiliateEntity, (affiliate) => affiliate.Orders, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'affiliateId' })
+  Affiliate: AffiliateEntity | null;
+
+  @Column({ type: 'varchar' })
+  affiliateId: string;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.Order, {
     cascade: true,

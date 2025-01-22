@@ -2,7 +2,7 @@ import {
   OrderEntity,
   OrderUniqueRefs,
 } from 'src/Application/Entities/Order.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Not, Repository, Table } from 'typeorm';
 import { IOrderRepositoryContract } from './IOrderRepository.contract';
 import { PaginationResult } from '#types';
 import { GenericPaginationDto } from 'src/utils/validators';
@@ -54,7 +54,7 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
 
   async update(
     unqRef: OrderUniqueRefs,
-    updateEntity: unknown,
+    updateEntity: Partial<OrderEntity>,
   ): Promise<OrderEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
@@ -139,6 +139,20 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
       return this.orderRepository.findOneBy({ id: orderStatus.order.id });
     } catch (e) {
       console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getorOrdersWithOutffiliate(): Promise<OrderEntity[]> {
+    try {
+      const orders = await this.dataSource.manager.query(
+        'SELECT * FROM "order" WHERE "affiliateId" IS NULL',
+        [],
+      );
+
+      return orders;
+    } catch (e) {
+      console.error(e);
       throw new InternalServerErrorException();
     }
   }

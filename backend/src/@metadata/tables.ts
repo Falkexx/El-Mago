@@ -10,4 +10,5 @@ export enum TABLE {
   cart_item = 'cart_item',
   order_status = 'order_status',
   order_item = 'order_item',
+  order_in_progress = 'order_in_progress',
 }
