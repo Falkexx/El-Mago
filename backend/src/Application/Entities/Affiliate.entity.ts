@@ -12,6 +12,7 @@ import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
 import { Languages } from 'src/@metadata';
 import { OrderEntity } from './Order.entity';
+import { ProofOfDeliveryEntity } from './ProofOfDelivery.entity';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -64,6 +65,12 @@ export class AffiliateEntity {
   @JoinColumn()
   @Exclude()
   user: UserEntity;
+
+  @OneToMany(
+    () => ProofOfDeliveryEntity,
+    (proofOfDelivery) => proofOfDelivery.Affiliate,
+  )
+  ProofOfDelivery: ProofOfDeliveryEntity[];
 }
 
 export class AffiliateUpdateEntity {

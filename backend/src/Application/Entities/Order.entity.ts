@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
 } from 'typeorm';
 import { UserEntity } from './User.entity';
@@ -12,6 +13,7 @@ import { TABLE } from 'src/@metadata/tables';
 import { OrderStatus } from './order-status.entity';
 import { OrderItem } from './order-item.entity';
 import { AffiliateEntity } from './Affiliate.entity';
+import { ProofOfDeliveryEntity } from './ProofOfDelivery.entity';
 
 /**
  * Preciso criar a ordem, slavar as  informações dos items  no momento da compra com
@@ -94,6 +96,12 @@ export class OrderEntity {
     eager: true,
   })
   OrderItems: OrderItem[];
+
+  @OneToOne(
+    () => ProofOfDeliveryEntity,
+    (proofOfDelivery) => proofOfDelivery.Order,
+  )
+  ProofOfDelivery: ProofOfDeliveryEntity;
 }
 
 export type OrderUniqueRefs = Pick<OrderEntity, 'id'>;
