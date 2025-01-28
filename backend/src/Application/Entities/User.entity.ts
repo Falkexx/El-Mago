@@ -59,8 +59,8 @@ export class UserEntity {
   @Column({ type: 'numeric', precision: 150, nullable: true, default: null })
   age: number | null;
 
-  @Column({ type: 'varchar', length: 20 })
-  role: ROLE; // default: user
+  @Column({ type: 'varchar', length: 20, array: true })
+  roles: ROLE[]; // default: user
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -100,7 +100,7 @@ export class UserUpdateEntity {
   password: string;
   discord: string;
   numberPhone: string;
-  role: ROLE; // default: user
+  roles: ROLE[]; // default: user
   isBanned: boolean;
   isDeleted: boolean;
   fluentLanguages: Languages[];

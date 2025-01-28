@@ -21,6 +21,7 @@ import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemai
 import { AffiliateOnHoldStatus } from 'src/@metadata';
 import { ROLE } from 'src/@metadata/roles';
 import { UserEntity } from 'src/Application/Entities/User.entity';
+import { AffiliateService } from '../../Affiliate.service';
 
 export type ApproveAffiliateOnWaitingListUseCaseResult = {
   affiliate: Omit<AffiliateEntity, 'user'>;
@@ -78,7 +79,7 @@ export class ApproveAffiliateOnWaitingListUseCase {
       shortId: shortId(),
       name: affiliateOnHold.name,
       email: user.email,
-      battleTag: '',
+      battleTag: affiliateOnHold.battleTag,
       phoneNumber: affiliateOnHold.phoneNumber,
       cpfCnpj: affiliateOnHold.cpf,
       characterName: affiliateOnHold.characterName,
@@ -109,7 +110,7 @@ export class ApproveAffiliateOnWaitingListUseCase {
         id: user.id,
       },
       {
-        role: ROLE.AFFILIATE,
+        roles: [ROLE.AFFILIATE],
       },
     );
 

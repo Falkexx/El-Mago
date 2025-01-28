@@ -51,7 +51,7 @@ export class UserService {
       discordUserName: null,
       numberPhone: null,
       age: null,
-      role: ROLE.USER,
+      roles: [ROLE.USER],
       createdAt: new Date(),
       updatedAt: new Date(),
       isBanned: false,

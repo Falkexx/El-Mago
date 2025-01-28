@@ -4,6 +4,9 @@ import { AuthService } from './Auth.service';
 import { UserModule } from '../User/User.module';
 import { JwtModule } from '@nestjs/jwt';
 import { env } from '#utils';
+import { KEY_INJECTION } from 'src/@metadata/keys';
+import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
+import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
 
 @Module({
   imports: [
@@ -13,13 +16,20 @@ import { env } from '#utils';
         ignoreExpiration: false,
       },
       signOptions: {
-        expiresIn: '24h',
+        expiresIn: env.JWT_EXPIRES_IN,
       },
       global: true,
     }),
     UserModule,
+    RepositoriesModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [
+    {
+      provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
+      useClass: UserTypeOrmRepository,
+    },
+    AuthService,
+  ],
 })
 export class AuthModule {}

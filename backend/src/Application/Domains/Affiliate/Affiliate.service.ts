@@ -12,6 +12,7 @@ import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { shortId, uuidV4 } from '#utils';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { ROLE } from 'src/@metadata/roles';
 
 @Injectable()
 export class AffiliateService {
@@ -24,6 +25,14 @@ export class AffiliateService {
   ) {}
 
   async create(affiliateDto: CreateAffiliateDto) {
+    const affiliateExist = await this.affiliateRepository.getBy({
+      email: affiliateDto.email,
+    });
+
+    if (affiliateExist) {
+      throw new NotAcceptableException('affiliate already exist');
+    }
+
     await this.checkIfAffiliateExistOnThrow(affiliateDto);
 
     const user = await this.userRepository.getBy({ email: affiliateDto.email });
@@ -37,7 +46,7 @@ export class AffiliateService {
       shortId: shortId(),
       name: affiliateDto.name,
       email: affiliateDto.email,
-      battleTag: '',
+      battleTag: affiliateDto.battleTag,
       discord: affiliateDto.discord,
       phoneNumber: affiliateDto.phoneNumber,
       cpfCnpj: affiliateDto.cpfCnpj,
@@ -53,6 +62,15 @@ export class AffiliateService {
     const affiliateCreated =
       await this.affiliateRepository.create(affiliateEntity);
 
+    const userUpdated = await this.userRepository.update(
+      {
+        id: user.id,
+      },
+      {
+        roles: [...user.roles, ROLE.AFFILIATE],
+      },
+    );
+
     return affiliateCreated;
   }
 
@@ -63,6 +81,8 @@ export class AffiliateService {
   }
 
   private async checkIfAffiliateExistOnThrow(affiliateDto: CreateAffiliateDto) {
+    console.log(affiliateDto);
+
     const conficts =
       await this.affiliateRepository.findConflictingFields(affiliateDto);
 

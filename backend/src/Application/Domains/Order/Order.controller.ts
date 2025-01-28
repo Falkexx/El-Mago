@@ -6,6 +6,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OrderService } from './Order.service';
 import { CreateOrderUseCase } from './UseCases/CreateOrder/CreateOrder.usecase';
@@ -26,6 +27,10 @@ import { env } from '#utils';
 import { AddAffiliateOnOrderUseCase } from './UseCases/AddAffiliateOnOrder/AddAffiliateOnOrder.usecase';
 import { AddAffiliateOnOrderDto } from './UseCases/AddAffiliateOnOrder/AddAffiliateOnOrder.dto';
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
+import { SendProofToOrderItemDto } from './UseCases/SendProofToOrderItem/SendProofToOrdemItem.dto';
+import { SendProofToOrder } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
 
 @Controller({ path: 'order', version: '1' })
 export class OrderController {
@@ -40,6 +45,7 @@ export class OrderController {
     private readonly getOrderById: GetOrderByIdUseCase,
     private readonly getOrderAsAffiliateUseCase: GetOrderAsAffiliateUseCase,
     private readonly addAffiliateOnOrderUseCase: AddAffiliateOnOrderUseCase,
+    private readonly sendProofToOrderItemUseCase: SendProofToOrderItemUseCase,
   ) {}
 
   @Get('many')
@@ -126,5 +132,16 @@ export class OrderController {
       message: 'affiliate accept order successfuly',
       status: 200,
     };
+  }
+
+  @Post('send-proof-delivery-for-order')
+  @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.AFFILIATE)
+  sendProofImageDto(
+    @User() payload: PayloadType,
+    @SendProofToOrder() sendProofDto: SendProofToOrderItemDto,
+  ) {
+    return this.sendProofToOrderItemUseCase.execute(payload, sendProofDto);
   }
 }

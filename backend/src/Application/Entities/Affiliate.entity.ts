@@ -62,9 +62,12 @@ export class AffiliateEntity {
   Orders: OrderEntity[];
 
   @OneToOne(() => UserEntity, (user) => user.affiliate)
-  @JoinColumn()
+  @JoinColumn({ name: 'userId' })
   @Exclude()
   user: UserEntity;
+
+  @Column({ type: 'varchar' })
+  userId: string;
 
   @OneToMany(
     () => ProofOfDeliveryEntity,
@@ -83,6 +86,6 @@ export class AffiliateUpdateEntity {
 export type AffiliateEntityUniqueRefs = RequireOnlyOne<
   Pick<
     AffiliateEntity,
-    'id' | 'email' | 'characterName' | 'shortId' | 'cpfCnpj'
+    'id' | 'email' | 'characterName' | 'shortId' | 'cpfCnpj' | 'userId'
   >
 >;

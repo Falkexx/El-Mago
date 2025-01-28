@@ -38,7 +38,10 @@ export class CreateItemService {
       throw new UnauthorizedException();
     }
 
-    if (user.role !== ROLE.ADMIN && createItemDto.type === ItemType.COMMON) {
+    if (
+      !user.roles.includes(ROLE.ADMIN) &&
+      createItemDto.type === ItemType.COMMON
+    ) {
       throw new UnauthorizedException('only admin must be create common item');
     }
 

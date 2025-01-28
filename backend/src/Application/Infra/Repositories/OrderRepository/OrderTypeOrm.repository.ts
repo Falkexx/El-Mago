@@ -15,6 +15,10 @@ import { SearchBuilderService } from '../SearchBuilder.service';
 import { TABLE } from 'src/@metadata/tables';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
+import {
+  OrderItem,
+  OrderItemUniqueRefs,
+} from 'src/Application/Entities/order-item.entity';
 
 export class OrderTypeOrmRepository implements IOrderRepositoryContract {
   constructor(
@@ -22,6 +26,8 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
     private readonly orderRepository: Repository<OrderEntity>,
     @InjectRepository(OrderStatus)
     private readonly orderStatusRepository: Repository<OrderStatus>,
+    @InjectRepository(OrderItem)
+    private readonly orderItemRepository: Repository<OrderItem>,
     private readonly dataSource: DataSource,
     private readonly searchBuilderService: SearchBuilderService,
   ) {}
@@ -155,5 +161,45 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
       console.error(e);
       throw new InternalServerErrorException();
     }
+  }
+
+  async updateOrderItem(
+    orderItemId: string,
+    data: Partial<OrderItem>,
+  ): Promise<OrderItem> {
+    const queryBuilder = this.orderItemRepository.createQueryBuilder();
+
+    try {
+      const result = await queryBuilder
+        .update(OrderItem)
+        .set({ ...data })
+        .where('id = :id', {
+          id: orderItemId,
+        })
+        .returning('*')
+        .execute();
+
+      return result.raw[0];
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getOrderItemBy(uniqueRef: OrderItemUniqueRefs): Promise<OrderItem> {
+    const queryBuilder = this.orderItemRepository.createQueryBuilder();
+    const [key, value] = splitKeyAndValue(uniqueRef);
+
+    try {
+      const result = await queryBuilder
+        .select('*')
+        .from(OrderItem, TABLE.order_item)
+        .where(`${key} = :${key}`, {
+          [key]: value,
+        })
+        .getOne();
+
+      return result;
+    } catch (e) {}
   }
 }

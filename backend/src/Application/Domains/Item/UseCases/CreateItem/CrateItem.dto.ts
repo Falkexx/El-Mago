@@ -10,6 +10,7 @@ import {
   Min,
 } from 'class-validator';
 import { ItemType } from 'src/@metadata';
+import { ImageDto } from 'src/utils/validators';
 
 export class CreateItemBodyDto {
   @IsNotEmpty()
@@ -53,8 +54,4 @@ export class CreateItemBodyDto {
   categoryId: string;
 }
 
-export class CreateItemImageDto {
-  image: Express.Multer.File;
-}
-
-export type CreateItemDto = CreateItemBodyDto & CreateItemImageDto;
+export type CreateItemDto = CreateItemBodyDto & ImageDto;

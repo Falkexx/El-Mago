@@ -79,6 +79,9 @@ export class OrderEntity {
   @Column({ type: 'varchar', length: 120 })
   battleTag: string;
 
+  @Column({ type: 'boolean', nullable: true, default: null })
+  completedAt: Date | null;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 
@@ -88,8 +91,8 @@ export class OrderEntity {
   @JoinColumn({ name: 'affiliateId' })
   Affiliate: AffiliateEntity | null;
 
-  @Column({ type: 'varchar' })
-  affiliateId: string;
+  @Column({ type: 'varchar', nullable: true })
+  affiliateId: string | null;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.Order, {
     cascade: true,

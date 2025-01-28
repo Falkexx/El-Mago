@@ -15,9 +15,12 @@ import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecas
 import { GetOrderAsAffiliateUseCase } from './UseCases/GetOrderAsAffiliate/GetOrderAsAffiliate.usecase';
 import { AddAffiliateOnOrderUseCase } from './UseCases/AddAffiliateOnOrder/AddAffiliateOnOrder.usecase';
 import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/AffiliateRepository/AffiliateTypeOrm.repository';
+import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
+import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
+import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/ImageRepository/ImageTypeOrm.repository';
 
 @Module({
-  imports: [RepositoriesModule, PaypalModule],
+  imports: [RepositoriesModule, PaypalModule, StorageModule],
   controllers: [OrderController],
   providers: [
     {
@@ -44,6 +47,10 @@ import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/A
       provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
       useClass: UserTypeOrmRepository,
     },
+    {
+      provide: KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT,
+      useClass: ImageTypeormRepository,
+    },
 
     // services
     OrderService,
@@ -55,6 +62,7 @@ import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/A
     GetOrderByIdUseCase,
     GetOrderAsAffiliateUseCase,
     AddAffiliateOnOrderUseCase,
+    SendProofToOrderItemUseCase,
   ],
 })
 export class OrderModule {}
