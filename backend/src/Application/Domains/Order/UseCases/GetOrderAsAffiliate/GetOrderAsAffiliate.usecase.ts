@@ -14,7 +14,8 @@ export class GetOrderAsAffiliateUseCase {
   async execute() {
     const orders = await this.orderRepository.getorOrdersWithOutffiliate();
 
-    return orders;
+    const response = orders.map(({ paymentUrl, paymentId, ...rest }) => rest);
+
+    return response;
   }
 }
-('');
