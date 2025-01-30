@@ -23,4 +23,5 @@ export type IOrderRepositoryContract = IBaseRepositoryContract<
     orderItemId: string,
     data: Partial<OrderItem>,
   ): Promise<OrderItem>;
+  getAvailableOrder(orderId: string): Promise<OrderEntity>;
 };

@@ -152,7 +152,12 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
   async getorOrdersWithOutffiliate(): Promise<OrderEntity[]> {
     try {
       const orders = await this.dataSource.manager.query(
-        'SELECT * FROM "order" WHERE "affiliateId" IS NULL',
+        `
+          SELECT "order".* FROM "order" 
+            JOIN "order_status" ON "order_status"."orderId" = "order"."id"
+            WHERE "order_status"."status" = 'paid'
+          AND "affiliateId" IS NULL;
+        `,
         [],
       );
 
@@ -201,5 +206,29 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
 
       return result;
     } catch (e) {}
+  }
+
+  async getAvailableOrder(orderId: string): Promise<OrderEntity> {
+    try {
+      const [order] = await this.orderItemRepository.query(
+        `
+          SELECT "order".*
+          FROM "order"
+          WHERE "order"."id" = $1
+          AND "affiliateId" IS NULL
+          AND EXISTS (
+            SELECT 1 FROM "order_status"
+            WHERE "order_status"."orderId" = "order"."id"
+            AND "order_status"."status" = 'paid'
+          );
+        `,
+        [orderId],
+      );
+
+      return order;
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException();
+    }
   }
 }
