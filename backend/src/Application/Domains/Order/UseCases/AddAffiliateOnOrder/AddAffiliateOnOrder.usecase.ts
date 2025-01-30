@@ -37,23 +37,25 @@ export class AddAffiliateOnOrderUseCase {
       email: user.email,
     });
 
-    const order = await this.orderRepository.getBy({
-      id: addAffiliateOnOrderDto.orderId,
-    });
+    const availableOrder = await this.orderRepository.getAvailableOrder(
+      addAffiliateOnOrderDto.orderId,
+    );
 
-    console.log(order);
-
-    if (!order) {
+    if (!availableOrder) {
       throw new NotFoundException('order not found');
     }
 
-    if (order.Affiliate || order['affiliateId']) {
+    if (availableOrder.completedAt) {
+      throw new NotAcceptableException('the order has already been completed');
+    }
+
+    if (availableOrder.Affiliate || availableOrder['affiliateId']) {
       throw new NotAcceptableException('already affiliate in this order');
     }
 
     const orderUpdated = await this.orderRepository.update(
       {
-        id: order.id,
+        id: availableOrder.id,
       },
       {
         Affiliate: affiliate,
