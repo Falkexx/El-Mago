@@ -58,6 +58,7 @@ export class UserService {
       isDeleted: false,
       softDeleted: false,
       affiliate: null,
+      affiliateId: null,
       items: [],
       orders: [],
       cart: null,

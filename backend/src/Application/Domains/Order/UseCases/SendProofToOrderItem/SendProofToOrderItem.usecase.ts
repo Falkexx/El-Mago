@@ -15,6 +15,7 @@ import { STORAGE_PROVIDER } from 'src/@metadata';
 import { IIMageRepositoryContract } from 'src/Application/Infra/Repositories/ImageRepository/IImage.repository-contract';
 import { PayloadType } from '#types';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
+import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 
 @Injectable()
 export class SendProofToOrderItemUseCase {
@@ -26,27 +27,39 @@ export class SendProofToOrderItemUseCase {
     private readonly affiliateRepository: IAffiliateRepositoryContract,
     @Inject(KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT)
     private readonly imageRepository: IIMageRepositoryContract,
+    @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
+    private readonly userRepository: IUserRepositoryContract,
   ) {}
 
   async execute(
     payload: PayloadType,
     sendProofToOrderItemDto: SendProofToOrderItemDto,
   ) {
+    const user = await this.userRepository.getBy({
+      id: payload.sub,
+    });
+
     const order = await this.orderRepository.getBy({
       id: sendProofToOrderItemDto.orderId,
+    });
+
+    console.log(order);
+
+    const affiliate = await this.affiliateRepository.getBy({
+      userId: payload.sub,
     });
 
     if (!order) {
       throw new NotFoundException('order not found');
     }
 
+    if (order.affiliateId !== affiliate.id) {
+      throw new NotFoundException('order not found');
+    }
+
     if (order.completedAt) {
       throw new NotAcceptableException('order already completed');
     }
-
-    const affiliate = await this.affiliateRepository.getBy({
-      userId: payload.sub,
-    });
 
     if (!affiliate || affiliate.isSoftDelete) {
       throw new ForbiddenException(
