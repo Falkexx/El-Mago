@@ -19,6 +19,8 @@ import {
   OrderItem,
   OrderItemUniqueRefs,
 } from 'src/Application/Entities/order-item.entity';
+import { table } from 'node:console';
+import { Status } from 'src/@metadata';
 
 export class OrderTypeOrmRepository implements IOrderRepositoryContract {
   constructor(
@@ -149,23 +151,72 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
     }
   }
 
-  async getorOrdersWithOutffiliate(): Promise<OrderEntity[]> {
+  async getAvailableOrdersToAccept(): Promise<OrderEntity[]> {
     try {
-      const orders = await this.dataSource.manager.query(
-        `
-          SELECT "order".* FROM "order" 
-            JOIN "order_status" ON "order_status"."orderId" = "order"."id"
-            WHERE "order_status"."status" = 'paid'
-          AND "affiliateId" IS NULL;
-        `,
-        [],
-      );
+      // const orders = await this.dataSource.manager.query(
+      //   `
+      //   SELECT
+      //       o."id",
+      //       o."name",
+      //       o."createdAt",
+      //       o."updatedAt"
+      //   FROM
+      //       "${TABLE.order}" o
+      //   LEFT JOIN
+      //       "${TABLE.order_status}" os ON os."orderId" = o.id
+      //   WHERE
+      //     o."digitalShippingId" IS NULL
+      //     AND  os."status" = '${Status.CREATED}'
+      //   GROUP BY
+      //       o.id -- Agrupa por ordem
+      //   `,
+      // );
+
+      const orders = await this.orderItemRepository.query(`
+        SELECT
+          O."id",  
+          o."name",
+          o."createdAt",
+          o."updatedAt",
+          json_agg(
+            json_build_object(
+              'name', oi."name",
+              'currency', oi."currency",
+              'itemId', oi."itemId",
+              'orderId', oi."orderId",
+              'price', oi."price",
+              'quantity', oi."quantity"
+            )
+          ) AS items
+        FROM
+          "${TABLE.order}" o
+        LEFT JOIN
+          ${TABLE.order_status} os ON os."orderId" = o.id
+        LEFT JOIN
+          ${TABLE.order_item} oi ON oi."orderId" = o.id
+        WHERE
+          o."digitalShippingId" IS NULL
+          AND os."status" = '${Status.CREATED}'
+        GROUP BY
+          o.id
+      `);
 
       return orders;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
     }
+  }
+
+  async getPendingOrdersFromAffiliate(
+    affiliateId: string,
+  ): Promise<OrderEntity> {
+    const result = await this.dataSource.query(
+      `SELECT * FROM "${TABLE.digital_shipping}" WHERE "affiliateId" = $1 AND "finishedAt" IS NOT NULL`,
+      [affiliateId],
+    );
+
+    return result;
   }
 
   async updateOrderItem(
@@ -215,11 +266,11 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
           SELECT "order".*
           FROM "order"
           WHERE "order"."id" = $1
-          AND "affiliateId" IS NULL
+          AND "digitalShippingId" IS NULL
           AND EXISTS (
             SELECT 1 FROM "order_status"
             WHERE "order_status"."orderId" = "order"."id"
-            AND "order_status"."status" = 'paid'
+            AND "order_status"."status" = '${Status.PAID}'
           );
         `,
         [orderId],

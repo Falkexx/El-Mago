@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
+  NotImplementedException,
   Param,
   Post,
   Query,
@@ -24,13 +26,14 @@ import { GetOrderAsAffiliateUseCase } from './UseCases/GetOrderAsAffiliate/GetOr
 import { plainToInstance } from 'class-transformer';
 import { UserEntity } from 'src/Application/Entities/User.entity';
 import { env } from '#utils';
-import { AddAffiliateOnOrderUseCase } from './UseCases/AddAffiliateOnOrder/AddAffiliateOnOrder.usecase';
-import { AddAffiliateOnOrderDto } from './UseCases/AddAffiliateOnOrder/AddAffiliateOnOrder.dto';
+import { AcceptOrderUseCase } from './UseCases/AcceptOrder/AcceptOrder.usecase';
+import { AcceptOrderDto } from './UseCases/AcceptOrder/AcceptOrder.dto';
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { SendProofToOrderItemDto } from './UseCases/SendProofToOrderItem/SendProofToOrdemItem.dto';
 import { SendProofToOrder } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
+import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
 
 @Controller({ path: 'order', version: '1' })
 export class OrderController {
@@ -44,8 +47,9 @@ export class OrderController {
     private readonly payOrderUseCase: PayOrderUseCase,
     private readonly getOrderById: GetOrderByIdUseCase,
     private readonly getOrderAsAffiliateUseCase: GetOrderAsAffiliateUseCase,
-    private readonly addAffiliateOnOrderUseCase: AddAffiliateOnOrderUseCase,
+    private readonly addAffiliateOnOrderUseCase: AcceptOrderUseCase,
     private readonly sendProofToOrderItemUseCase: SendProofToOrderItemUseCase,
+    private readonly getPendingOrdersUseCase: GetPendingOrdersUseCase,
   ) {}
 
   @Get('many')
@@ -110,18 +114,30 @@ export class OrderController {
     return this.getOrderById.execute(payload, orderId);
   }
 
-  @Get('as-affiliate')
-  getOrderAsAffiliate() {
-    return this.getOrderAsAffiliateUseCase.execute();
+  @Get('affiliate/available-orders')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.AFFILIATE)
+  getAvailableOrders(
+    @User() user: PayloadType,
+    @Query() paginationDto: GenericPaginationDto,
+  ) {
+    return this.getOrderAsAffiliateUseCase.execute(user);
   }
 
-  @Post('accept/:orderId')
+  @Get('affiliate/pending')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.AFFILIATE)
+  getPendingOrders(@User() user: PayloadType) {
+    return this.getPendingOrdersUseCase.execute(user);
+  }
+
+  @Post('affiliate/accept/:orderId')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.AFFILIATE)
   async addAffiliateOnOrder(
     @User() payload: PayloadType,
-    @Param() addAffiliateOnOrder: AddAffiliateOnOrderDto,
-  ): Promise<ApiResponse<OrderEntity>> {
+    @Param() addAffiliateOnOrder: AcceptOrderDto,
+  ): Promise<ApiResponse<any>> {
     const result = await this.addAffiliateOnOrderUseCase.execute(
       payload,
       addAffiliateOnOrder,
@@ -129,9 +145,10 @@ export class OrderController {
 
     return {
       data: result,
-      message: 'affiliate accept order successfuly',
+      message: 'affiliate accept order successfully',
       status: 200,
     };
+    throw new NotImplementedException('method not implemented');
   }
 
   @Post('send-proof-delivery-for-order')
@@ -142,6 +159,6 @@ export class OrderController {
     @User() payload: PayloadType,
     @SendProofToOrder() sendProofDto: SendProofToOrderItemDto,
   ) {
-    return this.sendProofToOrderItemUseCase.execute(payload, sendProofDto);
+    throw new InternalServerErrorException('need implement this method');
   }
 }

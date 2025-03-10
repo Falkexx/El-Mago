@@ -13,7 +13,7 @@ import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { shortId } from '#utils';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Table } from 'typeorm';
 import { UserEntity } from 'src/Application/Entities/User.entity';
 import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
@@ -21,6 +21,7 @@ import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/Item
 import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { Status } from 'src/@metadata';
 import { CreateOrderDto } from './CreateOrder.dto';
+import { TABLE } from 'src/@metadata/tables';
 
 @Injectable()
 export class CreateOrderUseCase {
@@ -49,6 +50,7 @@ export class CreateOrderUseCase {
     }
 
     const itemsIds = cart.items.map((_item_) => _item_.itemId);
+    console.log(itemsIds);
 
     if (itemsIds.length <= 0) {
       throw new NotAcceptableException('no have items in cart');
@@ -97,7 +99,6 @@ export class CreateOrderUseCase {
         updatedAt: new Date(),
         name: 'Compra dos items...',
         userId: user.id,
-        user: user,
         status: [status],
         OrderItems: itemsEntityList,
         battleTag: createOrderDto.battleTag,
@@ -110,7 +111,6 @@ export class CreateOrderUseCase {
       await manager.save(order.status);
 
       const orderEntity = manager.create(OrderEntity, order);
-      console.log(orderEntity);
 
       const savedOrder = await manager.save(OrderEntity, orderEntity);
 

@@ -13,7 +13,8 @@ import { TABLE } from 'src/@metadata/tables';
 import { OrderStatus } from './order-status.entity';
 import { OrderItem } from './order-item.entity';
 import { AffiliateEntity } from './Affiliate.entity';
-import { ProofOfDeliveryEntity } from './ProofOfDelivery.entity';
+import { DigitalShippingEntity } from './DigitalShipping.entity';
+import { RequireOnlyOne } from '#types';
 
 /**
  * Preciso criar a ordem, slavar as  informações dos items  no momento da compra com
@@ -85,15 +86,6 @@ export class OrderEntity {
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 
-  @ManyToOne(() => AffiliateEntity, (affiliate) => affiliate.Orders, {
-    nullable: true,
-  })
-  @JoinColumn({ name: 'affiliateId' })
-  Affiliate: AffiliateEntity | null;
-
-  @Column({ type: 'varchar', nullable: true })
-  affiliateId: string | null;
-
   @OneToMany(() => OrderItem, (orderItem) => orderItem.Order, {
     cascade: true,
     eager: true,
@@ -101,10 +93,14 @@ export class OrderEntity {
   OrderItems: OrderItem[];
 
   @OneToOne(
-    () => ProofOfDeliveryEntity,
-    (proofOfDelivery) => proofOfDelivery.Order,
+    () => DigitalShippingEntity,
+    (digitalShipping) => digitalShipping.Order,
   )
-  ProofOfDelivery: ProofOfDeliveryEntity;
+  @JoinColumn({ name: 'digitalShippingId' })
+  DigitalShipping: DigitalShippingEntity;
+
+  @Column({ type: 'varchar', length: 40, nullable: true, default: null })
+  digitalShippingId: string;
 }
 
-export type OrderUniqueRefs = Pick<OrderEntity, 'id'>;
+export type OrderUniqueRefs = RequireOnlyOne<Pick<OrderEntity, 'id'>>;

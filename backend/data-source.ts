@@ -11,7 +11,7 @@ import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
 import { RequestAffiliateEntity } from 'src/Application/Entities/Request-Affiliate.entity';
-import { ProofOfDeliveryEntity } from 'src/Application/Entities/ProofOfDelivery.entity';
+import { DigitalShippingEntity } from 'src/Application/Entities/DigitalShipping.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres', // ou o banco de dados que você está usando
@@ -32,7 +32,7 @@ export const AppDataSource = new DataSource({
     OrderStatus,
     OrderItem,
     RequestAffiliateEntity,
-    ProofOfDeliveryEntity,
+    DigitalShippingEntity,
   ],
   migrations: ['./src/migrations/**/*.ts'],
   synchronize: false,

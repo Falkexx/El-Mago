@@ -12,7 +12,6 @@ import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
 import { Languages } from 'src/@metadata';
 import { OrderEntity } from './Order.entity';
-import { ProofOfDeliveryEntity } from './ProofOfDelivery.entity';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -58,9 +57,6 @@ export class AffiliateEntity {
   @Column({ type: 'enum', array: true, enum: Languages })
   fluentLanguages: string[];
 
-  @OneToMany(() => OrderEntity, (order) => order.Affiliate)
-  Orders: OrderEntity[];
-
   @OneToOne(() => UserEntity, (user) => user.affiliate)
   @JoinColumn({ name: 'userId' })
   @Exclude()
@@ -68,12 +64,6 @@ export class AffiliateEntity {
 
   @Column({ type: 'varchar' })
   userId: string;
-
-  @OneToMany(
-    () => ProofOfDeliveryEntity,
-    (proofOfDelivery) => proofOfDelivery.Affiliate,
-  )
-  ProofOfDelivery: ProofOfDeliveryEntity[];
 }
 
 export class AffiliateUpdateEntity {

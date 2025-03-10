@@ -43,8 +43,6 @@ export class SendProofToOrderItemUseCase {
       id: sendProofToOrderItemDto.orderId,
     });
 
-    console.log(order);
-
     const affiliate = await this.affiliateRepository.getBy({
       userId: payload.sub,
     });
@@ -53,9 +51,9 @@ export class SendProofToOrderItemUseCase {
       throw new NotFoundException('order not found');
     }
 
-    if (order.affiliateId !== affiliate.id) {
-      throw new NotFoundException('order not found');
-    }
+    // if (order.affiliateId !== affiliate.id) {
+    //   throw new NotFoundException('order not found');
+    // }
 
     if (order.completedAt) {
       throw new NotAcceptableException('order already completed');
@@ -67,9 +65,9 @@ export class SendProofToOrderItemUseCase {
       );
     }
 
-    if (order.affiliateId !== payload.sub) {
-      throw new ForbiddenException('this order belongs to outher affiliate');
-    }
+    // if (order.affiliateId !== payload.sub) {
+    //   throw new ForbiddenException('this order belongs to outher affiliate');
+    // }
 
     const orderItemExist = await order.OrderItems.find(
       (_item_) => _item_.id === sendProofToOrderItemDto.orderItemId,

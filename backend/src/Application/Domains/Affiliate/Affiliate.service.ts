@@ -68,6 +68,7 @@ export class AffiliateService {
       },
       {
         roles: [...user.roles, ROLE.AFFILIATE],
+        affiliateId: affiliateCreated.id,
       },
     );
 
@@ -81,8 +82,6 @@ export class AffiliateService {
   }
 
   private async checkIfAffiliateExistOnThrow(affiliateDto: CreateAffiliateDto) {
-    console.log(affiliateDto);
-
     const conficts =
       await this.affiliateRepository.findConflictingFields(affiliateDto);
 

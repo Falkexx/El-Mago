@@ -116,6 +116,7 @@ export class UserUpdateEntity {
   isBanned: boolean;
   isDeleted: boolean;
   fluentLanguages: Languages[];
+  affiliateId: string;
 }
 
 export type UserEntityUniqueRefs =

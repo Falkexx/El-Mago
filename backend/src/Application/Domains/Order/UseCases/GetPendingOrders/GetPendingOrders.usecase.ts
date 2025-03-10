@@ -9,15 +9,13 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 
-export type GetOrderAsAffiliateUseCaseResult = {};
-
 @Injectable()
-export class GetOrderAsAffiliateUseCase {
+export class GetPendingOrdersUseCase {
   constructor(
-    @Inject(KEY_INJECTION.ORDER_REPOSITORY)
-    private readonly orderRepository: IOrderRepositoryContract,
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
+    @Inject(KEY_INJECTION.ORDER_REPOSITORY)
+    private readonly orderRepository: IOrderRepositoryContract,
   ) {}
 
   async execute(payload: PayloadType) {
@@ -31,10 +29,11 @@ export class GetOrderAsAffiliateUseCase {
       throw new ForbiddenException();
     }
 
-    const orders = await this.orderRepository.getAvailableOrdersToAccept();
+    const ordersPending =
+      await this.orderRepository.getPendingOrdersFromAffiliate(
+        user.affiliateId,
+      );
 
-    return {
-      availableOrders: orders,
-    };
+    return ordersPending;
   }
 }

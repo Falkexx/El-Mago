@@ -20,6 +20,10 @@ async function bootstrap() {
 
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(env.BACKEND_PORT ?? 3000);
+
+  const PORT = env.BACKEND_PORT || 3000;
+  await app.listen(PORT, () => {
+    console.log(`Server is running at ${env.BACKEND_BASE_URL}:${PORT}`);
+  });
 }
 bootstrap();

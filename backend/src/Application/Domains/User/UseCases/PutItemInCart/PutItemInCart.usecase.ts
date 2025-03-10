@@ -53,8 +53,16 @@ export class PutItemInCartUseCase {
     if (!itemIsAlreadyInTheCart) {
       // create
 
+      let id: string = shortId(15);
+      let existItemWithId = await this.cartRepository.getBy({ id });
+
+      while (existItemWithId) {
+        id = shortId(15);
+        existItemWithId = await this.cartRepository.getBy({ id });
+      }
+
       const newCartItem = Object.assign(new CartItemEntity(), {
-        id: shortId(15),
+        id,
         amount: putDto.amount ?? 1,
         createdAt: new Date(),
         updatedAt: new Date(),

@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Inject,
   Injectable,
   NotAcceptableException,
@@ -7,13 +8,13 @@ import {
 } from '@nestjs/common';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
-import { AddAffiliateOnOrderDto } from './AddAffiliateOnOrder.dto';
+import { AcceptOrderDto } from './AcceptOrder.dto';
 import { PayloadType } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 
 @Injectable()
-export class AddAffiliateOnOrderUseCase {
+export class AcceptOrderUseCase {
   constructor(
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
@@ -23,23 +24,22 @@ export class AddAffiliateOnOrderUseCase {
     private readonly affiliateRepository: IAffiliateRepositoryContract,
   ) {}
 
-  async execute(
-    payload: PayloadType,
-    addAffiliateOnOrderDto: AddAffiliateOnOrderDto,
-  ) {
+  async execute(payload: PayloadType, addAffiliateOnOrderDto: AcceptOrderDto) {
     const user = await this.userRepository.getBy({ id: payload.sub });
 
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    const affiliate = await this.affiliateRepository.getBy({
-      email: user.email,
-    });
+    if (!user.affiliateId) {
+      throw new ForbiddenException('only affiliate make this action');
+    }
 
     const availableOrder = await this.orderRepository.getAvailableOrder(
       addAffiliateOnOrderDto.orderId,
     );
+
+    console.log(availableOrder);
 
     if (!availableOrder) {
       throw new NotFoundException('order not found');
@@ -49,19 +49,19 @@ export class AddAffiliateOnOrderUseCase {
       throw new NotAcceptableException('the order has already been completed');
     }
 
-    if (availableOrder.Affiliate || availableOrder['affiliateId']) {
-      throw new NotAcceptableException('already affiliate in this order');
-    }
+    // if (availableOrder.Affiliate || availableOrder['affiliateId']) {
+    //   throw new NotAcceptableException('already affiliate in this order');
+    // }
 
-    const orderUpdated = await this.orderRepository.update(
-      {
-        id: availableOrder.id,
-      },
-      {
-        Affiliate: affiliate,
-      },
-    );
+    // const orderUpdated = await this.orderRepository.update(
+    //   {
+    //     id: availableOrder.id,
+    //   },
+    //   {
+    //     Affiliate: affiliate,
+    //   },
+    // );
 
-    return orderUpdated;
+    // return orderUpdated;
   }
 }

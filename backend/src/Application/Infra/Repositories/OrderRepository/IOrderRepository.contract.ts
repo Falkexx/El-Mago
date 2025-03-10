@@ -17,7 +17,8 @@ export type IOrderRepositoryContract = IBaseRepositoryContract<
   getOrderWithRelations(orderId: string): Promise<OrderEntity>;
   getOrderByUserId(userId: string): Promise<OrderEntity[]>;
   createOrderStatus(orderStatus: OrderStatus): Promise<OrderEntity>;
-  getorOrdersWithOutffiliate(): Promise<OrderEntity[]>;
+  getAvailableOrdersToAccept(): Promise<OrderEntity[]>;
+  getPendingOrdersFromAffiliate(affiliateId: string): Promise<OrderEntity>;
   getOrderItemBy(uniqueRef: OrderItemUniqueRefs): Promise<OrderItem>;
   updateOrderItem(
     orderItemId: string,

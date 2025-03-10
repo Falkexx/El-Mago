@@ -13,11 +13,12 @@ import { OrderTypeOrmRepository } from 'src/Application/Infra/Repositories/Order
 import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth.usecase';
 import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecase';
 import { GetOrderAsAffiliateUseCase } from './UseCases/GetOrderAsAffiliate/GetOrderAsAffiliate.usecase';
-import { AddAffiliateOnOrderUseCase } from './UseCases/AddAffiliateOnOrder/AddAffiliateOnOrder.usecase';
+import { AcceptOrderUseCase } from './UseCases/AcceptOrder/AcceptOrder.usecase';
 import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/AffiliateRepository/AffiliateTypeOrm.repository';
 import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
 import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
 import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/ImageRepository/ImageTypeOrm.repository';
+import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
 
 @Module({
   imports: [RepositoriesModule, PaypalModule, StorageModule],
@@ -61,8 +62,9 @@ import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/Image
     GetOrderByAuthUseCase,
     GetOrderByIdUseCase,
     GetOrderAsAffiliateUseCase,
-    AddAffiliateOnOrderUseCase,
+    AcceptOrderUseCase,
     SendProofToOrderItemUseCase,
+    GetPendingOrdersUseCase,
   ],
 })
 export class OrderModule {}
