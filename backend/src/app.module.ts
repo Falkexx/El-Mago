@@ -39,9 +39,9 @@ import { OrderModule } from './Application/Domains/Order/Order.module';
       password: env.POSTGRES_PASSWORD,
       database: env.POSTGRES_DB,
       entities: [`${__dirname}/**/*.entity{.js,.ts}`],
-      migrations: [`${__dirname}/migrations/{.ts,*js}`],
+      // migrations: [`${__dirname}/migrations/{.ts,*js}`],
       migrationsRun: true,
-      synchronize: false,
+      synchronize: true,
       logging: env.DATABASE_LOG,
     }),
 
