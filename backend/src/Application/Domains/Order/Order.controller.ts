@@ -69,21 +69,16 @@ export class OrderController {
     @User() payload: PayloadType,
     @Body() createOrderDto: CreateOrderDto,
   ): Promise<ApiResponse<any>> {
-    const result = await this.createOrderUseCase.execute(
+    const orderCreated = await this.createOrderUseCase.execute(
       payload,
       createOrderDto,
     );
 
-    const user = plainToInstance(UserEntity, result.user);
-
     return {
-      data: {
-        ...result,
-        user,
-      },
+      data: orderCreated,
       message: 'created',
       status: 201,
-      href: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/order/check/${result.id}`,
+      href: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/order/check/${orderCreated.id}`,
     };
   }
 

@@ -32,14 +32,6 @@ export class ImageEntity {
 
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
-
-  @OneToOne(() => ItemEntity, (item) => item.image, { nullable: true })
-  item: ItemEntity | null;
-
-  @OneToOne(() => OrderItem, (orderItem) => orderItem.ProofImage, {
-    nullable: true,
-  })
-  ProofImage: OrderItem | null;
 }
 
 export class ImageUpdateEntity {

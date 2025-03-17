@@ -67,6 +67,7 @@ export class PutItemInCartUseCase {
         createdAt: new Date(),
         updatedAt: new Date(),
         item: item,
+        quantity: putDto.amount,
         itemId: item.id,
         cart: cart,
       } as CartItemEntity);
@@ -76,9 +77,9 @@ export class PutItemInCartUseCase {
 
     // update
     const updateCartItem: UpdateCartItemEntity = {
-      amount: putDto.amount
-        ? itemIsAlreadyInTheCart.amount + putDto.amount
-        : itemIsAlreadyInTheCart.amount + 1,
+      quantity: putDto.amount
+        ? itemIsAlreadyInTheCart.quantity + putDto.amount
+        : itemIsAlreadyInTheCart.quantity + 1,
       updatedAt: new Date(),
     };
 

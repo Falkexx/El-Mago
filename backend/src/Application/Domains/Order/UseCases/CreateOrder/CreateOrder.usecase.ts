@@ -32,91 +32,107 @@ export class CreateOrderUseCase {
     private readonly cartRepository: ICartRepositoryContract,
     @Inject(KEY_INJECTION.ITEM_REPOSITORY_CONTRACT)
     private readonly itemRepository: IItemRepositoryContract,
-
     private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, createOrderDto: CreateOrderDto) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
-
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-
-    const cart = await this.cartRepository.getBy({ userId: user.id });
-
-    if (!cart) {
-      throw new NotFoundException('cart not created');
-    }
-
-    const itemsIds = cart.items.map((_item_) => _item_.itemId);
-    console.log(itemsIds);
-
-    if (itemsIds.length <= 0) {
-      throw new NotAcceptableException('no have items in cart');
-    }
-
-    const items = await this.itemRepository.getManyByIds(itemsIds);
-
-    // if (cart.items.length <= 0) {
-    //   throw new NotAcceptableException('no have items in card');
-    // }
-
-    return this.createOrderTransaction(user, cart, items, createOrderDto);
-  }
-
-  private async createOrderTransaction(
-    user: UserEntity,
-    cart: CartEntity,
-    items: ItemEntity[],
-    createOrderDto: CreateOrderDto,
-  ) {
     return await this.dataSource.transaction(async (manager) => {
-      const itemsEntityList = items.map((_item_) => {
-        return Object.assign(new OrderItem(), {
-          id: shortId(20),
-          currency: 'USD',
-          Item: _item_,
-          price: _item_.price.toString(),
-          itemId: _item_.id,
-          name: _item_.name,
-          description: '  ',
-        });
+      // Busca o usuário
+      const user = await this.userRepository.getBy({ id: payload.sub });
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+
+      // Busca o carrinho
+      const cart = await this.cartRepository.getBy({ userId: user.id });
+      if (!cart) {
+        throw new NotFoundException('cart not created');
+      }
+
+      // Verifica se há itens no carrinho
+      const itemsIds = cart.items.map((item) => item.itemId);
+      if (itemsIds.length <= 0) {
+        throw new NotAcceptableException('no items in cart');
+      }
+
+      // Busca os itens
+      const items = await this.itemRepository.getManyByIds(itemsIds);
+      if (!items || items.length <= 0) {
+        throw new NotAcceptableException('no items in cart');
+      }
+
+      // Cria a entidade de pedido
+      const order = manager.create(OrderEntity, {
+        id: shortId(10),
+        coupon: ' ',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        name: 'Compra dos itens...',
+        userId: user.id,
+        battleTag: createOrderDto.battleTag,
+        nickName: createOrderDto.nickName,
+        platform: createOrderDto.platform ?? null,
+        completedAt: null,
+        digitalShippingId: null,
+        paymentId: null,
+        paymentUrl: null,
+        DigitalShipping: null,
+        user,
       });
 
-      const status = Object.assign(new OrderStatus(), {
+      const orderCreated = (
+        await manager
+          .createQueryBuilder()
+          .insert()
+          .into(OrderEntity)
+          .values(order)
+          .returning('*') // Retorna todos os campos após a inserção
+          .execute()
+      ).raw;
+
+      // Cria os itens do pedido
+      const itemsEntityList = items.map((item) => {
+        const quantity = cart.items.find(
+          (_cart_item_) => _cart_item_.itemId === item.id,
+        ).quantity;
+        return manager.create(OrderItem, {
+          id: shortId(20),
+          currency: 'USD',
+          Item: item,
+          price: item.price.toString(),
+          itemId: item.id,
+          name: item.name,
+          description: '  ',
+          imageUrl: '',
+          orderId: order.id,
+          price_per_unit: item.price.toString(),
+          quantity: quantity,
+          Order: order,
+        } as OrderItem);
+      });
+
+      // Salva os itens do pedido
+      await manager.save(OrderItem, itemsEntityList);
+
+      // Cria o status do pedido
+      const status = manager.create(OrderStatus, {
         id: shortId(10),
         createdAt: new Date(),
         status: Status.CREATED,
         title: 'Aguardando o pagamento',
         description: null,
+        orderId: order.id, // Relaciona o status ao pedido
+        Order: order, // Relaciona explicitamente a entidade Order
+        order: order,
       } as OrderStatus);
 
-      const order = Object.assign(new OrderEntity(), {
-        id: shortId(10),
-        coupon: ' ',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        name: 'Compra dos items...',
-        userId: user.id,
-        status: [status],
-        OrderItems: itemsEntityList,
-        battleTag: createOrderDto.battleTag,
-        nickName: createOrderDto.nickName,
-        platform: createOrderDto.platform ?? null,
-      } as OrderEntity);
+      // Salva o status
+      await manager.save(OrderStatus, status);
 
-      await manager.save(order.OrderItems);
-
-      await manager.save(order.status);
-
-      const orderEntity = manager.create(OrderEntity, order);
-
-      const savedOrder = await manager.save(OrderEntity, orderEntity);
-
+      // // Remove os itens do carrinho
       await manager.delete(CartItemEntity, { cart: { id: cart.id } });
 
-      return savedOrder;
+      return orderCreated;
     });
   }
 }

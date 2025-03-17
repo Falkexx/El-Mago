@@ -42,7 +42,7 @@ export class PayOrderUseCase {
     }
 
     const totalPrice = order.OrderItems.reduce(
-      (acc, curr) => acc + parseFloat(curr.price),
+      (acc, curr) => acc + parseFloat(curr.price_per_unit),
       parseFloat('0.00'),
     ).toFixed(2);
 
@@ -77,7 +77,7 @@ export class PayOrderUseCase {
         unit_amount: {
           // currency_code: _item_.currency,
           currency_code: 'BRL',
-          value: parseFloat(_item_.price).toFixed(2),
+          value: parseFloat(_item_.price_per_unit).toFixed(2),
         },
         description: _item_.description,
       } as Item;

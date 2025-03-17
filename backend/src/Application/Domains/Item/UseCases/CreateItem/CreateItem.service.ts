@@ -1,8 +1,6 @@
-import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { CreateItemDto } from './CrateItem.dto';
-import { generateImageId, shortId } from '#utils';
-import { ItemType } from 'src/@metadata';
-import { ImageEntity } from 'src/Application/Entities/Image.entity';
+import { generateImageId, generateShortId, shortId } from '#utils';
+import { ItemType, STORAGE_PROVIDER } from 'src/@metadata';
 import {
   Inject,
   NotFoundException,
@@ -53,7 +51,7 @@ export class CreateItemService {
       throw new NotFoundException('category not found');
     }
 
-    const imageId = shortId();
+    const imageId = generateShortId();
 
     const imageUploadResult = await this.storageService.upload({
       bucket: env.PUBLIC_IMAGES_BUCKET_NAME,
@@ -63,23 +61,20 @@ export class CreateItemService {
       type: 'IMAGE',
     });
 
-    const imageEntity = Object.assign(new ImageEntity(), {
+    const imageCrated = await this.imageRepository.create({
       id: imageId,
       name: createItemDto.image.originalname,
       bucket: imageUploadResult.Bucket,
       mimeType: createItemDto.image.mimetype,
       isDeleted: false,
-      storageProvider: 'S3',
+      storageProvider: STORAGE_PROVIDER.S3,
       updatedAt: new Date(),
       url: imageUploadResult.Location,
-      item: undefined,
       createdAt: new Date(),
-    } as ImageEntity);
+    });
 
-    const imageCrated = await this.imageRepository.create(imageEntity);
-
-    const itemEntity = Object.assign(new ItemEntity(), {
-      id: shortId(),
+    const itemCreated = await this.itemRepository.create({
+      id: generateShortId(),
       name: createItemDto.name,
       description: createItemDto.description,
       type: createItemDto.type,
@@ -88,15 +83,15 @@ export class CreateItemService {
       isInfinite: createItemDto.type === ItemType.COMMON,
       price: createItemDto.price,
       softDeleted: false,
-      image: imageCrated,
       createdAt: new Date(),
       updatedAt: new Date(),
-      user: user,
+      imageUrl: imageCrated.url,
       tags: createItemDto.tags,
       Categories: [category],
-    } as ItemEntity);
-
-    const itemCreated = await this.itemRepository.create(itemEntity);
+      user: user,
+      CartItems: undefined,
+      OrderItem: undefined,
+    });
 
     return itemCreated;
   }

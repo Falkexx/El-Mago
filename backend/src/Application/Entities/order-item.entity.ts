@@ -1,16 +1,7 @@
 import { TABLE } from 'src/@metadata/tables';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { OrderEntity } from './Order.entity';
 import { ItemEntity } from './Item.entity';
-import { ImageEntity } from './Image.entity';
-import { nullable } from 'zod';
 import { RequireOnlyOne } from '#types';
 
 @Entity({ name: TABLE.order_item })
@@ -28,38 +19,27 @@ export class OrderItem {
   description?: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 3 })
-  price: string;
+  price_per_unit: string;
 
   @Column({ type: 'varchar' })
   currency: 'USD' | 'BRL' | 'EUR';
 
   @Column({ type: 'varchar' })
-  itemId: string;
-
-  @OneToOne(() => ImageEntity, (image) => image.ProofImage, {
-    nullable: true,
-  })
-  @JoinColumn({ name: 'proofImageId' })
-  ProofImage: ImageEntity | null;
-
-  @Column({
-    type: 'varchar',
-    name: 'proofImageId',
-    nullable: true,
-    unique: true,
-  })
-  proofImageId: string | null;
-
-  // @Column({ type: 'varchar', length: 120 })
-  // server: string;
+  imageUrl: string;
 
   @ManyToOne(() => OrderEntity, (order) => order.OrderItems)
+  @JoinColumn({ name: 'orderId' })
   Order: OrderEntity;
 
+  @Column({ type: 'varchar' })
+  orderId: string;
+
   @ManyToOne(() => ItemEntity, (item) => item.OrderItem)
+  @JoinColumn({ name: 'itemId' })
   Item: ItemEntity;
+
+  @Column({ type: 'varchar' })
+  itemId: string;
 }
 
-export type OrderItemUniqueRefs = RequireOnlyOne<
-  Pick<OrderItem, 'id' | 'proofImageId'>
->;
+export type OrderItemUniqueRefs = RequireOnlyOne<Pick<OrderItem, 'id'>>;

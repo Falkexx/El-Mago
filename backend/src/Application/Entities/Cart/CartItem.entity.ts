@@ -9,7 +9,7 @@ export class CartItemEntity {
   id: string;
 
   @Column({ type: 'int' })
-  amount: number;
+  quantity: number;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -29,5 +29,5 @@ export class CartItemEntity {
 }
 
 export type UpdateCartItemEntity =
-  | Pick<CartItemEntity, 'amount'>
+  | Pick<CartItemEntity, 'quantity'>
   | Pick<CartItemEntity, 'updatedAt'>;

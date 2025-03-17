@@ -44,9 +44,8 @@ export class ItemEntity {
   @Column({ type: 'boolean', default: false })
   softDeleted: boolean;
 
-  @OneToOne(() => ImageEntity, (image) => image.item)
-  @JoinColumn()
-  image: ImageEntity;
+  @Column({ type: 'varchar' })
+  imageUrl: string;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
