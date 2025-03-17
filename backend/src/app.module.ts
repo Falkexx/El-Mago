@@ -13,6 +13,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { Redis } from 'ioredis';
 import { OrderModule } from './Application/Domains/Order/Order.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { InfraCredentialsManagerModule } from './Application/Infra/InfraCredentialsManager/InfraCredentialsManager.module';
 
 @Module({
   imports: [
@@ -44,6 +46,10 @@ import { OrderModule } from './Application/Domains/Order/Order.module';
       synchronize: true,
       logging: env.DATABASE_LOG,
     }),
+    CacheModule.register({
+      isGlobal: true,
+    }),
+    InfraCredentialsManagerModule,
 
     AuthModule,
     UserModule,

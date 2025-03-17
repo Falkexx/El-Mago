@@ -5,6 +5,7 @@ import {
   PayPalCreateOrderResponse,
   PayPalGetOrderResponse,
 } from 'src/@types/paypal';
+import { InfraCredentialsManagerService } from '../../InfraCredentialsManager/infraCredentialsManager.service';
 
 export type Item = {
   name: string;
@@ -27,12 +28,15 @@ export type PayOrderProps = {
 
 @Injectable()
 export class PaypalService {
-  private accessToken: string | null;
-  private tokenExpiresAt: number;
-
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly infraCredentialsManagerService: InfraCredentialsManagerService,
+  ) {}
 
   public async payOrder(createOrder: PayOrderProps) {
+    const paypalAccessToken =
+      await this.infraCredentialsManagerService.getPaypalAccessToken();
+
     try {
       const orderDataValid = this.validateOrder(createOrder);
 
@@ -43,7 +47,7 @@ export class PaypalService {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${await this.getValidAccessToken()}`,
+              Authorization: `Bearer ${paypalAccessToken}`,
             },
             data: orderDataValid,
           },
@@ -77,13 +81,16 @@ export class PaypalService {
   }
 
   public async checkOrder(paypalOrderId: string) {
+    const paypalAccessToken =
+      await this.infraCredentialsManagerService.getPaypalAccessToken();
+
     try {
       const response = await this.httpService.axiosRef<PayPalGetOrderResponse>(
         `${env.PAYPAL_BASE_URL}/v2/checkout/orders/${paypalOrderId}`,
         {
           method: 'GET',
           headers: {
-            Authorization: `Bearer ${await this.getValidAccessToken()}`,
+            Authorization: `Bearer ${paypalAccessToken}`,
           },
         },
       );
@@ -113,50 +120,6 @@ export class PaypalService {
         throw new Error(`Unexpected error: ${error.message}`);
       }
     }
-  }
-
-  private async getAccessToken() {
-    const auth = Buffer.from(
-      `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`,
-    ).toString('base64');
-
-    const url = `${env.PAYPAL_BASE_URL}/v1/oauth2/token`;
-
-    try {
-      const response = await this.httpService.axiosRef(url, {
-        method: 'POST',
-        data: 'grant_type=client_credentials',
-        headers: {
-          Authorization: `Basic ${auth}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
-
-      this.accessToken = response.data.access_token;
-      const expiresIn = response.data.expires_in;
-      this.tokenExpiresAt = Date.now() + expiresIn + 1000;
-
-      return this.accessToken;
-    } catch (e) {
-      console.log('Erro ao obter o token: ', e.response.data);
-      throw new Error('Não foi possível obter o tken de accesso');
-    }
-  }
-
-  private async getValidAccessToken() {
-    if (
-      this.accessToken &&
-      this.tokenExpiresAt &&
-      Date.now() < this.tokenExpiresAt
-    ) {
-      return this.accessToken;
-    }
-
-    const token = await this.getAccessToken();
-
-    console.log(token);
-
-    return token;
   }
 
   private validateOrder(createOrder: PayOrderProps) {

@@ -78,3 +78,12 @@ type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
 export type RequireOnlyOne<T, Keys extends keyof T = keyof T> = {
   [K in Keys]: Required<Pick<T, K>> & Partial<Record<Exclude<Keys, K>, never>>;
 }[Keys];
+
+export type ExceptionType = {
+  message: {
+    ptBr: string;
+    engUs: string;
+    esp: string;
+  };
+  statusCode: number;
+};
