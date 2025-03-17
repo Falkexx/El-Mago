@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Inject,
   InternalServerErrorException,
   NotAcceptableException,
@@ -13,10 +14,11 @@ import {
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { DataSource } from 'typeorm';
 import { PayOrderDto } from './PayOrder.dto';
-import { PayloadType } from '#types';
+import { ExceptionType, PayloadType } from '#types';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { PayPalCreateOrderResponse } from 'src/@types/paypal';
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
+import { OrderItem } from 'src/Application/Entities/order-item.entity';
 
 export class PayOrderUseCase {
   constructor(
@@ -31,27 +33,42 @@ export class PayOrderUseCase {
   async execute(payload: PayloadType, { orderId }: PayOrderDto) {
     const user = await this.userRepository.getBy({ id: payload.sub });
 
-    if (!user || user.isBanned || user.isDeleted) {
+    if (!user) {
       throw new UnauthorizedException();
+    }
+
+    if (user.isBanned || user.isDeleted) {
+      throw new ForbiddenException({
+        message: {
+          ptBr: 'usuário banido ou deletado',
+          engUs: 'user banned ou deleted',
+          esp: 'usuario baneado o eliminado',
+        },
+      } as ExceptionType);
     }
 
     const order = await this.orderRepository.getOrderWithRelations(orderId);
 
     if (!order || order.userId !== payload.sub) {
-      throw new NotFoundException('order not found');
+      throw new NotFoundException({
+        message: {
+          engUs: 'order not exist',
+          ptBr: 'o pedido não existe',
+          esp: 'el orden no existe',
+        },
+      } as ExceptionType);
     }
-
-    const totalPrice = order.OrderItems.reduce(
-      (acc, curr) => acc + parseFloat(curr.price_per_unit),
-      parseFloat('0.00'),
-    ).toFixed(2);
-
-    console.log(totalPrice);
 
     const isPaid = order.status.find((_status_) => _status_.status === 'PAID');
 
     if (isPaid) {
-      throw new NotAcceptableException('order already paid');
+      throw new NotAcceptableException({
+        message: {
+          engUs: 'the order already paid',
+          ptBr: 'o pedido já foi pago',
+          esp: 'la orden de campra ya ha sido pagada',
+        },
+      } as ExceptionType);
     }
 
     const isReturned = order.status.find(
@@ -59,7 +76,13 @@ export class PayOrderUseCase {
     );
 
     if (isReturned) {
-      throw new NotAcceptableException('order returned');
+      throw new NotAcceptableException({
+        message: {
+          engUs: 'the order was refiused',
+          ptBr: 'o pedido foi negado',
+          esp: 'la orden de compra fue rechazada',
+        },
+      } as ExceptionType);
     }
 
     const isCanceled = order.status.find(
@@ -67,24 +90,33 @@ export class PayOrderUseCase {
     );
 
     if (isCanceled) {
-      throw new NotAcceptableException('order canceled');
+      throw new NotAcceptableException({
+        message: {
+          engUs: 'the order was canceled',
+          ptBr: 'o pedido foi cancelado',
+          esp: 'el pedido fue cancelado',
+        },
+      } as ExceptionType);
     }
 
-    const items = order.OrderItems.map((_item_) => {
-      return {
-        name: _item_.name,
-        quantity: _item_.quantity,
-        unit_amount: {
-          // currency_code: _item_.currency,
-          currency_code: 'BRL',
-          value: parseFloat(_item_.price_per_unit).toFixed(2),
-        },
-        description: _item_.description,
-      } as Item;
-    });
+    const items = order.OrderItems.map(
+      (_item_) =>
+        ({
+          name: _item_.name,
+          quantity: _item_.quantity,
+          unit_amount: {
+            // currency_code: _item_.currency,
+            currency_code: 'BRL',
+            value: parseFloat(_item_.price_per_unit).toFixed(2),
+          },
+          description: _item_.description,
+        }) as Item,
+    );
 
     let createOrderResult: PayPalCreateOrderResponse;
     let orderUpdated: OrderEntity;
+
+    // call payment api
     try {
       if (!order.paymentUrl) {
         createOrderResult = await this.paypalService.payOrder({
@@ -92,7 +124,7 @@ export class PayOrderUseCase {
           orderId: order.id,
           amount: {
             currency_code: 'BRL',
-            totalPrice,
+            totalPrice: this.calculateToTalPrice(order.OrderItems),
           },
         });
 
@@ -126,5 +158,16 @@ export class PayOrderUseCase {
         'Content-type': 'text/html',
       },
     };
+  }
+
+  private calculateToTalPrice(orderItems: OrderItem[]) {
+    const total = orderItems
+      .reduce(
+        (acc, curr) => acc + parseFloat(curr.price_per_unit) * curr.quantity,
+        parseFloat('0.00'),
+      )
+      .toFixed(2);
+
+    return total;
   }
 }
