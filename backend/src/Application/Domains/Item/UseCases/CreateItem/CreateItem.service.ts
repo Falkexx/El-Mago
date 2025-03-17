@@ -51,7 +51,7 @@ export class CreateItemService {
       throw new NotFoundException('category not found');
     }
 
-    const imageId = generateShortId();
+    const imageId = generateShortId(20);
 
     const imageUploadResult = await this.storageService.upload({
       bucket: env.PUBLIC_IMAGES_BUCKET_NAME,
@@ -74,7 +74,7 @@ export class CreateItemService {
     });
 
     const itemCreated = await this.itemRepository.create({
-      id: generateShortId(),
+      id: generateShortId(20),
       name: createItemDto.name,
       description: createItemDto.description,
       type: createItemDto.type,

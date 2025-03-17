@@ -34,13 +34,13 @@ export function generateShortId(length: number = 14): string {
   const randomPart = randomBytes(Math.ceil(randomLength / 2)) // Ajusta o número de bytes
     .toString('base64') // Usa base64 para mais densidade de caracteres
     .replace(/[^a-zA-Z0-9]/g, '') // Remove caracteres inválidos como +, /
-    .substr(0, randomLength > 0 ? randomLength : 1); // Garante pelo menos 1 caractere
+    .slice(0, randomLength > 0 ? randomLength : 1); // Garante pelo menos 1 caractere
 
   // Combina timestamp e parte aleatória
   const fullId = `${timestamp}-${randomPart}`;
 
   // Retorna o ID cortado para o comprimento desejado
-  return fullId.substr(0, length);
+  return fullId.slice(0, length);
 }
 
 // Exemplo de uso
