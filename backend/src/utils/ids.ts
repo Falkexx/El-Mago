@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import ShortUniqueId from 'short-unique-id';
+import { randomBytes } from 'crypto';
 
 const ShortId = new ShortUniqueId();
 
@@ -8,14 +9,13 @@ export function uuidV4() {
 }
 
 export function shortId(size: number = 10) {
-  return ShortId.rnd(size);
+  // return ShortId.rnd(size); // deprecated
+  return generateShortId(size);
 }
 
 export function generateImageId(name: string) {
   return `${shortId(10)}-${name}`;
 }
-
-import { randomBytes } from 'crypto';
 
 export function generateShortId(length: number = 14): string {
   if (length < 10) {
@@ -42,8 +42,3 @@ export function generateShortId(length: number = 14): string {
   // Retorna o ID cortado para o comprimento desejado
   return fullId.slice(0, length);
 }
-
-// Exemplo de uso
-console.log(generateShortId(14));
-console.log(generateShortId(14));
-console.log(generateShortId(14));
