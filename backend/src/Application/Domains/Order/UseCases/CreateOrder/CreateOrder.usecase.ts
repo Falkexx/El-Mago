@@ -12,16 +12,12 @@ import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/User
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { shortId } from '#utils';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
-import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';
 import { DataSource, Table } from 'typeorm';
-import { UserEntity } from 'src/Application/Entities/User.entity';
-import { ItemEntity } from 'src/Application/Entities/Item.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
 import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
 import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { Status } from 'src/@metadata';
 import { CreateOrderDto } from './CreateOrder.dto';
-import { TABLE } from 'src/@metadata/tables';
 
 @Injectable()
 export class CreateOrderUseCase {
@@ -58,7 +54,11 @@ export class CreateOrderUseCase {
       // Busca os itens
       const items = await this.itemRepository.getManyByIds(itemsIds);
       if (!items || items.length <= 0) {
-        throw new NotAcceptableException('no items in cart');
+        throw new NotAcceptableException({
+          ptBr: 'não ha itens no carrinho',
+          enUs: 'no have itens in cart',
+          esp: 'no hay artículos en el carrito',
+        });
       }
 
       // Cria a entidade de pedido
