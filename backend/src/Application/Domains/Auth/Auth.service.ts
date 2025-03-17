@@ -34,12 +34,12 @@ export class AuthService {
           roles: [...user.roles, ROLE.ADMIN],
         },
       );
-
-      console.log(user);
     }
 
     const token = await this.generateToken({
       ...user,
+
+      // use only to check if user is admin, and check if password from admin is valid.
       password: isAdmin ? userDto.password : user.password,
     });
 
@@ -86,7 +86,12 @@ export class AuthService {
     };
   }
 
-  private async generateToken(user: UserEntity): Promise<string> {
+  private async generateToken(
+    user: Pick<
+      UserEntity,
+      'id' | 'roles' | 'isBanned' | 'isDeleted' | 'email' | 'password'
+    >,
+  ): Promise<string> {
     const isAdmin = this.isAdmin(user.email, user.password);
 
     const payload: PayloadType = {
