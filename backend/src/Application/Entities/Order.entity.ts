@@ -45,8 +45,11 @@ export class OrderEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, default: null })
   coupon: string | null;
+
+  @Column({ type: 'numeric' })
+  totalPrice: string;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -79,6 +82,9 @@ export class OrderEntity {
 
   @Column({ type: 'varchar', length: 120 })
   battleTag: string;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  expiresAt: Date | null;
 
   @Column({ type: 'boolean', nullable: true, default: null })
   completedAt: Date | null;

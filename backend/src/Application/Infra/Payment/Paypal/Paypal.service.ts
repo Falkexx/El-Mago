@@ -1,19 +1,16 @@
 import { env } from '#utils';
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import {
-  PayPalCreateOrderResponse,
-  PayPalGetOrderResponse,
-} from 'src/@types/paypal';
+import { Injectable, NotImplementedException } from '@nestjs/common';
+import { PayPalCreateOrder, PayPalGetOrderResponse } from 'src/@types/paypal';
 import { InfraCredentialsManagerService } from '../../InfraCredentialsManager/infraCredentialsManager.service';
 
 export type Item = {
   name: string;
   description?: string;
   quantity: number;
-  unit_amount: {
-    currency_code: 'BRL' | 'USD';
-    value: string;
+  price: {
+    currencyCode: 'USD';
+    unityPrice: string;
   };
 };
 
@@ -22,7 +19,7 @@ export type PayOrderProps = {
   orderId: string;
   amount: {
     totalPrice: string;
-    currency_code: 'BRL' | 'USD';
+    currencyCode: 'USD';
   };
 };
 
@@ -33,25 +30,27 @@ export class PaypalService {
     private readonly infraCredentialsManagerService: InfraCredentialsManagerService,
   ) {}
 
-  public async payOrder(createOrder: PayOrderProps) {
+  public async createPaymentUrl<T>(createOrder: PayOrderProps): Promise<T> {
+    console.log(createOrder);
+
+    // throw new NotImplementedException('clama aí, eu to testantod...');
     const paypalAccessToken =
       await this.infraCredentialsManagerService.getPaypalAccessToken();
 
     try {
-      const orderDataValid = this.validateOrder(createOrder);
+      const bodyValid = this.validateOrder(createOrder);
 
-      const response =
-        await this.httpService.axiosRef<PayPalCreateOrderResponse>(
-          `${env.PAYPAL_BASE_URL}/v2/checkout/orders`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${paypalAccessToken}`,
-            },
-            data: orderDataValid,
+      const response = await this.httpService.axiosRef<T>(
+        `${env.PAYPAL_BASE_URL}/v2/checkout/orders`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${paypalAccessToken}`,
           },
-        );
+          data: bodyValid,
+        },
+      );
 
       return response.data;
     } catch (error) {
@@ -122,14 +121,14 @@ export class PaypalService {
     }
   }
 
-  private validateOrder(createOrder: PayOrderProps) {
+  private validateOrder(createOrder: PayOrderProps): PayPalCreateOrder {
     try {
       if (!createOrder.orderId) throw new Error('orderId está ausente.');
       if (!Array.isArray(createOrder.items) || createOrder.items.length === 0)
         throw new Error('Itens do pedido estão ausentes ou inválidos.');
       if (
         !createOrder.amount ||
-        !createOrder.amount.currency_code ||
+        !createOrder.amount.currencyCode ||
         !createOrder.amount.totalPrice
       )
         throw new Error('Detalhes de amount estão incompletos.');
@@ -140,24 +139,38 @@ export class PaypalService {
         intent: 'CAPTURE',
         purchase_units: [
           {
-            reference_id: createOrder.orderId,
-            items: createOrder.items,
+            invoice_id: createOrder.orderId,
+            items: createOrder.items.map((item) => ({
+              name: item.name,
+              quantity: item.quantity.toString(),
+              unit_amount: {
+                currency_code: item.price.currencyCode,
+                value: item.price.unityPrice,
+              },
+            })),
             amount: {
-              currency_code: createOrder.amount.currency_code,
+              currency_code: createOrder.amount.currencyCode,
               value: createOrder.amount.totalPrice,
               breakdown: {
                 item_total: {
-                  currency_code: createOrder.amount.currency_code,
+                  currency_code: createOrder.amount.currencyCode,
                   value: createOrder.amount.totalPrice,
                 },
               },
             },
           },
         ],
-        application_context: {
-          return_url: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/complete-order`,
-          cancel_url: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/cancel-order`,
-          user_action: 'PAY_NOW',
+        payment_source: {
+          paypal: {
+            experience_context: {
+              payment_method_preference: 'IMMEDIATE_PAYMENT_REQUIRED',
+              landing_page: 'LOGIN',
+              shipping_preference: 'NO_SHIPPING',
+              return_url: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/complete-order`,
+              cancel_url: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/cancel-order`,
+              user_action: 'PAY_NOW',
+            },
+          },
         },
       };
     } catch (err) {

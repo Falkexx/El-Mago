@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { OrderService } from './Order.service';
 import { OrderController } from './Order.controller';
-import { PaypalModule } from 'src/Application/Infra/Payment/Paypal/Paypal.module';
 import { CreateOrderUseCase } from './UseCases/CreateOrder/CreateOrder.usecase';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
 import { KEY_INJECTION } from 'src/@metadata/keys';
@@ -19,9 +18,10 @@ import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/Sen
 import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
 import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/ImageRepository/ImageTypeOrm.repository';
 import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
+import { PaymentModule } from 'src/Application/Infra/Payment/Payment.module';
 
 @Module({
-  imports: [RepositoriesModule, PaypalModule, StorageModule],
+  imports: [RepositoriesModule, StorageModule, PaymentModule],
   controllers: [OrderController],
   providers: [
     {

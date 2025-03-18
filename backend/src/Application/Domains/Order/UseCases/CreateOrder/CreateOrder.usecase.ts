@@ -3,6 +3,7 @@ import {
   Injectable,
   NotAcceptableException,
   NotFoundException,
+  NotImplementedException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { KEY_INJECTION } from 'src/@metadata/keys';
@@ -61,22 +62,42 @@ export class CreateOrderUseCase {
         });
       }
 
-      // Cria a entidade de pedido
+      const totalPrice = parseFloat(
+        items
+          .reduce((acc, curr) => {
+            const itemInCard = cart.items.find(
+              (cartItem) => cartItem.itemId === curr.id,
+            );
+
+            return acc + parseFloat(curr.price) * itemInCard.quantity;
+          }, 0)
+          .toString(),
+      ).toFixed(2);
+
+      const names = items.map((item) => item.name);
+
+      const now = new Date();
+
+      const expiresAt: Date = new Date(now.setHours(now.getHours() + 3 * 24)); // expires in 3 days
+
+      //Cria a entidade de pedido
       const order = manager.create(OrderEntity, {
-        id: shortId(10),
-        coupon: ' ',
+        id: shortId(20),
+        name: `Compra dos itens: ${names.join(', ')}`,
+        coupon: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        name: 'Compra dos itens...',
         userId: user.id,
         battleTag: createOrderDto.battleTag,
         nickName: createOrderDto.nickName,
         platform: createOrderDto.platform ?? null,
+        totalPrice: totalPrice,
         completedAt: null,
         digitalShippingId: null,
         paymentId: null,
         paymentUrl: null,
         DigitalShipping: null,
+        expiresAt,
         user,
       });
 
@@ -105,7 +126,7 @@ export class CreateOrderUseCase {
           description: '  ',
           imageUrl: '',
           orderId: order.id,
-          price_per_unit: item.price.toString(),
+          price_per_unit: item.price,
           quantity: quantity,
           Order: order,
         } as OrderItem);

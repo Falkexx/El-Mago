@@ -22,7 +22,7 @@ export class OrderItem {
   price_per_unit: string;
 
   @Column({ type: 'varchar' })
-  currency: 'USD' | 'BRL' | 'EUR';
+  currency: 'USD';
 
   @Column({ type: 'varchar' })
   imageUrl: string;

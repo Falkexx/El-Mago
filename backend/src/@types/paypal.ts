@@ -1,13 +1,14 @@
+export interface PayPalPaymentResult {
+  id: string;
+  status: string;
+  payment_source: PaymentSource;
+  links: Link[];
+}
+
 export interface Link {
   href: string;
   rel: string;
   method: string;
-}
-
-export interface PayPalCreateOrderResponse {
-  id: string;
-  status: string;
-  links: Link[];
 }
 
 export interface PayPalGetOrderResponse {
@@ -113,3 +114,58 @@ export interface Link {
   rel: string;
   method: string;
 }
+
+export type PayPalCreateOrder = {
+  intent: 'CAPTURE' | 'AUTHORIZE';
+  payment_source: {
+    paypal: {
+      experience_context: {
+        payment_method_preference:
+          | 'IMMEDIATE_PAYMENT_REQUIRED'
+          | 'UNRESTRICTED';
+        landing_page: 'LOGIN' | 'GUEST_CHECKOUT' | 'NO_PREFERENCE';
+        shipping_preference:
+          | 'GET_FROM_FILE'
+          | 'NO_SHIPPING'
+          | 'SET_PROVIDED_ADDRESS';
+        user_action: 'PAY_NOW' | 'CONTINUE';
+        return_url: string;
+        cancel_url: string;
+      };
+    };
+  };
+  purchase_units: Array<{
+    invoice_id?: string;
+    amount: {
+      currency_code: string; // ISO 4217 currency code, e.g., "USD"
+      value: string; // Decimal value as string
+      breakdown?: {
+        item_total?: {
+          currency_code: string;
+          value: string;
+        };
+        shipping?: {
+          currency_code: string;
+          value: string;
+        };
+      };
+    };
+    items?: Array<{
+      name: string;
+      description?: string;
+      unit_amount: {
+        currency_code: string;
+        value: string;
+      };
+      quantity: string; // String representation of integer
+      category?: 'DIGITAL_GOODS' | 'PHYSICAL_GOODS' | 'DONATION';
+      sku?: string;
+      image_url?: string;
+      url?: string;
+      upc?: {
+        type: 'UPC-A' | 'UPC-E' | 'EAN-13' | 'ISBN-10' | 'ISBN-13';
+        code: string;
+      };
+    }>;
+  }>;
+};

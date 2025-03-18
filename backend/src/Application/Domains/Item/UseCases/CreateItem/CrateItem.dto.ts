@@ -31,7 +31,8 @@ export class CreateItemBodyDto {
   @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   @IsNumber()
   @Min(0)
-  price: number;
+  @IsString()
+  price: string;
 
   @Transform(({ value }) => {
     try {

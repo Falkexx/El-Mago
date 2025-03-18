@@ -91,14 +91,10 @@ export class OrderController {
   ) {
     const result = await this.payOrderUseCase.execute(payload, { orderId });
 
-    const user = plainToInstance(UserEntity, result.order.user);
     return {
-      data: {
-        ...result,
-        user,
-      },
-
-      href: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/order/check/${result.order.id}`,
+      data: result,
+      message: 'payment link created',
+      status: 201,
     };
   }
 

@@ -39,7 +39,7 @@ export class ItemEntity {
   isInfinite: boolean;
 
   @Column({ type: 'decimal', precision: 10, scale: 3 })
-  price: number;
+  price: string;
 
   @Column({ type: 'boolean', default: false })
   softDeleted: boolean;
