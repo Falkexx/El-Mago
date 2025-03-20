@@ -139,7 +139,6 @@ export class OrderController {
       message: 'affiliate accept order successfully',
       status: 200,
     };
-    throw new NotImplementedException('method not implemented');
   }
 
   @Post('send-proof-delivery-for-order')
