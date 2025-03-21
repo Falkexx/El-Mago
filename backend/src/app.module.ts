@@ -15,9 +15,17 @@ import { Redis } from 'ioredis';
 import { OrderModule } from './Application/Domains/Order/Order.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { InfraCredentialsManagerModule } from './Application/Infra/InfraCredentialsManager/InfraCredentialsManager.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
+    BullModule.forRoot({
+      connection: {
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+      },
+    }),
+
     ThrottlerModule.forRoot({
       throttlers: [
         {
