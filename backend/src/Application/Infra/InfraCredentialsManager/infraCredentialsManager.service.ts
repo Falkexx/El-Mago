@@ -8,7 +8,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { KEY_CACHE } from 'src/@metadata';
+import { KEY_CACHE } from 'src/@metadata/keys';
 
 @Injectable()
 export class InfraCredentialsManagerService {
