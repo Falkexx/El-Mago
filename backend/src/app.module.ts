@@ -16,6 +16,7 @@ import { OrderModule } from './Application/Domains/Order/Order.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { InfraCredentialsManagerModule } from './Application/Infra/InfraCredentialsManager/InfraCredentialsManager.module';
 import { BullModule } from '@nestjs/bullmq';
+import { JobsModule } from './Application/Infra/Jobs/Job.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { BullModule } from '@nestjs/bullmq';
       connection: {
         host: env.REDIS_HOST,
         port: env.REDIS_PORT,
+        password: env.REDIS_PASSWORD,
       },
     }),
 
@@ -65,6 +67,7 @@ import { BullModule } from '@nestjs/bullmq';
     ItemModule,
     CategoryModule,
     OrderModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [

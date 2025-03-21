@@ -16,6 +16,7 @@ export class PaypalWebHookService {
   ) {}
 
   async webhookResult(body: WebhookEvent, headers: any) {
+    console.log(body);
     await this.WebHookParser(body, headers);
 
     if (body.resource.status === 'APPROVED') {

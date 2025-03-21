@@ -91,7 +91,3 @@ export enum AffiliateOnHoldStatus {
   APPROVED = 'APPROVED',
   DECLINED = 'DECLINED',
 }
-
-export enum KEY_CACHE {
-  paypal_access_token = 'paypal_access_token',
-}
