@@ -11,7 +11,6 @@ export class JobConsumerService extends WorkerHost {
 
   async process(job: Job, token?: string): Promise<any> {
     const data = job.data;
-    console.log(token);
 
     if (job.name === KEY_OF_JOB.CONFIRM_PAYMENT) {
       await this.confirmPayment(data);
@@ -19,7 +18,6 @@ export class JobConsumerService extends WorkerHost {
   }
 
   private async confirmPayment(data: { body: any; headers: any }) {
-    console.log('consumer called');
     const { body, headers } = data;
     await this.paypalWebHookService.webhookResult(body, headers);
   }

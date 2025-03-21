@@ -9,17 +9,7 @@ export class JobProducerService {
     @InjectQueue(KEY_OF_QUEUE.PAYMENT) private readonly queue: Queue,
   ) {}
 
-  // async signUpSendMail() {
-  //   await this.queue.add(KEY_OF_JOB, Ddata);
-  // }
-
-  // async transactionSendMail() {
-  //   await this.queue.add();
-  // }
-
   async confirmPayment(data: { body: any; headers: any }) {
-    // await this.queue.add(KEY_OF_JOB.CONFIRM_PAYMENT, data);
-    console.log('producer called');
     await this.queue.add(KEY_OF_JOB.CONFIRM_PAYMENT, data);
   }
 }
