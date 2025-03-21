@@ -88,6 +88,11 @@ const envSchema = z.object({
     .transform((val) => parseInt(val, 10)),
   MAILTRAP_USER: z.string().nonempty(),
   MAILTRAP_PASS: z.string().nonempty(),
+
+  // GOOGLE OAUTH
+  GOOGLE_CLOUD_OAUTH_CLIENT_ID: z.string().nonempty(),
+  GOOGLE_CLOUD_OAUTH_CLIENT_SECRET: z.string().nonempty(),
+  GOOGLE_CLOUD_OAUTH_REFRESH_TOKEN: z.string().nonempty(),
 });
 
 export const env = envSchema.parse(process.env);

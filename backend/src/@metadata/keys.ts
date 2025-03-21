@@ -11,6 +11,7 @@ export enum KEY_INJECTION {
 
 export enum KEY_CACHE {
   paypal_access_token = 'paypal_access_token',
+  gmail_access_token = 'gmail_access_token',
 }
 
 export enum KEY_OF_QUEUE {

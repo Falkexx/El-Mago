@@ -1,4 +1,4 @@
-import { ExceptionType } from '#types';
+import { ExceptionType, GoogleOauth2Response } from '#types';
 import { env } from '#utils';
 import { HttpService } from '@nestjs/axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { KEY_CACHE } from 'src/@metadata/keys';
+import { lastValueFrom, map } from 'rxjs';
 
 @Injectable()
 export class InfraCredentialsManagerService {
@@ -22,8 +23,21 @@ export class InfraCredentialsManagerService {
       KEY_CACHE.paypal_access_token,
     );
 
+    console.log(accessToken);
     if (!accessToken) {
       return this.generateNewPaypalAccessToken();
+    }
+
+    return accessToken;
+  }
+
+  async getGmailAccessToken() {
+    const accessToken = await this.cacheManager.get(
+      KEY_CACHE.gmail_access_token,
+    );
+
+    if (!accessToken) {
+      return this.generateNewGmailAccessToken();
     }
 
     return accessToken;
@@ -65,5 +79,35 @@ export class InfraCredentialsManagerService {
         },
       } as ExceptionType);
     }
+  }
+
+  private async generateNewGmailAccessToken() {
+    const body = {
+      refresh_token: env.GOOGLE_CLOUD_OAUTH_REFRESH_TOKEN,
+      token_uri: 'https://oauth2.googleapis.com/token',
+    };
+
+    const result = await lastValueFrom(
+      this.httpService
+        .post<GoogleOauth2Response>(
+          'https://developers.google.com/oauthplayground/refreshAccessToken',
+          body,
+        )
+        .pipe(map((response) => response.data)),
+    );
+
+    await this.cacheManager.set(
+      KEY_CACHE.gmail_access_token,
+      JSON.stringify({
+        accessToken: result.access_token,
+        refreshToken: result.refresh_token,
+      }),
+      result.expires_in - 500,
+    );
+
+    return {
+      accessToken: result.access_token,
+      refreshToken: result.refresh_token,
+    };
   }
 }

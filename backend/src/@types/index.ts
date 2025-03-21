@@ -87,3 +87,10 @@ export type ExceptionType = {
   };
   statusCode: number;
 };
+
+export type GoogleOauth2Response = {
+  success: boolean;
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+};
