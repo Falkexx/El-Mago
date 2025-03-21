@@ -93,6 +93,9 @@ const envSchema = z.object({
   GOOGLE_CLOUD_OAUTH_CLIENT_ID: z.string().nonempty(),
   GOOGLE_CLOUD_OAUTH_CLIENT_SECRET: z.string().nonempty(),
   GOOGLE_CLOUD_OAUTH_REFRESH_TOKEN: z.string().nonempty(),
+
+  // COMPANY
+  COMPANY_EMAIL: z.string().nonempty(),
 });
 
 export const env = envSchema.parse(process.env);

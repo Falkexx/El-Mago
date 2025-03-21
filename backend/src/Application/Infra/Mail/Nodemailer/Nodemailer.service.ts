@@ -58,7 +58,7 @@ export class NodemailerService {
         service: 'gmail',
         auth: {
           type: 'OAuth2',
-          user: 'join.legends.company@gmail.com',
+          user: env.COMPANY_EMAIL,
           clientId: env.GOOGLE_CLOUD_OAUTH_CLIENT_ID,
           clientSecret: env.GOOGLE_CLOUD_OAUTH_CLIENT_SECRET,
           refreshToken: accessAndRefresh['refreshToken'],
