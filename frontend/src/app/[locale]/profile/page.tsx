@@ -9,15 +9,11 @@ function page() {
     <section className='px-32 w-full'>
       <main className='flex flex-row gap-6'>
 
-        {/*
         
         <UserPanel/>
 
         <UserCredentials/>
-        */}
-
-        <AffiliatePanel/>
-        <AffiliateCredentials/>
+      
 
       </main>
     </section>
