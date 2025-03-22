@@ -11,7 +11,6 @@ function page() {
     <main>
       <section className='px-32'>
 
-        {/*
         
         <Operation_steps/>
 
@@ -20,7 +19,6 @@ function page() {
         <FinishOrder affiliateComission={8.90} orderID={3} totalValue={22.22} key={1}/>
 
         <RegisterMarketplace/>
-        */}
 
         <Approved_Affiliate_page/>
       </section>
