@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../User/User.service';
 import { PayloadType } from '#types';
 import { CreateUserDto } from '../User/dtos/CreateUser.dto';
@@ -8,21 +8,38 @@ import { UserEntity } from 'src/Application/Entities/User.entity';
 import * as bcrypt from 'bcrypt';
 import { env } from '#utils';
 import { ROLE } from 'src/@metadata/roles';
+import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
+import { KEY_INJECTION } from 'src/@metadata/keys';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
+    private readonly userRepository: IUserRepositoryContract,
   ) {}
 
   async signUp(userDto: CreateUserDto) {
-    const user = await this.userService.create(userDto);
+    let user = await this.userService.create(userDto);
 
     const isAdmin = this.isAdmin(userDto.email, userDto.password);
 
+    if (user.email === env.ADMIN_EMAIL && !user.roles.includes(ROLE.ADMIN)) {
+      user = await this.userRepository.update(
+        {
+          id: user.id,
+        },
+        {
+          roles: [...user.roles, ROLE.ADMIN],
+        },
+      );
+    }
+
     const token = await this.generateToken({
       ...user,
+
+      // use only to check if user is admin, and check if password from admin is valid.
       password: isAdmin ? userDto.password : user.password,
     });
 
@@ -33,7 +50,7 @@ export class AuthService {
   }
 
   async sinIn(authDto: AuthDto) {
-    const user = await this.userService.getUserBy({ email: authDto.email });
+    let user = await this.userService.getUserBy({ email: authDto.email });
 
     if (!user) {
       throw new UnauthorizedException();
@@ -43,6 +60,17 @@ export class AuthService {
 
     if (!isAdmin) {
       await this.isPasswordMatch(authDto.password, user.password);
+    }
+
+    if (isAdmin && !user.roles.includes(ROLE.ADMIN)) {
+      user = await this.userRepository.update(
+        {
+          id: user.id,
+        },
+        {
+          roles: [...user.roles, ROLE.ADMIN],
+        },
+      );
     }
 
     const token = await this.generateToken({
@@ -58,12 +86,17 @@ export class AuthService {
     };
   }
 
-  private async generateToken(user: UserEntity): Promise<string> {
+  private async generateToken(
+    user: Pick<
+      UserEntity,
+      'id' | 'roles' | 'isBanned' | 'isDeleted' | 'email' | 'password'
+    >,
+  ): Promise<string> {
     const isAdmin = this.isAdmin(user.email, user.password);
 
     const payload: PayloadType = {
       sub: user.id,
-      roles: [isAdmin ? ROLE.ADMIN : user.role],
+      roles: user.roles,
       isBanned: !isAdmin ? user.isBanned : false,
       isDeleted: !isAdmin ? user.isDeleted : false,
     };

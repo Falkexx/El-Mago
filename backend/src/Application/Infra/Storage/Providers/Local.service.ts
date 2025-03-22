@@ -1,5 +1,5 @@
 import { checkIfFolderExistAndCreate, env } from '#utils';
-import * as path from 'path';
+import * as path from 'node:path';
 import * as fs from 'fs';
 import { StorageResult } from '#types';
 import { Injectable } from '@nestjs/common';
@@ -14,6 +14,7 @@ export class StorageLocalProvider {
   }: FileUploadProps): Promise<StorageResult> {
     const dir = checkIfFolderExistAndCreate(bucket);
 
+    console.log(name);
     const filePath = path.join(dir, name);
 
     fs.writeFileSync(filePath, file.buffer);

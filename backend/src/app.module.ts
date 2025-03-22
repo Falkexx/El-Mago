@@ -13,9 +13,21 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { Redis } from 'ioredis';
 import { OrderModule } from './Application/Domains/Order/Order.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { InfraCredentialsManagerModule } from './Application/Infra/InfraCredentialsManager/InfraCredentialsManager.module';
+import { BullModule } from '@nestjs/bullmq';
+import { JobsModule } from './Application/Infra/Jobs/Job.module';
 
 @Module({
   imports: [
+    BullModule.forRoot({
+      connection: {
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+        password: env.REDIS_PASSWORD,
+      },
+    }),
+
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -39,11 +51,15 @@ import { OrderModule } from './Application/Domains/Order/Order.module';
       password: env.POSTGRES_PASSWORD,
       database: env.POSTGRES_DB,
       entities: [`${__dirname}/**/*.entity{.js,.ts}`],
-      migrations: [`${__dirname}/migrations/{.ts,*js}`],
+      // migrations: [`${__dirname}/migrations/{.ts,*js}`],
       migrationsRun: true,
-      synchronize: false,
+      synchronize: true,
       logging: env.DATABASE_LOG,
     }),
+    CacheModule.register({
+      isGlobal: true,
+    }),
+    InfraCredentialsManagerModule,
 
     AuthModule,
     UserModule,
@@ -51,6 +67,7 @@ import { OrderModule } from './Application/Domains/Order/Order.module';
     ItemModule,
     CategoryModule,
     OrderModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [

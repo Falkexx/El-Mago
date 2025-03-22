@@ -48,7 +48,7 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
 
   async update(
     unqRef: UserEntityUniqueRefs,
-    updateEntity: UserUpdateEntity,
+    updateEntity: Partial<UserUpdateEntity>,
   ): Promise<UserEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 

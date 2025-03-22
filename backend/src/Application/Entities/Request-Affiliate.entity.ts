@@ -11,6 +11,7 @@ import { UserEntity } from './User.entity';
 import { RequireOnlyOne } from '#types';
 import { Exclude } from 'class-transformer';
 import { AffiliateOnHoldStatus } from 'src/@metadata';
+import { AffiliateEntity } from './Affiliate.entity';
 
 @Entity({ name: TABLE.affiliate_queue })
 export class RequestAffiliateEntity {
@@ -52,6 +53,9 @@ export class RequestAffiliateEntity {
 
   @Column({ type: 'varchar', array: true })
   fluentLanguages: string[];
+
+  @OneToOne(() => AffiliateEntity, (affiliate) => affiliate)
+  Affiliate: AffiliateEntity;
 
   @RelationId(
     (requestAffiliate: RequestAffiliateEntity) => requestAffiliate.User,

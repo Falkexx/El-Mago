@@ -160,6 +160,7 @@ export class AffiliateTypeOrmRepository
         `${TABLE.affiliate}.phoneNumber`,
         `${TABLE.affiliate}.cpfCnpj`,
         `${TABLE.affiliate}.characterName`,
+        `${TABLE.affiliate}.discord`,
       ])
       .getOne();
 

@@ -14,6 +14,12 @@ export const CreateItem = createParamDecorator(
     const body = request.body;
     const file = request.file;
 
+    if (file.originalname.length > 100) {
+      throw new BadRequestException(
+        'the image name cannot be greater than 100',
+      );
+    }
+
     const dtoInstance = plainToInstance(CreateItemBodyDto, body);
 
     const errors = validateSync(dtoInstance, {

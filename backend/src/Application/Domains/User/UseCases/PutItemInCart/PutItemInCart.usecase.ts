@@ -53,12 +53,21 @@ export class PutItemInCartUseCase {
     if (!itemIsAlreadyInTheCart) {
       // create
 
+      let id: string = shortId(15);
+      let existItemWithId = await this.cartRepository.getBy({ id });
+
+      while (existItemWithId) {
+        id = shortId(15);
+        existItemWithId = await this.cartRepository.getBy({ id });
+      }
+
       const newCartItem = Object.assign(new CartItemEntity(), {
-        id: shortId(15),
+        id,
         amount: putDto.amount ?? 1,
         createdAt: new Date(),
         updatedAt: new Date(),
         item: item,
+        quantity: putDto.amount,
         itemId: item.id,
         cart: cart,
       } as CartItemEntity);
@@ -68,9 +77,9 @@ export class PutItemInCartUseCase {
 
     // update
     const updateCartItem: UpdateCartItemEntity = {
-      amount: putDto.amount
-        ? itemIsAlreadyInTheCart.amount + putDto.amount
-        : itemIsAlreadyInTheCart.amount + 1,
+      quantity: putDto.amount
+        ? itemIsAlreadyInTheCart.quantity + putDto.amount
+        : itemIsAlreadyInTheCart.quantity + 1,
       updatedAt: new Date(),
     };
 

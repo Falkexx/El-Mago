@@ -2,14 +2,19 @@ import {
   Column,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
 } from 'typeorm';
 import { UserEntity } from './User.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { OrderStatus } from './order-status.entity';
 import { OrderItem } from './order-item.entity';
+import { AffiliateEntity } from './Affiliate.entity';
+import { DigitalShippingEntity } from './DigitalShipping.entity';
+import { RequireOnlyOne } from '#types';
 
 /**
  * Preciso criar a ordem, slavar as  informações dos items  no momento da compra com
@@ -40,8 +45,11 @@ export class OrderEntity {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: true, default: null })
   coupon: string | null;
+
+  @Column({ type: 'numeric' })
+  totalPrice: string;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -75,6 +83,12 @@ export class OrderEntity {
   @Column({ type: 'varchar', length: 120 })
   battleTag: string;
 
+  @Column({ type: 'timestamptz', nullable: true })
+  expiresAt: Date | null;
+
+  @Column({ type: 'boolean', nullable: true, default: null })
+  completedAt: Date | null;
+
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 
@@ -83,6 +97,16 @@ export class OrderEntity {
     eager: true,
   })
   OrderItems: OrderItem[];
+
+  @OneToOne(
+    () => DigitalShippingEntity,
+    (digitalShipping) => digitalShipping.Order,
+  )
+  @JoinColumn({ name: 'digitalShippingId' })
+  DigitalShipping: DigitalShippingEntity;
+
+  @Column({ type: 'varchar', length: 40, nullable: true, default: null })
+  digitalShippingId: string;
 }
 
-export type OrderUniqueRefs = Pick<OrderEntity, 'id'>;
+export type OrderUniqueRefs = RequireOnlyOne<Pick<OrderEntity, 'id'>>;

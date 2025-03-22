@@ -38,7 +38,7 @@ export class SearchBuilderService {
     }
 
     if (config.createdField) {
-      queryBuilder.orderBy(`${tableName}."${config.createdField}"`, 'DESC');
+      queryBuilder.orderBy(`"${config.createdField}"`, 'DESC');
     }
 
     const [data, total] = await queryBuilder
