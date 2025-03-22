@@ -1,3 +1,5 @@
+import e from 'express';
+
 export enum ItemType {
   COMMON = 'COMMON',
   UNIQUE = 'UNIQUE',
@@ -64,4 +66,28 @@ export function getNextAction(value: keyof typeof Status) {
 export enum PLATFORM {
   PC = 'PC',
   XBOX = 'XBOX',
+}
+
+export enum Languages {
+  portugues_br = 'português brasil',
+  portugues_pt = 'português portugal',
+  english_us = 'english united states',
+  english_uk = 'english united kingdom',
+  spanish_es = 'español españa',
+  spanish_mx = 'español méxico',
+  french_fr = 'français france',
+  german_de = 'deutsch deutschland',
+  italian_it = 'italiano italia',
+  japanese_jp = '日本語 日本',
+  chinese_cn = '中文 中国',
+  korean_kr = '한국어 한국',
+  hindi_in = 'हिंदी भारत',
+  russian_ru = 'русский россия',
+  arabic_sa = 'العربية السعودية',
+}
+
+export enum AffiliateOnHoldStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  DECLINED = 'DECLINED',
 }

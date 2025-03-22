@@ -71,6 +71,21 @@ const envSchema = z.object({
   PAYPAL_BASE_URL: z.string(),
   PAYPAL_CLIENT_ID: z.string(),
   PAYPAL_SECRET: z.string(),
+
+  // MAIL
+  MAIL_PROVIDER: z.string(),
+  MAIL_COMPANY: z.string(),
+
+  // MAIL (MAILTRAP)
+  MAILTRAP_HOST: z.string(),
+  MAILTRAP_PORT: z
+    .string()
+    .refine((val) => !isNaN(parseInt(val, 10)), {
+      message: 'POSTGRES_PORT must be a valid number',
+    })
+    .transform((val) => parseInt(val, 10)),
+  MAILTRAP_USER: z.string(),
+  MAILTRAP_PASS: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

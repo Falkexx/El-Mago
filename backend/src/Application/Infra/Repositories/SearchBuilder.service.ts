@@ -22,7 +22,7 @@ export class SearchBuilderService {
 
     if (search && config.createdField) {
       queryBuilder.andWhere(
-        `SIMILARITY(${tableName}.${config.searchField}, :search) > 0.3`,
+        `SIMILARITY(${tableName}."${config.searchField}", :search) > 0.3`,
         {
           search: `%${search}%`,
         },
@@ -37,10 +37,8 @@ export class SearchBuilderService {
       });
     }
 
-    console.log(tableName);
-
     if (config.createdField) {
-      queryBuilder.orderBy(`"${config.createdField}"`, 'DESC');
+      queryBuilder.orderBy(`${tableName}."${config.createdField}"`, 'DESC');
     }
 
     const [data, total] = await queryBuilder

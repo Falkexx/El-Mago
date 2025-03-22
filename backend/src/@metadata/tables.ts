@@ -1,6 +1,7 @@
 export enum TABLE {
   user = 'user',
   affiliate = 'affiliate',
+  affiliate_queue = 'affiliate_queue',
   item = 'item',
   image = 'image',
   category = 'category',

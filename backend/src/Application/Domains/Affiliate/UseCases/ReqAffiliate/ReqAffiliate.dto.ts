@@ -1,6 +1,5 @@
 import {
   IsArray,
-  IsEmail,
   IsEnum,
   IsNotEmpty,
   IsString,
@@ -8,15 +7,18 @@ import {
 } from 'class-validator';
 import { Languages } from 'src/@metadata';
 
-export class CreateAffiliateDto {
+export class ReqAffiliateDto {
   @IsString()
   @IsNotEmpty()
   name: string;
 
   @IsString()
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  discord: string;
+
+  @IsString()
+  @IsNotEmpty()
+  battleTag: string;
 
   @IsString()
   @IsNotEmpty()
@@ -34,19 +36,7 @@ export class CreateAffiliateDto {
 
   @IsString()
   @IsNotEmpty()
-  cpfCnpj: string;
-
-  @IsString()
-  @IsNotEmpty()
-  battleTag: string;
-
-  @IsString()
-  @IsNotEmpty()
-  photo: string;
-
-  @IsString()
-  @IsNotEmpty()
-  discord: string;
+  cpf: string;
 
   @IsString({ each: true })
   @IsArray()
