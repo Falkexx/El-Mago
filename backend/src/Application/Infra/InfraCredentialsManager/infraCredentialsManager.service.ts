@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { KEY_CACHE } from 'src/@metadata/keys';
-import { lastValueFrom, map } from 'rxjs';
+import { catchError, lastValueFrom, map } from 'rxjs';
+import { Interval } from '@nestjs/schedule';
 
 @Injectable()
 export class InfraCredentialsManagerService {
@@ -81,20 +82,48 @@ export class InfraCredentialsManagerService {
     }
   }
 
+  @Interval(3598 * 1000 - 500) // deducts 500 ms from the request time to avoid bugs
   private async generateNewGmailAccessToken() {
     const body = {
       refresh_token: env.GOOGLE_CLOUD_OAUTH_REFRESH_TOKEN,
       token_uri: 'https://oauth2.googleapis.com/token',
     };
 
-    const result = await lastValueFrom(
-      this.httpService
-        .post<GoogleOauth2Response>(
-          'https://developers.google.com/oauthplayground/refreshAccessToken',
-          body,
-        )
-        .pipe(map((response) => response.data)),
-    );
+    let result;
+    try {
+      result = await lastValueFrom(
+        this.httpService
+          .post<GoogleOauth2Response>(
+            'https://developers.google.com/oauthplayground/refreshAccessToken',
+            body,
+          )
+          .pipe(
+            map((response) => response.data),
+            catchError((error) => {
+              throw error;
+            }),
+          ),
+      );
+    } catch (e) {
+      console.log(e);
+      throw new InternalServerErrorException({
+        message: {
+          ptBr: 'error interno no servidor',
+          engUs: 'internal server error',
+        },
+      } as ExceptionType);
+    }
+
+    if (!result.access_token || !result.refresh_token) {
+      console.error('houve um error ao gerar o token de acesso do gmail');
+
+      throw new InternalServerErrorException({
+        message: {
+          ptBr: 'error interno no servidor',
+          engUs: 'internal server error',
+        },
+      });
+    }
 
     await this.cacheManager.set(
       KEY_CACHE.gmail_access_token,
