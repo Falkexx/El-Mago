@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 import nookies from "nookies";
 import Image from "next/image";
-import { useLocale } from "next-intl";
 import arrowDonw from "@/midias/Icons/arrow-down.svg";
 
 interface FlagInfo {
