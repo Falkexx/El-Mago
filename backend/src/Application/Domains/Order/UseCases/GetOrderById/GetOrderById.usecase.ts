@@ -20,7 +20,6 @@ export class GetOrderByIdUseCase {
     private readonly userRepository: IUserRepositoryContract,
     @Inject(KEY_INJECTION.ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepositoryContract,
-    private readonly paypalService: PaypalService,
   ) {}
 
   async execute(payload: PayloadType, orderId: string) {
@@ -34,33 +33,6 @@ export class GetOrderByIdUseCase {
 
     if (!order || order.userId !== payload.sub) {
       throw new NotFoundException('order not found');
-    }
-
-    if (!order.paymentId) {
-      return order;
-    }
-
-    const isPaid = order.status.find(
-      (_status_) => _status_.status === Status.PAID,
-    );
-
-    if (isPaid) {
-      return order;
-    }
-
-    const paypalOrder = await this.paypalService.checkOrder(order.paymentId);
-
-    if (paypalOrder.status === 'APPROVED') {
-      const newOrderStatus = Object.assign(new OrderStatus(), {
-        id: shortId(),
-        order: order,
-        status: Status.PAID,
-        title: 'order is paid',
-        description: 'paid successful',
-        createdAt: new Date(),
-      } as OrderStatus);
-
-      return this.orderRepository.createOrderStatus(newOrderStatus);
     }
 
     return order;

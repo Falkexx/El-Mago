@@ -8,6 +8,8 @@ import { PaymentModule } from '../Payment/Payment.module';
 import { RepositoriesModule } from '../Repositories/Repositories.module';
 import { OrderTypeOrmRepository } from '../Repositories/OrderRepository/OrderTypeOrm.repository';
 import { UserTypeOrmRepository } from '../Repositories/UserRepository/UserTypeOrm.repository';
+import { HttpModule } from '@nestjs/axios';
+import { InfraCredentialsManagerModule } from '../InfraCredentialsManager/InfraCredentialsManager.module';
 
 @Global()
 @Module({
@@ -19,6 +21,8 @@ import { UserTypeOrmRepository } from '../Repositories/UserRepository/UserTypeOr
     }),
     MailModule,
     PaymentModule,
+    HttpModule,
+    InfraCredentialsManagerModule,
   ],
   providers: [
     {

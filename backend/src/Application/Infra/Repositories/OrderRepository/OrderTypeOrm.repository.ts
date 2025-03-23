@@ -140,9 +140,16 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
 
   async createOrderStatus(orderStatus: OrderStatus): Promise<OrderEntity> {
     try {
-      const newStatus = this.orderStatusRepository.create(orderStatus);
-      const statusCreated = await this.orderStatusRepository.save(newStatus);
-      console.log(statusCreated);
+      const queryBuilder = this.orderStatusRepository.createQueryBuilder();
+
+      return (
+        await queryBuilder
+          .insert()
+          .into(OrderStatus)
+          .values(orderStatus)
+          .returning('*')
+          .execute()
+      ).raw[0];
 
       return this.orderRepository.findOneBy({ id: orderStatus.order.id });
     } catch (e) {

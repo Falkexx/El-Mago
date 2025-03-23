@@ -20,13 +20,12 @@ export class InfraCredentialsManagerService {
   ) {}
 
   async getPaypalAccessToken() {
-    const accessToken = await this.cacheManager.get(
+    let accessToken = await this.cacheManager.get(
       KEY_CACHE.paypal_access_token,
     );
 
-    console.log(accessToken);
     if (!accessToken) {
-      return this.generateNewPaypalAccessToken();
+      accessToken = this.generateNewPaypalAccessToken();
     }
 
     return accessToken;
@@ -66,8 +65,9 @@ export class InfraCredentialsManagerService {
 
       await this.cacheManager.set(
         KEY_CACHE.paypal_access_token,
-        expiresIn - 1000, // remove 1s to avoid error.
-      );
+        accessToken,
+        expiresIn - 1000,
+      ); // remove 1s to avoid error.
 
       return accessToken;
     } catch (e) {
