@@ -51,7 +51,11 @@ export class JobConsumerService extends WorkerHost {
         throw new NotFoundException('order not found, order id: ', order.id);
       }
 
-      const user = await this.userRepository.getBy({ id: order.id });
+      const user = await this.userRepository.getBy({ id: order.userId });
+
+      if (!user) {
+        throw new NotFoundException('user not found');
+      }
 
       // ATUALIZAR O STATUS DA ORDEM PARA PAGO
       await this.orderRepository.createOrderStatus({
