@@ -53,6 +53,13 @@
     "discordTitle": "Mais Perguntas?",
     "discordDesc": "Junte-se ao nosso Discord! Lá você pode fazer todas as suas perguntas para a nossa equipe ou membros da nossa comunidade.",
     "discoCTA": "Entrar no Discord"
+  },
+
+"Gold":{
+
+  "Server":{
+    "title":"Selecione um servidor"
   }
+}
   
 }
