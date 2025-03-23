@@ -7,6 +7,7 @@ export class PaymentController {
 
   @Post('paypal-webhook')
   paypalWebHook(@Body() body: any, @Headers() headers: any) {
+    console.log('web hook of payment is called');
     this.jobProducerService.confirmPayment({ body, headers });
   }
 }
