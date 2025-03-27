@@ -18,6 +18,10 @@ export default {
           800: "#495057",
         },
 
+        Input:{
+          Base:"#222",
+        },
+
         primary: { // Primary Collors 
           50: '#FDEEFF',
           100: '#F5CCFF',
