@@ -18,7 +18,7 @@ function WitcherHead({ title, description, optional_img }: Props) {
         <h1 className="text-[#f8f9fa] text-3xl font-bold leading-9">{title}</h1>
         <p className="text-[#ced4da] text-sm font-normal leading-6">{description}</p>
 
-        {optional_img && <Image src={optional_img} alt={title} />} {/* Renderiza somente se existir */}
+        {optional_img && <Image src={optional_img} alt={title} className="mt-8" />} {/* Renderiza somente se existir */}
       </article>
     </section>
   );
