@@ -12,6 +12,10 @@ import { AcceptOrderDto } from './AcceptOrder.dto';
 import { PayloadType } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
+import { generateShortId } from '#utils';
+import { OrderEntity } from 'src/Application/Entities/Order.entity';
+import { OrderStatus } from 'src/Application/Entities/order-status.entity';
+import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
 
 @Injectable()
 export class AcceptOrderUseCase {
@@ -22,6 +26,7 @@ export class AcceptOrderUseCase {
     private readonly orderRepository: IOrderRepositoryContract,
     @Inject(KEY_INJECTION.AFFILIATE_REPOSITORY_CONTRACT)
     private readonly affiliateRepository: IAffiliateRepositoryContract,
+    private readonly mainService: NodemailerService,
   ) {}
 
   async execute(payload: PayloadType, addAffiliateOnOrderDto: AcceptOrderDto) {
@@ -31,7 +36,11 @@ export class AcceptOrderUseCase {
       throw new UnauthorizedException();
     }
 
-    if (!user.affiliateId) {
+    const affiliate = await this.affiliateRepository.getBy({
+      id: user.affiliateId,
+    });
+
+    if (!user.affiliateId || !affiliate) {
       throw new ForbiddenException('only affiliate make this action');
     }
 
@@ -39,29 +48,61 @@ export class AcceptOrderUseCase {
       addAffiliateOnOrderDto.orderId,
     );
 
-    console.log(availableOrder);
-
     if (!availableOrder) {
       throw new NotFoundException('order not found');
     }
 
-    if (availableOrder.completedAt) {
-      throw new NotAcceptableException('the order has already been completed');
+    const customer = await this.userRepository.getBy({
+      id: availableOrder.userId,
+    });
+
+    if (!customer) {
+      throw new NotFoundException('customer not found');
     }
 
-    // if (availableOrder.Affiliate || availableOrder['affiliateId']) {
-    //   throw new NotAcceptableException('already affiliate in this order');
-    // }
+    await this.orderRepository.createOrderStatus({
+      id: generateShortId(20),
+      createdAt: new Date(),
+      title: `accept`,
+      orderId: availableOrder.id,
+      order: availableOrder,
+      status: 'ACCEPT',
+      description: `this order has been accept by ${affiliate.name}`,
+    } as OrderStatus);
 
-    // const orderUpdated = await this.orderRepository.update(
-    //   {
-    //     id: availableOrder.id,
-    //   },
-    //   {
-    //     Affiliate: affiliate,
-    //   },
-    // );
+    const orderUpdated = await this.orderRepository.update(
+      {
+        id: availableOrder.id,
+      },
+      {
+        Affiliate: affiliate,
+      },
+    );
 
-    // return orderUpdated;
+    this.mainService.send({
+      emails: [affiliate.email],
+      htmlContent: `
+        <h1>Você acabou de aceitar a ordem: ${orderUpdated.name} </h1>
+        <p>id: ${orderUpdated.id} </p>
+        <p>preço total: $${orderUpdated.totalPrice} </p>
+      `,
+      name: 'EL-mago',
+      subject: 'accept order',
+      text: 'você aceitou a ordem x...',
+    });
+
+    this.mainService.send({
+      emails: [customer.email],
+      htmlContent: `
+        <h1>Boas noticias ${orderUpdated.nickName}, o ${affiliate.name} vai prosseguir com o seu pedido</h1>
+        <p>id: ${orderUpdated.id} </p>
+        <p>preço total: $${orderUpdated.totalPrice} </p>
+      `,
+      name: 'EL-mago',
+      subject: 'accept order',
+      text: 'você aceitou a ordem x...',
+    });
+
+    return orderUpdated;
   }
 }

@@ -8,6 +8,7 @@ import {
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
+import { GenericPaginationDto } from 'src/utils/validators';
 
 export type GetOrderAsAffiliateUseCaseResult = {};
 
@@ -20,7 +21,7 @@ export class GetOrderAsAffiliateUseCase {
     private readonly userRepository: IUserRepositoryContract,
   ) {}
 
-  async execute(payload: PayloadType) {
+  async execute(payload: PayloadType, paginationDto: GenericPaginationDto) {
     const user = await this.userRepository.getBy({ id: payload.sub });
 
     if (!user) {
@@ -31,10 +32,12 @@ export class GetOrderAsAffiliateUseCase {
       throw new ForbiddenException();
     }
 
-    const orders = await this.orderRepository.getAvailableOrdersToAccept();
+    const result =
+      await this.orderRepository.getAvailableOrdersToAccept(paginationDto);
 
     return {
-      availableOrders: orders,
+      orders: result.data,
+      meta: result.meta,
     };
   }
 }

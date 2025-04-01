@@ -19,9 +19,10 @@ import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
 import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/ImageRepository/ImageTypeOrm.repository';
 import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
 import { PaymentModule } from 'src/Application/Infra/Payment/Payment.module';
+import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
 
 @Module({
-  imports: [RepositoriesModule, StorageModule, PaymentModule],
+  imports: [RepositoriesModule, StorageModule, PaymentModule, MailModule],
   controllers: [OrderController],
   providers: [
     {

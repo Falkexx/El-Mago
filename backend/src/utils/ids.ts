@@ -37,7 +37,7 @@ export function generateShortId(length: number = 14): string {
     .slice(0, randomLength > 0 ? randomLength : 1); // Garante pelo menos 1 caractere
 
   // Combina timestamp e parte aleatória
-  const fullId = `${timestamp}-${randomPart}`;
+  const fullId = `${timestamp}${randomPart}`;
 
   // Retorna o ID cortado para o comprimento desejado
   return fullId.slice(0, length);

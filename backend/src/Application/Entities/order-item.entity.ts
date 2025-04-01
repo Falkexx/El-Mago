@@ -19,7 +19,7 @@ export class OrderItem {
   description?: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 3 })
-  price_per_unit: string;
+  price: string;
 
   @Column({ type: 'varchar' })
   currency: 'USD';
