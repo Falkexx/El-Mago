@@ -105,14 +105,14 @@ export class OrderController {
     return this.getOrderById.execute(payload, orderId);
   }
 
-  @Get('affiliate/available-orders')
+  @Get('affiliate/available-orders-to-accept')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.AFFILIATE)
   getAvailableOrders(
     @User() user: PayloadType,
     @Query() paginationDto: GenericPaginationDto,
   ) {
-    return this.getOrderAsAffiliateUseCase.execute(user);
+    return this.getOrderAsAffiliateUseCase.execute(user, paginationDto);
   }
 
   @Get('affiliate/pending')

@@ -8,6 +8,7 @@ import {
   OrderItem,
   OrderItemUniqueRefs,
 } from 'src/Application/Entities/order-item.entity';
+import { GenericPaginationDto } from 'src/utils/validators';
 
 export type IOrderRepositoryContract = IBaseRepositoryContract<
   OrderEntity,
@@ -17,7 +18,12 @@ export type IOrderRepositoryContract = IBaseRepositoryContract<
   getOrderWithRelations(orderId: string): Promise<OrderEntity>;
   getOrderByUserId(userId: string): Promise<OrderEntity[]>;
   createOrderStatus(orderStatus: OrderStatus): Promise<OrderEntity>;
-  getAvailableOrdersToAccept(): Promise<OrderEntity[]>;
+  getAvailableOrdersToAccept(
+    paginationDto: GenericPaginationDto,
+  ): Promise<{
+    data: OrderEntity[];
+    meta: { totalItems: number; page: number; limit: number };
+  }>;
   getPendingOrdersFromAffiliate(affiliateId: string): Promise<OrderEntity>;
   getOrderItemBy(uniqueRef: OrderItemUniqueRefs): Promise<OrderItem>;
   updateOrderItem(
