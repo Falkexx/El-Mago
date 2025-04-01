@@ -64,6 +64,7 @@ export class JobConsumerService extends WorkerHost {
         order: order,
         status: 'PAID',
         title: 'the order is paid',
+        orderId: order.id,
       });
 
       // SEND EMAIL TO CUSTOMER

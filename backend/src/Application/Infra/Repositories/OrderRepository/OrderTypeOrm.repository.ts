@@ -150,8 +150,6 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
           .returning('*')
           .execute()
       ).raw[0];
-
-      return this.orderRepository.findOneBy({ id: orderStatus.order.id });
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();
@@ -160,25 +158,6 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
 
   async getAvailableOrdersToAccept(): Promise<OrderEntity[]> {
     try {
-      // const orders = await this.dataSource.manager.query(
-      //   `
-      //   SELECT
-      //       o."id",
-      //       o."name",
-      //       o."createdAt",
-      //       o."updatedAt"
-      //   FROM
-      //       "${TABLE.order}" o
-      //   LEFT JOIN
-      //       "${TABLE.order_status}" os ON os."orderId" = o.id
-      //   WHERE
-      //     o."digitalShippingId" IS NULL
-      //     AND  os."status" = '${Status.CREATED}'
-      //   GROUP BY
-      //       o.id -- Agrupa por ordem
-      //   `,
-      // );
-
       const orders = await this.orderItemRepository.query(`
         SELECT
           O."id",  
@@ -268,20 +247,23 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
 
   async getAvailableOrder(orderId: string): Promise<OrderEntity> {
     try {
-      const [order] = await this.orderItemRepository.query(
-        `
-          SELECT "order".*
-          FROM "order"
-          WHERE "order"."id" = $1
-          AND "digitalShippingId" IS NULL
-          AND EXISTS (
-            SELECT 1 FROM "order_status"
-            WHERE "order_status"."orderId" = "order"."id"
-            AND "order_status"."status" = '${Status.PAID}'
-          );
-        `,
-        [orderId],
-      );
+      const orderQuery = `
+        SELECT DISTINCT o.*
+        FROM "${TABLE.order}" o
+        INNER JOIN "${TABLE.order_status}" os1 on os1."orderId" = o."id" and os1."status" = '${Status.CREATED}'
+        INNER JOIN "${TABLE.order_status}" os2 on os2."orderId" = o."id" and os2."status" = '${
+          Status.PAID
+        }'
+        WHERE  o."id" = $1
+        AND NOT exists (
+          SELECT 1
+          FROM "${TABLE.order_status}" os_excl
+          WHERE os_excl."orderId" = o.id
+          AND os_excl."status" in ('${Status.ACCEPT}', '${Status.CREATED}, ${Status.CANCELED}')
+        )
+      `;
+
+      const [order] = await this.orderRepository.query(orderQuery, [orderId]);
 
       return order;
     } catch (e) {

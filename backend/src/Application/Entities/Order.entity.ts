@@ -92,6 +92,13 @@ export class OrderEntity {
   @ManyToOne(() => UserEntity, (user) => user.orders, { cascade: true })
   user: UserEntity;
 
+  @ManyToOne(() => AffiliateEntity, (affiliate) => affiliate.orders)
+  @JoinColumn({ name: 'affiliateId' })
+  Affiliate: AffiliateEntity;
+
+  @Column({ type: 'varchar', length: 40, nullable: true, default: null })
+  affiliateId: string;
+
   @OneToMany(() => OrderItem, (orderItem) => orderItem.Order, {
     cascade: true,
     eager: true,
@@ -106,7 +113,7 @@ export class OrderEntity {
   DigitalShipping: DigitalShippingEntity;
 
   @Column({ type: 'varchar', length: 40, nullable: true, default: null })
-  digitalShippingId: string;
+  digitalShippingId: string | null;
 }
 
 export type OrderUniqueRefs = RequireOnlyOne<Pick<OrderEntity, 'id'>>;

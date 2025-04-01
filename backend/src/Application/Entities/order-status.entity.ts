@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { OrderEntity } from './Order.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { OrderStatusType } from '#types';
@@ -23,5 +23,9 @@ export class OrderStatus {
   // relations
 
   @ManyToOne(() => OrderEntity, (order) => order.status)
+  @JoinColumn({ name: 'orderId' })
   order: OrderEntity;
+
+  @Column({ type: 'varchar', length: 40 })
+  orderId: string;
 }

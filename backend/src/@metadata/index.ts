@@ -12,11 +12,11 @@ export enum STORAGE_PROVIDER {
 }
 
 export const Status = {
-  CREATED: 'created',
-  PAID: 'paid',
-  ACCEPT: 'accept',
-  CANCELED: 'canceled',
-  RETURNED: 'returned',
+  CREATED: 'CREATED', // when create the order
+  PAID: 'PAID', // when paid the order
+  ACCEPT: 'ACCEPT', // when affiliate accept the order
+  CANCELED: 'CANCELED', // when a customer cancel the order
+  RETURNED: 'RETURNED', // when admin or affiliate return the order
 };
 
 export const OrderAction = {

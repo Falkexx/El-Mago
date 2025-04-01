@@ -64,6 +64,10 @@ export class AffiliateEntity {
 
   @Column({ type: 'varchar' })
   userId: string;
+
+  @OneToMany(() => OrderEntity, (order) => order.Affiliate)
+  @JoinColumn()
+  orders: OrderEntity[];
 }
 
 export class AffiliateUpdateEntity {

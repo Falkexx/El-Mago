@@ -125,7 +125,7 @@ export class PayOrderUseCase {
           name: _item_.name,
           price: {
             currencyCode: 'USD',
-            unityPrice: parseFloat(_item_.price_per_unit).toFixed(2),
+            unityPrice: parseFloat(_item_.price).toFixed(2),
           },
           quantity: _item_.quantity,
           description: _item_.description,
@@ -188,7 +188,7 @@ export class PayOrderUseCase {
   private calculateToTalPrice(orderItems: OrderItem[]) {
     const total = orderItems
       .reduce(
-        (acc, curr) => acc + parseFloat(curr.price_per_unit) * curr.quantity,
+        (acc, curr) => acc + parseFloat(curr.price) * curr.quantity,
         parseFloat('0.00'),
       )
       .toFixed(2);
