@@ -61,6 +61,14 @@ export class SendProofToOrderItemUseCase {
       throw new ForbiddenException('only affiliate to be access');
     }
 
+    if (affiliate.id !== order.affiliateId) {
+      throw new ForbiddenException('this order belongs to another affiliate');
+    }
+
+    if (order.proofOfDelivery) {
+      throw new NotAcceptableException('proof cannot be sent again');
+    }
+
     const items = await this.orderRepository.getItemsByOrderId(order.id);
     const itemsIds = items.map((item) => item.id);
 
