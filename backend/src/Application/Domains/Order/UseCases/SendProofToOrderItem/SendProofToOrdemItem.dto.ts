@@ -1,15 +1,30 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-import { ImageDto } from 'src/utils/validators';
-import jwt from 'jsonwebtoken';
+import { Type } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
 
-export class SendProofToOrderItemBody {
+export class ProofItem {
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(1)
+  @MaxLength(40)
+  id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  imageUrl: string;
+}
+
+export class SendProofToOrder {
   @IsString()
   @IsNotEmpty()
   orderId: string;
 
-  @IsString()
-  @IsNotEmpty()
-  orderItemId: string;
+  @ValidateNested()
+  @Type(() => ProofItem)
+  items: ProofItem[];
 }
-
-export type SendProofToOrderItemDto = SendProofToOrderItemBody & ImageDto;

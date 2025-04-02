@@ -21,6 +21,7 @@ import {
 } from 'src/Application/Entities/order-item.entity';
 import { table } from 'node:console';
 import { Status } from 'src/@metadata';
+import { ItemEntity } from 'src/Application/Entities/Item.entity';
 
 export class OrderTypeOrmRepository implements IOrderRepositoryContract {
   constructor(
@@ -304,5 +305,15 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
       console.log(e);
       throw new InternalServerErrorException();
     }
+  }
+  async getItemsByOrderId(id: string): Promise<ItemEntity[]> {
+    const items = await this.orderItemRepository.query(
+      `
+      SELECT * FROM "${TABLE.order_item}" WHERE "orderId" = $1
+    `,
+      [id],
+    );
+
+    return items;
   }
 }

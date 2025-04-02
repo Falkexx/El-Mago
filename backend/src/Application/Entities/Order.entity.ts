@@ -13,7 +13,6 @@ import { TABLE } from 'src/@metadata/tables';
 import { OrderStatus } from './order-status.entity';
 import { OrderItem } from './order-item.entity';
 import { AffiliateEntity } from './Affiliate.entity';
-import { DigitalShippingEntity } from './DigitalShipping.entity';
 import { RequireOnlyOne } from '#types';
 
 /**
@@ -105,15 +104,10 @@ export class OrderEntity {
   })
   OrderItems: OrderItem[];
 
-  @OneToOne(
-    () => DigitalShippingEntity,
-    (digitalShipping) => digitalShipping.Order,
-  )
-  @JoinColumn({ name: 'digitalShippingId' })
-  DigitalShipping: DigitalShippingEntity;
-
-  @Column({ type: 'varchar', length: 40, nullable: true, default: null })
-  digitalShippingId: string | null;
+  @Column({ type: 'jsonb', nullable: true, default: null })
+  proofOfDelivery:
+    | { itemId: string; imageUrl: string; createdAt: Date }[]
+    | null;
 }
 
 export type OrderUniqueRefs = RequireOnlyOne<Pick<OrderEntity, 'id'>>;

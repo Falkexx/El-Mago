@@ -9,6 +9,7 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 
+/**@deprecated */
 @Injectable()
 export class GetPendingOrdersUseCase {
   constructor(
