@@ -40,6 +40,9 @@ export class OrderItem {
 
   @Column({ type: 'varchar' })
   itemId: string;
+
+  @Column({ type: 'jsonb', nullable: true, default: null })
+  proofOfDelivery: any;
 }
 
 export type OrderItemUniqueRefs = RequireOnlyOne<Pick<OrderItem, 'id'>>;

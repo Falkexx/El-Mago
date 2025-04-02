@@ -9,6 +9,7 @@ import {
   OrderItemUniqueRefs,
 } from 'src/Application/Entities/order-item.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { ItemEntity } from 'src/Application/Entities/Item.entity';
 
 export type IOrderRepositoryContract = IBaseRepositoryContract<
   OrderEntity,
@@ -18,9 +19,7 @@ export type IOrderRepositoryContract = IBaseRepositoryContract<
   getOrderWithRelations(orderId: string): Promise<OrderEntity>;
   getOrderByUserId(userId: string): Promise<OrderEntity[]>;
   createOrderStatus(orderStatus: OrderStatus): Promise<OrderEntity>;
-  getAvailableOrdersToAccept(
-    paginationDto: GenericPaginationDto,
-  ): Promise<{
+  getAvailableOrdersToAccept(paginationDto: GenericPaginationDto): Promise<{
     data: OrderEntity[];
     meta: { totalItems: number; page: number; limit: number };
   }>;
@@ -31,4 +30,5 @@ export type IOrderRepositoryContract = IBaseRepositoryContract<
     data: Partial<OrderItem>,
   ): Promise<OrderItem>;
   getAvailableOrder(orderId: string): Promise<OrderEntity>;
+  getItemsByOrderId(id: string): Promise<ItemEntity[]>;
 };

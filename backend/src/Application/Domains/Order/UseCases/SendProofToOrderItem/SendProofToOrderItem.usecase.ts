@@ -2,10 +2,12 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotAcceptableException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { SendProofToOrderItemDto } from './SendProofToOrdemItem.dto';
+import { SendProofToOrder } from './SendProofToOrdemItem.dto';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { StorageService } from 'src/Application/Infra/Storage/Storage.service';
@@ -33,88 +35,80 @@ export class SendProofToOrderItemUseCase {
 
   async execute(
     payload: PayloadType,
-    sendProofToOrderItemDto: SendProofToOrderItemDto,
+    sendProofToOrderItemDto: SendProofToOrder,
   ) {
     const user = await this.userRepository.getBy({
       id: payload.sub,
     });
 
+    if (!user || user.isDeleted) {
+      throw new UnauthorizedException();
+    }
+
     const order = await this.orderRepository.getBy({
       id: sendProofToOrderItemDto.orderId,
-    });
-
-    const affiliate = await this.affiliateRepository.getBy({
-      userId: payload.sub,
     });
 
     if (!order) {
       throw new NotFoundException('order not found');
     }
 
-    // if (order.affiliateId !== affiliate.id) {
-    //   throw new NotFoundException('order not found');
-    // }
-
-    if (order.completedAt) {
-      throw new NotAcceptableException('order already completed');
-    }
-
-    if (!affiliate || affiliate.isSoftDelete) {
-      throw new ForbiddenException(
-        'only affiliate must be access  this method',
-      );
-    }
-
-    // if (order.affiliateId !== payload.sub) {
-    //   throw new ForbiddenException('this order belongs to outher affiliate');
-    // }
-
-    const orderItemExist = await order.OrderItems.find(
-      (_item_) => _item_.id === sendProofToOrderItemDto.orderItemId,
-    );
-
-    if (!orderItemExist) {
-      throw new NotFoundException('item on order not found');
-    }
-
-    const image = sendProofToOrderItemDto.image;
-
-    const storageResult = await this.storageService.upload({
-      type: 'IMAGE',
-      bucket: 'bucket-of-test',
-      file: image,
-      mimetype: image.mimetype,
-      name: image.originalname,
+    const affiliate = await this.affiliateRepository.getBy({
+      userId: payload.sub,
     });
 
-    const imageEntity = Object.assign(new ImageEntity(), {
-      id: shortId(),
-      bucket: storageResult.Bucket,
-      createdAt: new Date(),
-      isDeleted: false,
-      item: null,
-      mimeType: image.mimetype,
-      name: image.originalname,
-      ProofImage: {
-        id: sendProofToOrderItemDto.orderItemId,
-      },
-      storageProvider: STORAGE_PROVIDER.LOCAL,
-      updatedAt: new Date(),
-      url: storageResult.Location,
-    } as ImageEntity);
+    if (!affiliate) {
+      throw new ForbiddenException('only affiliate to be access');
+    }
 
-    const imageSaved = await this.imageRepository.create(imageEntity);
+    if (affiliate.id !== order.affiliateId) {
+      throw new ForbiddenException('this order belongs to another affiliate');
+    }
 
-    const teste = await this.orderRepository.updateOrderItem(
-      sendProofToOrderItemDto.orderItemId,
+    if (order.proofOfDelivery) {
+      throw new NotAcceptableException('proof cannot be sent again');
+    }
+
+    const items = await this.orderRepository.getItemsByOrderId(order.id);
+    const itemsIds = items.map((item) => item.id);
+
+    if (items.length <= 0) {
+      throw new InternalServerErrorException('items not found');
+    }
+
+    const itemsIdsDto = sendProofToOrderItemDto.items.map((item) => item.id);
+
+    if (!this.comparArrays(itemsIds, itemsIdsDto)) {
+      throw new NotAcceptableException('some items is invalid');
+    }
+
+    const proofOfDelivery = sendProofToOrderItemDto.items.map(
+      (item) =>
+        ({
+          itemId: item.id,
+          imageUrl: item.imageUrl,
+          createdAt: new Date(),
+        }) as { itemId: string; imageUrl: string; createdAt: Date },
+    );
+
+    const orderUpdated = await this.orderRepository.update(
+      { id: order.id },
       {
-        quantity: 1,
+        proofOfDelivery: proofOfDelivery,
       },
     );
 
-    return {
-      teste: teste,
-      image: imageSaved,
-    };
+    return orderUpdated;
+  }
+
+  private comparArrays(arr1: Array<any>, arr2: Array<any>) {
+    if (arr1.length !== arr2.length) return false;
+
+    const shortedArr1 = [...arr1].sort();
+    const shortedArr2 = [...arr2].sort();
+
+    return shortedArr1.every(
+      (element, index) => element === shortedArr2[index],
+    );
   }
 }

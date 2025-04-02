@@ -129,6 +129,7 @@ export class CreateOrderUseCase {
           price_per_unit: item.price,
           quantity: quantity,
           Order: order,
+          proofOfDelivery: null,
         } as OrderItem);
       });
 

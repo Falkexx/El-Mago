@@ -20,10 +20,12 @@ import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/Image
 import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
 import { PaymentModule } from 'src/Application/Infra/Payment/Payment.module';
 import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
+import { OrderAffiliateController } from './OrderAffiliate/OrderAffiliate.controller';
+import { GetMyCurrentOrdersAsAffiliate } from './OrderAffiliate/UseCases/GetMyCurrentOrdersAsAffiliate/GetMyCurrentOrdersAsAffiliate.usecase';
 
 @Module({
   imports: [RepositoriesModule, StorageModule, PaymentModule, MailModule],
-  controllers: [OrderController],
+  controllers: [OrderController, OrderAffiliateController],
   providers: [
     {
       provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
@@ -46,10 +48,6 @@ import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
       useClass: AffiliateTypeOrmRepository,
     },
     {
-      provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
-      useClass: UserTypeOrmRepository,
-    },
-    {
       provide: KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT,
       useClass: ImageTypeormRepository,
     },
@@ -66,6 +64,7 @@ import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
     AcceptOrderUseCase,
     SendProofToOrderItemUseCase,
     GetPendingOrdersUseCase,
+    GetMyCurrentOrdersAsAffiliate,
   ],
 })
 export class OrderModule {}

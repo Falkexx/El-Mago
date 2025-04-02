@@ -29,11 +29,10 @@ import { env } from '#utils';
 import { AcceptOrderUseCase } from './UseCases/AcceptOrder/AcceptOrder.usecase';
 import { AcceptOrderDto } from './UseCases/AcceptOrder/AcceptOrder.dto';
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
-import { SendProofToOrderItemDto } from './UseCases/SendProofToOrderItem/SendProofToOrdemItem.dto';
-import { SendProofToOrder } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
 import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
+import { SendProofToOrder } from './UseCases/SendProofToOrderItem/SendProofToOrdemItem.dto';
 
 @Controller({ path: 'order', version: '1' })
 export class OrderController {
@@ -142,13 +141,12 @@ export class OrderController {
   }
 
   @Post('send-proof-delivery-for-order')
-  @UseInterceptors(FileInterceptor('image'))
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.AFFILIATE)
   sendProofImageDto(
     @User() payload: PayloadType,
-    @SendProofToOrder() sendProofDto: SendProofToOrderItemDto,
+    @Body() sendProofDto: SendProofToOrder,
   ) {
-    throw new InternalServerErrorException('need implement this method');
+    return this.sendProofToOrderItemUseCase.execute(payload, sendProofDto);
   }
 }
