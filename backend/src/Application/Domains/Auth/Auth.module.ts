@@ -7,6 +7,7 @@ import { env } from '#utils';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { UserTypeOrmRepository } from 'src/Application/Infra/Repositories/UserRepository/UserTypeOrm.repository';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
+import { CartTypeOrmRepository } from 'src/Application/Infra/Repositories/CartRepository/CartTypeOrm.repository';
 
 @Module({
   imports: [
@@ -28,6 +29,10 @@ import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositor
     {
       provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
       useClass: UserTypeOrmRepository,
+    },
+    {
+      provide: KEY_INJECTION.CART_REPOSITORY,
+      useClass: CartTypeOrmRepository,
     },
     AuthService,
   ],

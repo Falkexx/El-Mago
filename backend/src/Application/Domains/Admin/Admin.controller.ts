@@ -28,20 +28,14 @@ export class AdminController {
   @RolesDecorator(ROLE.ADMIN)
   async createAffiliate(
     @Body() affiliateDto: CreateAffiliateDto,
-  ): Promise<ApiResponse<AffiliateEntity>> {
-    const result = plainToInstance(
-      AffiliateEntity,
-      await this.affiliateService.create(affiliateDto),
-      { exposeUnsetFields: true },
-    );
-
+  ): Promise<ApiResponse<any>> {
     return {
-      data: result,
+      data: await this.affiliateService.create(affiliateDto),
       href:
         env.BACKEND_BASE_URL +
         env.BACKEND_PORT +
         '/v1/admin/affiliate/id/' +
-        result.id,
+        '',
       message: 'created',
       status: 201,
       meta: null,

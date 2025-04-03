@@ -199,7 +199,7 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
           LEFT JOIN
           ${TABLE.order_item} oi ON oi."orderId" = o.id
           WHERE
-          o."digitalShippingId" IS NULL
+          o."proofOfDelivery" IS NULL
           AND o."affiliateId" IS NULL
           AND os."status" = '${Status.PAID}'
           GROUP BY

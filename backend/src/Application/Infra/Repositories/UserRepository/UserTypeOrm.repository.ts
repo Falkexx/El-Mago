@@ -5,7 +5,7 @@ import {
   UserEntityUniqueRefs,
   UserUpdateEntity,
 } from 'src/Application/Entities/User.entity';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { IUserRepositoryContract } from './IUserRepository.contract';
 import { splitKeyAndValue } from '#utils';
 import { PaginationResult } from '#types';
@@ -49,32 +49,31 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
   async update(
     unqRef: UserEntityUniqueRefs,
     updateEntity: Partial<UserUpdateEntity>,
+    trx?: QueryRunner,
   ): Promise<UserEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      const userToUpdate = await this.userRepository.findOne({
-        where: { [key]: value },
-      });
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(UserEntity)
+        .set(updateEntity)
+        .where(`"${TABLE.user}"."${key}" = :value`, { value })
+        .returning('*')
+        .execute();
 
-      const newUser = Object.assign(userToUpdate, {
-        ...updateEntity,
-      } as UserUpdateEntity);
-
-      const userUpdated = await this.userRepository.save(newUser);
-
-      return userUpdated;
+      return result.raw[0] as UserEntity;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
     }
   }
 
-  async delete(unqRef: UserEntityUniqueRefs): Promise<void> {
+  async delete(unqRef: UserEntityUniqueRefs, trx?: QueryRunner): Promise<void> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      await this.userRepository.delete({ [key]: value });
+      await trx.manager.delete(UserEntity, { [key]: value });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();

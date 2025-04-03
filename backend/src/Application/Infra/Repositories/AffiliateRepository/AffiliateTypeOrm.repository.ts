@@ -5,7 +5,7 @@ import {
   AffiliateEntityUniqueRefs,
   AffiliateUpdateEntity,
 } from 'src/Application/Entities/Affiliate.entity';
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
 import { IAffiliateRepositoryContract } from './IAffiliate.repository-contract';
 import { PaginationResult } from '#types';
 import { splitKeyAndValue } from '#utils';
@@ -18,18 +18,26 @@ export class AffiliateTypeOrmRepository
 {
   constructor(
     @InjectRepository(AffiliateEntity)
-    private readonly affiliateRepository: Repository<AffiliateEntity>,
+    private affiliateRepository: Repository<AffiliateEntity>,
+
+    private readonly dataSource: DataSource,
   ) {}
 
-  async create(entity: AffiliateEntity): Promise<AffiliateEntity> {
+  async create(
+    entity: AffiliateEntity,
+    trx?: QueryRunner,
+  ): Promise<AffiliateEntity> {
     try {
-      const affiliateTypeOrmEntity = this.affiliateRepository.create(entity);
+      const createdEntity = trx.manager.create(AffiliateEntity, entity);
+      return trx.manager.save(AffiliateEntity, createdEntity);
+      // const repo = manager
+      //   ? manager.getRepository(AffiliateEntity)
+      //   : this.affiliateRepository;
+      // const affiliateTypeOrmEntity = repo.create(entity);
 
-      const affiliateCreated = await this.affiliateRepository.save(
-        affiliateTypeOrmEntity,
-      );
+      // const affiliateCreated = repo.save(affiliateTypeOrmEntity);
 
-      return affiliateCreated;
+      // return affiliateCreated;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
@@ -147,10 +155,16 @@ export class AffiliateTypeOrmRepository
       TABLE.affiliate,
     );
 
-    Object.keys(data).forEach((key) => {
-      queryBuilder.orWhere(`${TABLE.affiliate}."${key}" = :${key}`, {
-        [key]: data[key],
-      });
+    Object.keys(data).forEach((key, index) => {
+      if (index === 0) {
+        queryBuilder.where(`${TABLE.affiliate}."${key}" = :${key}`, {
+          [key]: data[key],
+        });
+      } else {
+        queryBuilder.orWhere(`${TABLE.affiliate}."${key}" = :${key}`, {
+          [key]: data[key],
+        });
+      }
     });
 
     const result = await queryBuilder
@@ -168,7 +182,9 @@ export class AffiliateTypeOrmRepository
 
     if (result) {
       Object.keys(data).forEach((key) => {
-        if (result[key] === data[key]) {
+        console.log(data[key], result[key]);
+
+        if (data[key] === result[key]) {
           conflictFields[key as keyof AffiliateEntity] = result[key];
         }
       });

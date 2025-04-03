@@ -92,7 +92,7 @@ export class UserEntity {
   @OneToMany(() => ItemEntity, (items) => items.user)
   items: ItemEntity[];
 
-  @OneToOne(() => CartEntity)
+  @OneToOne(() => CartEntity, { onDelete: 'CASCADE' })
   cart: CartEntity;
 
   @OneToMany(() => OrderEntity, (order) => order.user)

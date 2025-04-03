@@ -13,11 +13,6 @@ export class OrderAffiliateController {
     private readonly getMyCurrentOrdersAsAffiliate: GetMyCurrentOrdersAsAffiliate,
   ) {}
 
-  @Get()
-  test() {
-    return 'ORDER AFFILIATE CONTROLLER';
-  }
-
   @Get('get-open-orders')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.AFFILIATE)

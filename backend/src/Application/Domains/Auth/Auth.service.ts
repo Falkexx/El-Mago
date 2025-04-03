@@ -1,56 +1,123 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../User/User.service';
 import { PayloadType } from '#types';
 import { CreateUserDto } from '../User/dtos/CreateUser.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto/auth.dto';
 import { UserEntity } from 'src/Application/Entities/User.entity';
 import * as bcrypt from 'bcrypt';
-import { env } from '#utils';
+import { env, generateShortId, shortId } from '#utils';
 import { ROLE } from 'src/@metadata/roles';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { KEY_INJECTION } from 'src/@metadata/keys';
+import { DataSource } from 'typeorm';
+import { ICartRepositoryContract } from 'src/Application/Infra/Repositories/CartRepository/ICartRepository.contract';
+import { v4 as uuid_v4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
     private readonly jwtService: JwtService,
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
+    @Inject(KEY_INJECTION.CART_REPOSITORY)
+    private readonly cartRepository: ICartRepositoryContract,
+
+    private readonly dataSource: DataSource,
   ) {}
 
   async signUp(userDto: CreateUserDto) {
-    let user = await this.userService.create(userDto);
+    const trx = this.dataSource.createQueryRunner();
 
-    const isAdmin = this.isAdmin(userDto.email, userDto.password);
+    try {
+      trx.startTransaction();
 
-    if (user.email === env.ADMIN_EMAIL && !user.roles.includes(ROLE.ADMIN)) {
-      user = await this.userRepository.update(
+      // let user = await this.userService.create(userDto);
+      const checkIfEmailInUsed = await this.userRepository.getBy({
+        email: userDto.email,
+      });
+
+      if (checkIfEmailInUsed) {
+        throw new UnauthorizedException('email in used');
+      }
+
+      const salt = await bcrypt.genSalt(12);
+
+      const hashedPassword = await bcrypt.hash(userDto.password, salt);
+
+      let user = await this.userRepository.create(
         {
-          id: user.id,
-        },
-        {
-          roles: [...user.roles, ROLE.ADMIN],
-        },
+          id: uuid_v4(),
+          firstName: null,
+          lastName: null,
+          email: userDto.email,
+          cpfCnpj: null,
+          country: null,
+          password: hashedPassword,
+          discordUserName: null,
+          numberPhone: null,
+          age: null,
+          roles: [ROLE.USER],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isBanned: false,
+          isDeleted: false,
+          softDeleted: false,
+          affiliate: null,
+          affiliateId: null,
+          items: [],
+          orders: [],
+          cart: null,
+          fluentLanguages: [],
+          RequestAffiliate: null,
+          Account: null,
+        } as UserEntity,
+        trx,
       );
+
+      await this.cartRepository.create({
+        id: generateShortId(10),
+        items: [],
+        user: user,
+        userId: user.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const isAdmin = this.isAdmin(userDto.email, userDto.password);
+
+      if (user.email === env.ADMIN_EMAIL && !user.roles.includes(ROLE.ADMIN)) {
+        user = await this.userRepository.update(
+          {
+            id: user.id,
+          },
+          {
+            roles: [...user.roles, ROLE.ADMIN],
+          },
+          trx,
+        );
+      }
+
+      const token = await this.generateToken({
+        ...user,
+
+        // use only to check if user is admin, and check if password from admin is valid.
+        password: isAdmin ? userDto.password : user.password,
+      });
+
+      trx.commitTransaction();
+
+      return {
+        user: user,
+        accessToken: token,
+      };
+    } catch (e) {
+      trx.rollbackTransaction();
+      throw e;
     }
-
-    const token = await this.generateToken({
-      ...user,
-
-      // use only to check if user is admin, and check if password from admin is valid.
-      password: isAdmin ? userDto.password : user.password,
-    });
-
-    return {
-      user,
-      accessToken: token,
-    };
   }
 
   async sinIn(authDto: AuthDto) {
-    let user = await this.userService.getUserBy({ email: authDto.email });
+    let user = await this.userRepository.getBy({ email: authDto.email });
 
     if (!user) {
       throw new UnauthorizedException();

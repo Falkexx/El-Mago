@@ -12,6 +12,7 @@ import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
 import { Languages } from 'src/@metadata';
 import { OrderEntity } from './Order.entity';
+import { AccountEntity } from './Account.entity';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -68,6 +69,9 @@ export class AffiliateEntity {
   @OneToMany(() => OrderEntity, (order) => order.Affiliate)
   @JoinColumn()
   orders: OrderEntity[];
+
+  @OneToOne(() => AccountEntity, (account) => account.Affiliate)
+  Account: AccountEntity;
 }
 
 export class AffiliateUpdateEntity {
@@ -80,6 +84,13 @@ export class AffiliateUpdateEntity {
 export type AffiliateEntityUniqueRefs = RequireOnlyOne<
   Pick<
     AffiliateEntity,
-    'id' | 'email' | 'characterName' | 'shortId' | 'cpfCnpj' | 'userId'
+    | 'id'
+    | 'email'
+    | 'characterName'
+    | 'shortId'
+    | 'cpfCnpj'
+    | 'userId'
+    | 'battleTag'
+    | 'phoneNumber'
   >
 >;

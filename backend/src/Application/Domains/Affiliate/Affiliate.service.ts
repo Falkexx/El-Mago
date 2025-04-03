@@ -8,11 +8,17 @@ import {
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 import { CreateAffiliateDto } from './dtos';
-import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
-import { shortId, uuidV4 } from '#utils';
+import {
+  AffiliateEntity,
+  AffiliateEntityUniqueRefs,
+} from 'src/Application/Entities/Affiliate.entity';
+import { generateShortId, shortId, uuidV4 } from '#utils';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { ROLE } from 'src/@metadata/roles';
+import { IAccountRepositoryContract } from 'src/Application/Infra/Repositories/AccountRepository/IAccount.repository-contract';
+import { DataSource } from 'typeorm';
+import { instanceToInstance } from 'class-transformer';
 
 @Injectable()
 export class AffiliateService {
@@ -22,57 +28,94 @@ export class AffiliateService {
 
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
+
+    @Inject(KEY_INJECTION.ACCOUNT_REPOSITORY)
+    private readonly accountRepository: IAccountRepositoryContract,
+
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(affiliateDto: CreateAffiliateDto) {
-    const affiliateExist = await this.affiliateRepository.getBy({
-      email: affiliateDto.email,
-    });
+    const trz = this.dataSource.createQueryRunner();
+    try {
+      trz.startTransaction();
 
-    if (affiliateExist) {
-      throw new NotAcceptableException('affiliate already exist');
+      const affiliateExist = await this.affiliateRepository.getBy({
+        email: affiliateDto.email,
+      });
+
+      if (affiliateExist) {
+        throw new NotAcceptableException('affiliate already exist');
+      }
+
+      await this.checkIfAffiliateExistOnThrow(affiliateDto);
+
+      const user = await this.userRepository.getBy({
+        email: affiliateDto.email,
+      });
+
+      if (!user) {
+        throw new NotFoundException('user not found');
+      }
+
+      const affiliateCreated = await this.affiliateRepository.create(
+        {
+          id: uuidV4(),
+          shortId: shortId(),
+          name: affiliateDto.name,
+          email: affiliateDto.email,
+          battleTag: affiliateDto.battleTag,
+          discord: affiliateDto.discord,
+          phoneNumber: affiliateDto.phoneNumber,
+          cpfCnpj: affiliateDto.cpfCnpj,
+          characterName: affiliateDto.characterName,
+          photo: affiliateDto.photo ?? null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          fluentLanguages: affiliateDto.fluentLanguages,
+          isSoftDelete: false,
+          user: user,
+          Account: null,
+        } as AffiliateEntity,
+        trz,
+      );
+
+      const accountCreated = await this.accountRepository.create(
+        {
+          id: generateShortId(20),
+          Affiliate: affiliateCreated,
+          affiliateId: affiliateCreated.id,
+          balance: String(0.0),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: null,
+          Transactions: [],
+        },
+        trz,
+      );
+
+      const userUpdated = await this.userRepository.update(
+        {
+          id: user.id,
+        },
+        {
+          roles: [...user.roles, ROLE.AFFILIATE],
+          affiliateId: affiliateCreated.id,
+        },
+        trz,
+      );
+
+      trz.commitTransaction();
+
+      return {
+        affiliate: affiliateCreated,
+        account: accountCreated,
+        user: userUpdated,
+      };
+    } catch (e) {
+      trz.rollbackTransaction();
+      throw e;
     }
-
-    await this.checkIfAffiliateExistOnThrow(affiliateDto);
-
-    const user = await this.userRepository.getBy({ email: affiliateDto.email });
-
-    if (!user) {
-      throw new NotFoundException('user not found');
-    }
-
-    const affiliateEntity = Object.assign(new AffiliateEntity(), {
-      id: uuidV4(),
-      shortId: shortId(),
-      name: affiliateDto.name,
-      email: affiliateDto.email,
-      battleTag: affiliateDto.battleTag,
-      discord: affiliateDto.discord,
-      phoneNumber: affiliateDto.phoneNumber,
-      cpfCnpj: affiliateDto.cpfCnpj,
-      characterName: affiliateDto.characterName,
-      photo: affiliateDto.photo ?? null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      fluentLanguages: affiliateDto.fluentLanguages,
-      isSoftDelete: false,
-      user: user,
-    } as AffiliateEntity);
-
-    const affiliateCreated =
-      await this.affiliateRepository.create(affiliateEntity);
-
-    const userUpdated = await this.userRepository.update(
-      {
-        id: user.id,
-      },
-      {
-        roles: [...user.roles, ROLE.AFFILIATE],
-        affiliateId: affiliateCreated.id,
-      },
-    );
-
-    return affiliateCreated;
   }
 
   async getById(id: string) {
@@ -82,8 +125,14 @@ export class AffiliateService {
   }
 
   private async checkIfAffiliateExistOnThrow(affiliateDto: CreateAffiliateDto) {
-    const conficts =
-      await this.affiliateRepository.findConflictingFields(affiliateDto);
+    const conficts = await this.affiliateRepository.findConflictingFields({
+      id: undefined,
+      characterName: affiliateDto.characterName,
+      cpfCnpj: affiliateDto.cpfCnpj,
+      email: affiliateDto.email,
+      battleTag: affiliateDto.battleTag,
+      phoneNumber: affiliateDto.phoneNumber,
+    } as AffiliateEntityUniqueRefs);
 
     if (Object.keys(conficts).length > 0) {
       throw new ConflictException({

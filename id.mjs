@@ -1,27 +1,9 @@
-import { v4 } from 'uuid';
-import ShortUniqueId from 'short-unique-id';
-import { randomBytes } from 'crypto';
+import { randomBytes } from "node:crypto";
 
-const ShortId = new ShortUniqueId();
-
-export function uuidV4() {
-  return v4();
-}
-
-/**@deprecated */
-export function shortId(size: number = 10) {
-  // return ShortId.rnd(size); // deprecated
-  return generateShortId(size);
-}
-
-export function generateImageId(name: string) {
-  return `${shortId(10)}-${name}`;
-}
-
-export function generateShortId(length: number = 14): string {
+export function generateShortId(length = 14) {
   if (length < 10) {
     throw new Error(
-      'Length must be at least 10 characters for reasonable uniqueness',
+      "Length must be at least 10 characters for reasonable uniqueness"
     );
   }
 
@@ -33,8 +15,8 @@ export function generateShortId(length: number = 14): string {
 
   // Gera bytes aleatórios com crypto e converte para base 36
   const randomPart = randomBytes(Math.ceil(randomLength / 2)) // Ajusta o número de bytes
-    .toString('base64') // Usa base64 para mais densidade de caracteres
-    .replace(/[^a-zA-Z0-9]/g, '') // Remove caracteres inválidos como +, /
+    .toString("base64") // Usa base64 para mais densidade de caracteres
+    .replace(/[^a-zA-Z0-9]/g, "") // Remove caracteres inválidos como +, /
     .slice(0, randomLength > 0 ? randomLength : 1); // Garante pelo menos 1 caractere
 
   // Combina timestamp e parte aleatória
@@ -43,3 +25,5 @@ export function generateShortId(length: number = 14): string {
   // Retorna o ID cortado para o comprimento desejado
   return fullId.slice(0, length);
 }
+
+console.log(generateShortId(15));

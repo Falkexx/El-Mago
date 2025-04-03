@@ -91,3 +91,14 @@ export enum AffiliateOnHoldStatus {
   APPROVED = 'APPROVED',
   DECLINED = 'DECLINED',
 }
+
+export enum TransactionType {
+  BANK_DEPOSIT = 'BANK_DEPOSIT',
+  BANK_WITHDRAWAL = 'BANK_WITHDRAWAL',
+}
+
+export enum TransactionProvider {
+  SERVER_ACCOUNT = 'SERVER_ACCOUNT',
+  PAGSEGURO = 'PAGSEGURO',
+  PAYPAL = 'PAYPAL',
+}
