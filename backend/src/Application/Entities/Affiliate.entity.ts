@@ -12,7 +12,7 @@ import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
 import { Languages } from 'src/@metadata';
 import { OrderEntity } from './Order.entity';
-import { AccountEntity } from './Account.entity';
+import { WalletEntity } from './Wallet.entity';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -49,8 +49,8 @@ export class AffiliateEntity {
   @Column({ type: 'timestamptz', update: true })
   updatedAt: Date;
 
-  @Column({ type: 'boolean' })
-  isSoftDelete: boolean;
+  @Column({ type: 'timestamptz', nullable: true, default: null })
+  deletedAt: Date | null;
 
   @Column({ type: 'varchar', length: 50 })
   discord: string;
@@ -70,8 +70,8 @@ export class AffiliateEntity {
   @JoinColumn()
   orders: OrderEntity[];
 
-  @OneToOne(() => AccountEntity, (account) => account.Affiliate)
-  Account: AccountEntity;
+  @OneToOne(() => WalletEntity, (account) => account.Affiliate)
+  Account: WalletEntity;
 }
 
 export class AffiliateUpdateEntity {

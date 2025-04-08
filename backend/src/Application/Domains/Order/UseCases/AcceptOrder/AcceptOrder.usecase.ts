@@ -16,6 +16,7 @@ import { generateShortId } from '#utils';
 import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
+import { IWalletRepositoryContract } from 'src/Application/Infra/Repositories/WalletRepository/IWallet.repository-contract';
 
 @Injectable()
 export class AcceptOrderUseCase {
@@ -26,6 +27,8 @@ export class AcceptOrderUseCase {
     private readonly orderRepository: IOrderRepositoryContract,
     @Inject(KEY_INJECTION.AFFILIATE_REPOSITORY_CONTRACT)
     private readonly affiliateRepository: IAffiliateRepositoryContract,
+    @Inject(KEY_INJECTION.WALLET_REPOSITORY)
+    private readonly walletRepository: IWalletRepositoryContract,
     private readonly mainService: NodemailerService,
   ) {}
 
@@ -42,6 +45,14 @@ export class AcceptOrderUseCase {
 
     if (!user.affiliateId || !affiliate) {
       throw new ForbiddenException('only affiliate make this action');
+    }
+
+    const affiliateWallet = await this.walletRepository.getBy({
+      affiliateId: affiliate.id,
+    });
+
+    if (!affiliateWallet || !affiliateWallet.deletedAt) {
+      throw new NotAcceptableException('affiliate wallet not found');
     }
 
     const availableOrder = await this.orderRepository.getAvailableOrder(

@@ -1,7 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { AccountEntity } from './Account.entity';
+import { WalletEntity } from './Wallet.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { TransactionProvider, TransactionType } from 'src/@metadata';
+import { RequireOnlyOne } from '#types';
 
 @Entity({ name: TABLE.transaction })
 export class TransactionEntity {
@@ -23,10 +24,16 @@ export class TransactionEntity {
   @Column({ type: 'timestamptz' })
   createdAt: Date;
 
-  @ManyToOne(() => AccountEntity, (account) => account.Transactions)
+  @ManyToOne(() => WalletEntity, (account) => account.Transactions)
   @JoinColumn({ name: 'accountId' })
-  Account: AccountEntity;
+  Wallet: WalletEntity;
 
   @Column({ type: 'varchar', length: 40 })
-  accountId: string;
+  walletId: string;
 }
+
+export type TransactionUpdateEntity = Partial<TransactionEntity>;
+
+export type TransactionUniqueRefs = RequireOnlyOne<
+  Pick<TransactionEntity, 'id'>
+>;

@@ -16,9 +16,8 @@ import { generateShortId, shortId, uuidV4 } from '#utils';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { ROLE } from 'src/@metadata/roles';
-import { IAccountRepositoryContract } from 'src/Application/Infra/Repositories/AccountRepository/IAccount.repository-contract';
 import { DataSource } from 'typeorm';
-import { instanceToInstance } from 'class-transformer';
+import { IWalletRepositoryContract } from 'src/Application/Infra/Repositories/WalletRepository/IWallet.repository-contract';
 
 @Injectable()
 export class AffiliateService {
@@ -29,16 +28,16 @@ export class AffiliateService {
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
 
-    @Inject(KEY_INJECTION.ACCOUNT_REPOSITORY)
-    private readonly accountRepository: IAccountRepositoryContract,
+    @Inject(KEY_INJECTION.WALLET_REPOSITORY)
+    private readonly accountRepository: IWalletRepositoryContract,
 
     private readonly dataSource: DataSource,
   ) {}
 
   async create(affiliateDto: CreateAffiliateDto) {
-    const trz = this.dataSource.createQueryRunner();
+    const trx = this.dataSource.createQueryRunner();
     try {
-      trz.startTransaction();
+      trx.startTransaction();
 
       const affiliateExist = await this.affiliateRepository.getBy({
         email: affiliateDto.email,
@@ -73,11 +72,11 @@ export class AffiliateService {
           createdAt: new Date(),
           updatedAt: new Date(),
           fluentLanguages: affiliateDto.fluentLanguages,
-          isSoftDelete: false,
           user: user,
+          deletedAt: null,
           Account: null,
         } as AffiliateEntity,
-        trz,
+        trx,
       );
 
       const accountCreated = await this.accountRepository.create(
@@ -91,7 +90,7 @@ export class AffiliateService {
           deletedAt: null,
           Transactions: [],
         },
-        trz,
+        trx,
       );
 
       const userUpdated = await this.userRepository.update(
@@ -102,10 +101,10 @@ export class AffiliateService {
           roles: [...user.roles, ROLE.AFFILIATE],
           affiliateId: affiliateCreated.id,
         },
-        trz,
+        trx,
       );
 
-      trz.commitTransaction();
+      trx.commitTransaction();
 
       return {
         affiliate: affiliateCreated,
@@ -113,7 +112,7 @@ export class AffiliateService {
         user: userUpdated,
       };
     } catch (e) {
-      trz.rollbackTransaction();
+      trx.rollbackTransaction();
       throw e;
     }
   }

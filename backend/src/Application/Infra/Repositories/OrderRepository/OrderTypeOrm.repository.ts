@@ -233,7 +233,28 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
     affiliateId: string,
   ): Promise<OrderEntity> {
     const result = await this.dataSource.query(
-      `SELECT * FROM "${TABLE.digital_shipping}" WHERE "affiliateId" = $1 AND "finishedAt" IS NOT NULL`,
+      `
+       SELECT 
+          o."id",
+          o."name",
+          o."totalPrice",
+          o."createdAt",
+          o."updatedAt",
+          o."nickName",
+          (
+            SELECT jsonb_agg(
+              json_build_object(
+                'id', s."id",
+                'status', s."status",
+                'createdAt', s."createdAt"
+              )
+            )
+            FROM "order_status" s
+            WHERE s."orderId" = o."id"
+          ) AS status
+       FROM "order" o
+       WHERE o."affiliateId" = $1
+      `,
       [affiliateId],
     );
 

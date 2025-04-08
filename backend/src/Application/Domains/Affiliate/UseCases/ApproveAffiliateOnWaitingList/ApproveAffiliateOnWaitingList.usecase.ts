@@ -88,8 +88,8 @@ export class ApproveAffiliateOnWaitingListUseCase {
       updatedAt: new Date(),
       discord: affiliateOnHold.discord,
       fluentLanguages: affiliateOnHold.fluentLanguages,
-      isSoftDelete: false,
       user: user,
+      deletedAt: null,
     } as AffiliateEntity);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

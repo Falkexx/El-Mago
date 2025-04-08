@@ -1,18 +1,25 @@
-import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { TransactionEntity } from './Transactions.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
 import { AffiliateEntity } from './Affiliate.entity';
 
-@Entity({ name: TABLE.account })
-export class AccountEntity {
+@Entity({ name: TABLE.wallet })
+export class WalletEntity {
   @PrimaryColumn({ type: 'varchar', length: 40 })
   id: string;
 
   @Column({ type: 'numeric' })
   balance: string;
 
-  @OneToMany(() => TransactionEntity, (transaction) => transaction.Account)
+  @OneToMany(() => TransactionEntity, (transaction) => transaction.Wallet)
   Transactions: TransactionEntity[];
 
   @Column({ type: 'timestamptz' })
@@ -28,12 +35,13 @@ export class AccountEntity {
   Affiliate: AffiliateEntity;
 
   @Column({ type: 'varchar', length: 40 })
+  @Index({ unique: true })
   affiliateId: string;
 }
 
-export type AccountUpdateEntity = Partial<Pick<AccountEntity, 'balance'>> &
-  Pick<AccountEntity, 'updatedAt'>;
+export type WalletUpdateEntity = Partial<Pick<WalletEntity, 'balance'>> &
+  Pick<WalletEntity, 'updatedAt'>;
 
-export type AccountUniqueRefs = RequireOnlyOne<
-  Pick<AccountEntity, 'id' | 'affiliateId'>
+export type WalletUniqueRefs = RequireOnlyOne<
+  Pick<WalletEntity, 'id' | 'affiliateId'>
 >;

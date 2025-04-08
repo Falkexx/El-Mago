@@ -19,9 +19,10 @@ import { OrderTypeOrmRepository } from './OrderRepository/OrderTypeOrm.repositor
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { RequestAffiliateEntity } from 'src/Application/Entities/Request-Affiliate.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
-import { AccountEntity } from 'src/Application/Entities/Account.entity';
+import { WalletEntity } from 'src/Application/Entities/Wallet.entity';
 import { TransactionEntity } from 'src/Application/Entities/Transactions.entity';
-import { AccountTypeOrmRepository } from './AccountRepository/AccountTypeOrm.repository';
+import { WalletTypeOrmRepository } from './WalletRepository/WalletTypeOrm.repository';
+import { TransactionTypeOrmRepository } from './TransactionRepository/TransactionTypeOrm.repository';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { AccountTypeOrmRepository } from './AccountRepository/AccountTypeOrm.rep
       OrderStatus,
       RequestAffiliateEntity,
       OrderItem,
-      AccountEntity,
+      WalletEntity,
       TransactionEntity,
     ]),
   ],
@@ -50,7 +51,8 @@ import { AccountTypeOrmRepository } from './AccountRepository/AccountTypeOrm.rep
     CartTypeOrmRepository,
     OrderTypeOrmRepository,
     SearchBuilderService,
-    AccountTypeOrmRepository,
+    WalletTypeOrmRepository,
+    TransactionTypeOrmRepository,
   ],
   exports: [TypeOrmModule, SearchBuilderService],
 })

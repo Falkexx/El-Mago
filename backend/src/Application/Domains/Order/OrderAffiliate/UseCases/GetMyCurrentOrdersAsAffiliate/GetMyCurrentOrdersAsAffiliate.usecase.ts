@@ -34,8 +34,8 @@ export class GetMyCurrentOrdersAsAffiliate {
       id: user.affiliateId,
     });
 
-    if (!affiliate || affiliate.isSoftDelete) {
-      throw new ForbiddenException();
+    if (!affiliate || affiliate.deletedAt) {
+      throw new ForbiddenException('affiliate not exist or was deleted');
     }
 
     const orders = await this.orderRepository.getWithPaginationAndFilters({

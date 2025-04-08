@@ -3,36 +3,33 @@ import {
   InternalServerErrorException,
   NotImplementedException,
 } from '@nestjs/common';
-import { IAccountRepositoryContract } from './IAccount.repository-contract';
 import { PaginationResult } from '#types';
 import {
-  AccountEntity,
-  AccountUniqueRefs,
-  AccountUpdateEntity,
-} from 'src/Application/Entities/Account.entity';
+  WalletEntity,
+  WalletUniqueRefs,
+  WalletUpdateEntity,
+} from 'src/Application/Entities/Wallet.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { splitKeyAndValue } from '#utils';
 import { EntityManager, QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TABLE } from 'src/@metadata/tables';
+import { IWalletRepositoryContract } from './IWallet.repository-contract';
 
 @Injectable()
-export class AccountTypeOrmRepository implements IAccountRepositoryContract {
+export class WalletTypeOrmRepository implements IWalletRepositoryContract {
   constructor(
-    @InjectRepository(AccountEntity)
-    private readonly accountRepository: Repository<AccountEntity>,
+    @InjectRepository(WalletEntity)
+    private readonly walletRepository: Repository<WalletEntity>,
   ) {}
 
-  async create(
-    entity: AccountEntity,
-    trx?: QueryRunner,
-  ): Promise<AccountEntity> {
+  async create(entity: WalletEntity, trx?: QueryRunner): Promise<WalletEntity> {
     try {
       const result = (
         await trx.manager
           .createQueryBuilder()
           .insert()
-          .into(AccountEntity)
+          .into(WalletEntity)
           .values(entity)
           .returning('*')
           .execute()
@@ -45,19 +42,24 @@ export class AccountTypeOrmRepository implements IAccountRepositoryContract {
     }
   }
 
-  async getBy(unqRef: AccountUniqueRefs): Promise<AccountEntity> {
+  async getBy(
+    unqRef: WalletUniqueRefs,
+    trx?: QueryRunner,
+  ): Promise<WalletEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
+    const test = await this.walletRepository.create({});
+
     try {
-      const account = await this.accountRepository
+      const wallet = await trx.manager
         .createQueryBuilder()
-        .select('*')
-        .from(AccountEntity, TABLE.account)
-        .where(`"${TABLE.account}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.account}"."deletedAt" IS NULL`)
+        .select(TABLE.wallet)
+        .from(WalletEntity, TABLE.wallet)
+        .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
         .getOne();
 
-      return account;
+      return wallet;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -65,18 +67,19 @@ export class AccountTypeOrmRepository implements IAccountRepositoryContract {
   }
 
   async update(
-    unqRef: AccountUniqueRefs,
-    updateEntity: AccountUpdateEntity,
-  ): Promise<AccountEntity> {
+    unqRef: WalletUniqueRefs,
+    updateEntity: WalletUpdateEntity,
+    trx?: QueryRunner,
+  ): Promise<WalletEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      await this.accountRepository
+      await trx.manager
         .createQueryBuilder()
-        .update(AccountEntity)
+        .update(WalletEntity)
         .set(updateEntity)
-        .where(`"${TABLE.account}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.account}"."deletedAt" IS NULL`)
+        .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
         .execute();
 
       return await this.getBy(unqRef);
@@ -86,15 +89,15 @@ export class AccountTypeOrmRepository implements IAccountRepositoryContract {
     }
   }
 
-  async delete(unqRef: AccountUniqueRefs): Promise<void> {
+  async delete(unqRef: WalletUniqueRefs, trx?: QueryRunner): Promise<void> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      await this.accountRepository
+      await trx.manager
         .createQueryBuilder()
         .delete()
-        .from(AccountEntity)
-        .where(`"${TABLE.account}"."${key}" = :value`, { value })
+        .from(WalletEntity)
+        .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
         .execute();
     } catch (e) {
       console.error(e);
@@ -102,16 +105,19 @@ export class AccountTypeOrmRepository implements IAccountRepositoryContract {
     }
   }
 
-  async softDelete(unqRef: AccountUniqueRefs): Promise<'success' | 'fail'> {
+  async softDelete(
+    unqRef: WalletUniqueRefs,
+    trx?: QueryRunner,
+  ): Promise<'success' | 'fail'> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      const result = await this.accountRepository
+      const result = await trx.manager
         .createQueryBuilder()
-        .update(AccountEntity)
+        .update(WalletEntity)
         .set({ deletedAt: new Date() })
-        .where(`"${TABLE.account}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.account}"."deletedAt" IS NULL`)
+        .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
         .execute();
 
       return result.affected > 0 ? 'success' : 'fail';
@@ -121,13 +127,13 @@ export class AccountTypeOrmRepository implements IAccountRepositoryContract {
     }
   }
 
-  async getAll(): Promise<AccountEntity[]> {
+  async getAll(trx?: QueryRunner): Promise<WalletEntity[]> {
     try {
-      return await this.accountRepository
+      return await trx.manager
         .createQueryBuilder()
         .select('*')
-        .from(AccountEntity, TABLE.account)
-        .where(`"${TABLE.account}"."deletedAt" IS NULL`)
+        .from(WalletEntity, TABLE.wallet)
+        .where(`"${TABLE.wallet}"."deletedAt" IS NULL`)
         .getMany();
     } catch (e) {
       console.error(e);
@@ -137,7 +143,7 @@ export class AccountTypeOrmRepository implements IAccountRepositoryContract {
 
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
-  ): Promise<PaginationResult<AccountEntity[]>> {
+  ): Promise<PaginationResult<WalletEntity[]>> {
     throw new NotImplementedException('method not implemented');
     //   const { page = 1, limit = 10 } = paginationDto;
 

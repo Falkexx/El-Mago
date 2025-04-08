@@ -93,8 +93,8 @@ export enum AffiliateOnHoldStatus {
 }
 
 export enum TransactionType {
-  BANK_DEPOSIT = 'BANK_DEPOSIT',
-  BANK_WITHDRAWAL = 'BANK_WITHDRAWAL',
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAWAL = 'WITHDRAWAL',
 }
 
 export enum TransactionProvider {

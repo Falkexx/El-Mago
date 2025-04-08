@@ -17,6 +17,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { InfraCredentialsManagerModule } from './Application/Infra/InfraCredentialsManager/InfraCredentialsManager.module';
 import { BullModule } from '@nestjs/bullmq';
 import { JobsModule } from './Application/Infra/Jobs/Job.module';
+import { WalletModule } from './Application/Domains/Wallet/Wallet.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { JobsModule } from './Application/Infra/Jobs/Job.module';
     CategoryModule,
     OrderModule,
     JobsModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [

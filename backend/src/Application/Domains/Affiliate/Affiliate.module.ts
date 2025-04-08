@@ -11,8 +11,7 @@ import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
 import { ListAffiliatesOnHoldUseCase } from './UseCases/ListAffiliatesOnHold/ListAffiliatesOnHold.usecase';
 import { ApproveAffiliateOnWaitingListUseCase } from './UseCases/ApproveAffiliateOnWaitingList/ApproveAffiliateOnWaitingList.usecase';
 import { RefuseAffiliateOnWaitingListUseCase } from './UseCases/RefuseAffiliateOnWaitingList/RefuseAffiliateOnWaitingList.usecase';
-import { AccountTypeOrmRepository } from 'src/Application/Infra/Repositories/AccountRepository/AccountTypeOrm.repository';
-import { DataSource } from 'typeorm';
+import { WalletTypeOrmRepository } from 'src/Application/Infra/Repositories/WalletRepository/WalletTypeOrm.repository';
 
 @Module({
   imports: [RepositoriesModule, MailModule],
@@ -31,8 +30,8 @@ import { DataSource } from 'typeorm';
       useClass: RequestAffiliateTypeOrmRepository,
     },
     {
-      provide: KEY_INJECTION.ACCOUNT_REPOSITORY,
-      useClass: AccountTypeOrmRepository,
+      provide: KEY_INJECTION.WALLET_REPOSITORY,
+      useClass: WalletTypeOrmRepository,
     },
     AffiliateService,
     ReqAffiliateUseCase,

@@ -15,8 +15,9 @@ import { OrderEntity } from './Order.entity';
 import { RequestAffiliateEntity } from './Request-Affiliate.entity';
 import { ROLE } from 'src/@metadata/roles';
 import { Languages } from 'src/@metadata';
+import { TABLE } from 'src/@metadata/tables';
 
-@Entity('user')
+@Entity({ name: TABLE.user })
 export class UserEntity {
   @PrimaryColumn('varchar')
   id: string;
