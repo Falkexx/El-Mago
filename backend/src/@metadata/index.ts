@@ -98,7 +98,6 @@ export enum TransactionType {
 }
 
 export enum TransactionProvider {
-  SERVER_ACCOUNT = 'SERVER_ACCOUNT',
-  PAGSEGURO = 'PAGSEGURO',
-  PAYPAL = 'PAYPAL',
+  SERVER = 'SERVER',
+  AFFILIATE = 'AFFILIATE',
 }

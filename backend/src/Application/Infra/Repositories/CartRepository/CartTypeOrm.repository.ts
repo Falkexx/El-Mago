@@ -10,41 +10,47 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { splitKeyAndValue } from '#utils';
 import {
   CartItemEntity,
   UpdateCartItemEntity,
 } from 'src/Application/Entities/Cart/CartItem.entity';
+import { TABLE } from 'src/@metadata/tables';
 
 export class CartTypeOrmRepository implements ICartRepositoryContract {
-  constructor(
-    @InjectRepository(CartEntity)
-    private readonly cartRepository: Repository<CartEntity>,
-    @InjectRepository(CartItemEntity)
-    private readonly cartItemRepository: Repository<CartItemEntity>,
-  ) {}
+  constructor() {}
 
-  create(entity: CartEntity): Promise<CartEntity> {
+  async create(entity: CartEntity, trx: QueryRunner): Promise<CartEntity> {
     try {
-      const cartEntity = this.cartRepository.create(entity);
+      const result = await trx.manager
+        .createQueryBuilder()
+        .insert()
+        .into(CartEntity)
+        .values(entity)
+        .returning('*')
+        .execute();
 
-      return this.cartRepository.save(cartEntity);
+      return result.raw[0];
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('internal server error');
     }
   }
 
-  async getBy(unqRef: CartUniqueRef): Promise<CartEntity> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
+  async getBy(
+    unqRef: CartUniqueRef,
+    trx: QueryRunner,
+  ): Promise<CartEntity | null> {
     try {
-      const cart = await this.cartRepository.findOne({
-        where: { [key]: value },
-        relations: ['items'],
-      });
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      const cart = await trx.manager
+        .createQueryBuilder(CartEntity, 'cart')
+        .leftJoinAndSelect('cart.items', 'items')
+        .where(`"${TABLE.cart}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.cart}"."deletedAt" IS NULL`)
+        .getOne();
 
       return cart ?? null;
     } catch (e) {
@@ -56,32 +62,46 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
   async update(
     unqRef: CartUniqueRef,
     updateEntity: CartUpdateEntity,
+    trx: QueryRunner,
   ): Promise<CartEntity> {
     try {
       const [key, value] = splitKeyAndValue(unqRef);
 
-      const cartToUpdate = await this.cartItemRepository.findOne({
-        where: { [key]: value },
-      });
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(CartEntity)
+        .set(updateEntity)
+        .where(`"${TABLE.cart}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.cart}"."deletedAt" IS NULL`)
+        .returning('*')
+        .execute();
 
-      if (!cartToUpdate) {
+      if (!result.raw[0]) {
         throw new NotFoundException('cart not found');
       }
 
-      const newCart = Object.assign(cartToUpdate, updateEntity);
-
-      return this.cartRepository.save(newCart);
+      return result.raw[0];
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('internal server error');
     }
   }
 
-  async delete(unqRef: CartUniqueRef): Promise<void> {
+  async delete(unqRef: CartUniqueRef, trx: QueryRunner): Promise<void> {
     try {
       const [key, value] = splitKeyAndValue(unqRef);
 
-      await this.cartRepository.delete({ [key]: value });
+      const result = await trx.manager
+        .createQueryBuilder()
+        .delete()
+        .from(CartEntity)
+        .where(`"${TABLE.cart}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.cart}"."deletedAt" IS NULL`)
+        .execute();
+
+      if (result.affected === 0) {
+        throw new NotFoundException('cart not found');
+      }
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('internal server error');
@@ -89,13 +109,16 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  softDelete(unqRef: CartUniqueRef): Promise<'success' | 'fail'> {
+  softDelete(unqRef: CartUniqueRef, trx: QueryRunner): Promise<CartEntity> {
     throw new Error('Method no implemented');
   }
 
-  getAll(): Promise<CartEntity[]> {
+  async getAll(trx: QueryRunner): Promise<CartEntity[]> {
     try {
-      return this.cartRepository.find();
+      return await trx.manager
+        .createQueryBuilder(CartEntity, 'cart')
+        .where(`"${TABLE.cart}"."deletedAt" IS NULL`)
+        .getMany();
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('internal server error');
@@ -106,6 +129,7 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
   getWithPaginationAndFilters<R extends keyof CartEntity>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     paginationDto: GenericPaginationDto,
+    trx: QueryRunner,
   ): Promise<PaginationResult<CartEntity[]>> {
     try {
       throw new Error('Method not implemented');
@@ -115,36 +139,47 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
     }
   }
 
-  async addCartItem(cartItem: CartItemEntity): Promise<CartItemEntity> {
+  async addCartItem(
+    cartItem: CartItemEntity,
+    trx: QueryRunner,
+  ): Promise<CartItemEntity> {
     try {
-      this.cartItemRepository.create(cartItem);
+      const result = await trx.manager
+        .createQueryBuilder()
+        .insert()
+        .into(CartItemEntity)
+        .values(cartItem)
+        .returning('*')
+        .execute();
 
-      return this.cartItemRepository.save(cartItem);
+      return result.raw[0];
     } catch (e) {
       console.log(e);
+      throw new InternalServerErrorException('internal server error');
     }
   }
 
   async updateCartItem(
     cartItemUnqRef: CartUniqueRef,
     cartUpdate: UpdateCartItemEntity,
+    trx: QueryRunner,
   ): Promise<CartItemEntity> {
-    const [key, value] = splitKeyAndValue(cartItemUnqRef);
-
     try {
-      const cartItemToUpdate = await this.cartItemRepository.findOne({
-        where: { [key]: value },
-      });
+      const [key, value] = splitKeyAndValue(cartItemUnqRef);
 
-      if (!cartItemToUpdate) {
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(CartItemEntity)
+        .set(cartUpdate)
+        .where(`"${TABLE.cart_item}"."${key}" = :value`, { value })
+        .returning('*')
+        .execute();
+
+      if (!result.raw[0]) {
         throw new NotFoundException('Cart item not found');
       }
 
-      const newCartItem = Object.assign(cartItemToUpdate, cartUpdate);
-
-      const result = await this.cartItemRepository.save(newCartItem);
-
-      return result;
+      return result.raw[0];
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException();

@@ -3,7 +3,6 @@ import {
   Injectable,
   NotAcceptableException,
   NotFoundException,
-  NotImplementedException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { KEY_INJECTION } from 'src/@metadata/keys';

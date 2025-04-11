@@ -24,6 +24,7 @@ import { OrderAffiliateController } from './OrderAffiliate/OrderAffiliate.contro
 import { GetMyCurrentOrdersAsAffiliate } from './OrderAffiliate/UseCases/GetMyCurrentOrdersAsAffiliate/GetMyCurrentOrdersAsAffiliate.usecase';
 import { WalletModule } from '../Wallet/Wallet.module';
 import { WalletTypeOrmRepository } from 'src/Application/Infra/Repositories/WalletRepository/WalletTypeOrm.repository';
+import { JobsModule } from 'src/Application/Infra/Jobs/Job.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { WalletTypeOrmRepository } from 'src/Application/Infra/Repositories/Wall
     PaymentModule,
     MailModule,
     WalletModule,
+    JobsModule,
   ],
   controllers: [OrderController, OrderAffiliateController],
   providers: [

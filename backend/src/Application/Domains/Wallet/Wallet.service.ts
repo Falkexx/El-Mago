@@ -97,8 +97,8 @@ export class WalletService {
         {
           id: generateShortId(10),
           createdAt: new Date(),
-          from: TransactionProvider.SERVER_ACCOUNT,
-          to: TransactionProvider.SERVER_ACCOUNT,
+          from: TransactionProvider.SERVER,
+          to: TransactionProvider.AFFILIATE,
           type: TransactionType.DEPOSIT,
           value: value,
           walletId: wallet.id,

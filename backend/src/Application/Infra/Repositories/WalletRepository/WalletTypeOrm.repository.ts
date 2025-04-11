@@ -23,7 +23,7 @@ export class WalletTypeOrmRepository implements IWalletRepositoryContract {
     private readonly walletRepository: Repository<WalletEntity>,
   ) {}
 
-  async create(entity: WalletEntity, trx?: QueryRunner): Promise<WalletEntity> {
+  async create(entity: WalletEntity, trx: QueryRunner): Promise<WalletEntity> {
     try {
       const result = (
         await trx.manager
@@ -44,11 +44,9 @@ export class WalletTypeOrmRepository implements IWalletRepositoryContract {
 
   async getBy(
     unqRef: WalletUniqueRefs,
-    trx?: QueryRunner,
+    trx: QueryRunner,
   ): Promise<WalletEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
-
-    const test = await this.walletRepository.create({});
 
     try {
       const wallet = await trx.manager
@@ -74,22 +72,25 @@ export class WalletTypeOrmRepository implements IWalletRepositoryContract {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      await trx.manager
-        .createQueryBuilder()
-        .update(WalletEntity)
-        .set(updateEntity)
-        .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
-        .execute();
+      const wallet = (
+        await trx.manager
+          .createQueryBuilder()
+          .update(WalletEntity)
+          .set(updateEntity)
+          .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
+          .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
+          .returning('*')
+          .execute()
+      ).raw[0];
 
-      return await this.getBy(unqRef);
+      return wallet;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
     }
   }
 
-  async delete(unqRef: WalletUniqueRefs, trx?: QueryRunner): Promise<void> {
+  async delete(unqRef: WalletUniqueRefs, trx: QueryRunner): Promise<void> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
@@ -107,20 +108,23 @@ export class WalletTypeOrmRepository implements IWalletRepositoryContract {
 
   async softDelete(
     unqRef: WalletUniqueRefs,
-    trx?: QueryRunner,
-  ): Promise<'success' | 'fail'> {
+    trx: QueryRunner,
+  ): Promise<WalletEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      const result = await trx.manager
-        .createQueryBuilder()
-        .update(WalletEntity)
-        .set({ deletedAt: new Date() })
-        .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
-        .execute();
+      const result = (
+        await trx.manager
+          .createQueryBuilder()
+          .update(WalletEntity)
+          .set({ deletedAt: new Date() })
+          .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
+          .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
+          .returning('*')
+          .execute()
+      ).raw[0];
 
-      return result.affected > 0 ? 'success' : 'fail';
+      return result;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();

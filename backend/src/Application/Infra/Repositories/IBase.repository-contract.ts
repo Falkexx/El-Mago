@@ -7,21 +7,18 @@ export interface IBaseRepositoryContract<
   UpdateEntity,
   UniqueEntityRefs,
 > {
-  create(entity: Entity, trx?: QueryRunner): Promise<Entity>;
-  getBy(unqRef: UniqueEntityRefs, trx?: QueryRunner): Promise<Entity | null>;
+  create(entity: Entity, trx: QueryRunner): Promise<Entity>;
+  getBy(unqRef: UniqueEntityRefs, trx: QueryRunner): Promise<Entity | null>;
   update(
     unqRef: UniqueEntityRefs,
     updateEntity: UpdateEntity,
-    trx?: QueryRunner,
+    trx: QueryRunner,
   ): Promise<Entity>;
   delete(unqRef: UniqueEntityRefs, trx?: QueryRunner): Promise<void>;
-  softDelete(
-    unqRef: UniqueEntityRefs,
-    trx?: QueryRunner,
-  ): Promise<'success' | 'fail'>;
-  getAll(trx?: QueryRunner): Promise<Entity[]>;
+  softDelete(unqRef: UniqueEntityRefs, trx: QueryRunner): Promise<Entity>;
+  getAll(trx: QueryRunner): Promise<Entity[]>;
   getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
-    trx?: QueryRunner,
+    trx: QueryRunner,
   ): Promise<PaginationResult<Entity[]>>;
 }

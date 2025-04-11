@@ -15,6 +15,7 @@ import { IIMageRepositoryContract } from 'src/Application/Infra/Repositories/Ima
 import { PayloadType } from '#types';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
+import { TransactionProducer } from 'src/Application/Infra/Jobs/Producer/Transaction.producer';
 
 @Injectable()
 export class SendProofToOrderItemUseCase {
@@ -28,6 +29,7 @@ export class SendProofToOrderItemUseCase {
     private readonly imageRepository: IIMageRepositoryContract,
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
+    private readonly transactionProducer: TransactionProducer,
   ) {}
 
   async execute(
@@ -94,6 +96,10 @@ export class SendProofToOrderItemUseCase {
         proofOfDelivery: proofOfDelivery,
       },
     );
+
+    await this.transactionProducer.makeDeposit({
+      orderId: orderUpdated.id,
+    });
 
     return orderUpdated;
   }

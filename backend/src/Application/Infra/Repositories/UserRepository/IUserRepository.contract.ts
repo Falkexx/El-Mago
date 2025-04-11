@@ -4,6 +4,7 @@ import {
   UserUpdateEntity,
 } from 'src/Application/Entities/User.entity';
 import { IBaseRepositoryContract } from '../IBase.repository-contract';
+import { QueryRunner } from 'typeorm';
 
 export interface IUserRepositoryContract
   extends IBaseRepositoryContract<
@@ -11,5 +12,5 @@ export interface IUserRepositoryContract
     Partial<UserUpdateEntity>,
     UserEntityUniqueRefs
   > {
-  getByEmail(email: string): Promise<UserEntity | null>;
+  getByEmail(email: string, trx: QueryRunner): Promise<UserEntity | null>;
 }

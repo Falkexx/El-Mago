@@ -13,7 +13,6 @@ import { PayloadType } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 import { generateShortId } from '#utils';
-import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
 import { IWalletRepositoryContract } from 'src/Application/Infra/Repositories/WalletRepository/IWallet.repository-contract';

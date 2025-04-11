@@ -5,48 +5,53 @@ import {
 import { GenericPaginationDto } from 'src/utils/validators';
 import { QueryRunner } from 'typeorm';
 import { ITransactionRepositoryContract } from './ITransaction.repository-contract';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotImplementedException,
+} from '@nestjs/common';
 import { splitKeyAndValue } from '#utils';
 import { PaginationResult } from '#types';
+import { TABLE } from 'src/@metadata/tables';
 
 @Injectable()
 export class TransactionTypeOrmRepository
   implements ITransactionRepositoryContract
 {
-  create(
+  async create(
     entity: TransactionEntity,
     trx?: QueryRunner,
   ): Promise<TransactionEntity> {
     try {
-      return trx.manager
-        .createQueryBuilder()
-        .insert()
-        .into(TransactionEntity)
-        .values(entity)
-        .returning('*')
-        .execute()
-        .then((result) => result.raw[0]);
+      return (
+        await trx.manager
+          .createQueryBuilder()
+          .insert()
+          .into(TransactionEntity)
+          .values(entity)
+          .returning('*')
+          .execute()
+      ).raw[0];
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
     }
   }
 
-  getBy(
+  async getBy(
     unqRef: TransactionUniqueRefs,
     trx?: QueryRunner,
   ): Promise<TransactionEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      return trx.manager
+      return await trx.manager
         .createQueryBuilder()
         .select()
         .from(TransactionEntity, 'transaction')
         .where(`"${key}" = :value`, { value })
         .andWhere(`"deletedAt" IS NULL`)
-        .execute()
-        .then((result) => result.raw[0]);
+        .getOne();
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -56,19 +61,26 @@ export class TransactionTypeOrmRepository
   async update(
     unqRef: TransactionUniqueRefs,
     updateEntity: Partial<TransactionEntity>,
-    trx?: QueryRunner,
+    trx: QueryRunner,
   ): Promise<TransactionEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      return trx.manager
+      const result = await trx.manager
         .createQueryBuilder()
-        .insert()
-        .into(TransactionEntity)
-        .values(updateEntity)
+        .update(TransactionEntity)
+        .set(updateEntity)
+        .where(`"${TABLE.transaction}."${key}" = :${value}`, { value })
         .returning('*')
-        .execute()
-        .then((result) => result.raw[0]);
+        .execute();
+
+      if (result.affected === 0) {
+        throw new Error(
+          `Rows affected is 0 when update transaction with ${key}: ${value}`,
+        );
+      }
+
+      return result[0];
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -81,12 +93,18 @@ export class TransactionTypeOrmRepository
   ): Promise<void> {
     const [key, value] = splitKeyAndValue(unqRef);
 
-    trx.manager
+    const result = await trx.manager
       .createQueryBuilder()
       .delete()
       .from(TransactionEntity)
       .where(`"${key}" = :value`, { value })
       .execute();
+
+    if (result.affected === 0) {
+      throw new Error(
+        `error when delete permanently transaction with ${key}: ${value}`,
+      );
+    }
 
     try {
     } catch (e) {
@@ -98,14 +116,29 @@ export class TransactionTypeOrmRepository
   async softDelete(
     unqRef: TransactionUniqueRefs,
     trx?: QueryRunner,
-  ): Promise<'success' | 'fail'> {
+  ): Promise<TransactionEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      trx.manager.createQueryBuilder().update(TransactionEntity).set({
-        deletedAt: new Date(),
-      });
-      return 'success';
+      throw new NotImplementedException(
+        'transaction entity not have soft delete property',
+      );
+
+      // const result = await trx.manager
+      //   .createQueryBuilder()
+      //   .update(TransactionEntity)
+      //   .set({
+      //     deletedAt: new Date(),
+      //   })
+      //   .where(`"${TABLE.transaction}."${key}" = :${value}`, { value })
+      //   .returning('*')
+      //   .execute();
+      // if (result.affected === 0) {
+      //   throw new Error(
+      //     `error when soft delete transaction with ${key}: ${value}`,
+      //   );
+      // }
+      // return result.raw[0];
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -114,13 +147,13 @@ export class TransactionTypeOrmRepository
 
   getAll(trx?: QueryRunner): Promise<TransactionEntity[]> {
     try {
-      return trx.manager
+      const result = trx.manager
         .createQueryBuilder()
         .select()
         .from(TransactionEntity, 'transaction')
-        .where('transaction.deletedAt IS NULL')
-        .execute()
-        .then((result) => result.raw);
+        .getMany();
+
+      return result;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();

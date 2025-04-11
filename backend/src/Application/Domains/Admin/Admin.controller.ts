@@ -13,7 +13,6 @@ import { AffiliateService } from '../Affiliate/Affiliate.service';
 import { ApiResponse } from '#types';
 import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { env } from '#utils';
-import { plainToInstance } from 'class-transformer';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { JwtAuthGuard } from '../../../@guards/jwt-auth.guard';
 import { RoleGuard } from '../../../@guards/role.guard';
