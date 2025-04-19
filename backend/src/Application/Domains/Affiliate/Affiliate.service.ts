@@ -36,8 +36,9 @@ export class AffiliateService {
 
   async create(affiliateDto: CreateAffiliateDto) {
     const trx = this.dataSource.createQueryRunner();
+
     try {
-      trx.startTransaction();
+      await trx.startTransaction();
 
       const affiliateExist = await this.affiliateRepository.getBy(
         {
@@ -110,7 +111,7 @@ export class AffiliateService {
         trx,
       );
 
-      trx.commitTransaction();
+      await trx.commitTransaction();
 
       return {
         affiliate: affiliateCreated,

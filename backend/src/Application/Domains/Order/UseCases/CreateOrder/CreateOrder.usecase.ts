@@ -9,13 +9,11 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { ICartRepositoryContract } from 'src/Application/Infra/Repositories/CartRepository/ICartRepository.contract';
 import { PayloadType } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
-import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { shortId } from '#utils';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { DataSource, Table } from 'typeorm';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
 import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
-import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { Status } from 'src/@metadata';
 import { CreateOrderDto } from './CreateOrder.dto';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
@@ -60,6 +58,8 @@ export class CreateOrderUseCase {
 
       // Busca os itens
       const items = await this.itemRepository.getManyByIds(itemsIds, trx);
+
+      console.log(items);
       if (!items || items.length <= 0) {
         throw new NotAcceptableException({
           ptBr: 'não ha itens no carrinho',
@@ -114,7 +114,7 @@ export class CreateOrderUseCase {
       );
 
       // Cria os itens do pedido
-      const itemsEntityList = items.map((item) => {
+      const itemsEntityListAsPromise = items.map((item) => {
         const quantity = cart.items.find(
           (_cart_item_) => _cart_item_.itemId === item.id,
         ).quantity;
@@ -139,8 +139,10 @@ export class CreateOrderUseCase {
         );
       });
 
+      const itemsEntityList = await Promise.all(itemsEntityListAsPromise);
+
       // Cria o status do pedido
-      const status = this.orderRepository.createOrderStatus(
+      const status = await this.orderRepository.createOrderStatus(
         {
           id: shortId(10),
           createdAt: new Date(),
@@ -153,8 +155,10 @@ export class CreateOrderUseCase {
         trx,
       );
 
+      console.log('status', status);
+
       // Remove os itens do carrinho
-      await this.cartRepository.release({ userId: user.id }, trx);
+      await this.cartRepository.release(cart.id, trx);
 
       await trx.commitTransaction();
 

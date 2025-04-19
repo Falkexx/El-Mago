@@ -318,7 +318,7 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
       return await trx.manager
         .createQueryBuilder(ItemEntity, 'item')
         .where(`"${TABLE.item}"."id" IN (:...ids)`, { ids })
-        .andWhere(`"${TABLE.item}"."deletedAt" IS NULL`)
+
         .getMany();
     } catch (error) {
       console.error(error);

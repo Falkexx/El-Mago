@@ -46,7 +46,6 @@ export class CategoryTypeOrmRepository implements ICategoryRepositoryContract {
       const category = await trx.manager
         .createQueryBuilder(CategoryEntity, 'category')
         .where(`"${TABLE.category}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.category}"."deletedAt" IS NULL`)
         .getOne();
 
       return category ?? null;

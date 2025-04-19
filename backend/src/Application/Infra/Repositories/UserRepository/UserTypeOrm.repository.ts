@@ -20,14 +20,14 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
     trx: QueryRunner,
   ): Promise<UserEntity | null> {
     try {
-      return (
-        (await trx.manager
-          .createQueryBuilder()
-          .select('*')
-          .from(UserEntity, TABLE.user)
-          .where(`${TABLE.user}."email" = :=${email}`, { email })
-          .getOne()) ?? null
-      );
+      const user = await trx.manager
+        .createQueryBuilder()
+        .select(TABLE.user)
+        .from(UserEntity, TABLE.user)
+        .where(`"${TABLE.user}"."email" = :email`, { email })
+        .getOne();
+
+      return user ?? null;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -58,14 +58,14 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      return await trx.manager
+      const user = await trx.manager
         .createQueryBuilder()
-        .select('*')
+        .select(TABLE.user)
         .from(UserEntity, TABLE.user)
-        .where(`"${TABLE.user}."${key} = :value`, {
-          value,
-        })
+        .where(`"${TABLE.user}"."${key}" = :value`, { value })
         .getOne();
+
+      return user ?? null;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();

@@ -68,10 +68,9 @@ export class PutItemInCartUseCase {
           existItemWithId = await this.cartRepository.getBy({ id }, trx);
         }
 
-        return this.cartRepository.addCartItem(
+        const cartItemAdded = await this.cartRepository.addCartItem(
           {
             id,
-            amount: putDto.amount ?? 1,
             createdAt: new Date(),
             updatedAt: new Date(),
             item: item,
@@ -79,24 +78,25 @@ export class PutItemInCartUseCase {
             itemId: item.id,
             cart: cart,
             cartId: cart.id,
-          } as CartItemEntity,
+          },
           trx,
         );
-      }
 
-      // update
-      const updateCartItem: UpdateCartItemEntity = {
-        quantity: putDto.amount
-          ? itemIsAlreadyInTheCart.quantity + putDto.amount
-          : itemIsAlreadyInTheCart.quantity + 1,
-        updatedAt: new Date(),
-      };
+        await trx.commitTransaction();
+
+        return cartItemAdded;
+      }
 
       const cartItemUpdated = await this.cartRepository.updateCartItem(
         {
           id: itemIsAlreadyInTheCart.id,
         },
-        updateCartItem,
+        {
+          quantity: putDto.amount
+            ? itemIsAlreadyInTheCart.quantity + putDto.amount
+            : itemIsAlreadyInTheCart.quantity + 1,
+          updatedAt: new Date(),
+        },
         trx,
       );
 

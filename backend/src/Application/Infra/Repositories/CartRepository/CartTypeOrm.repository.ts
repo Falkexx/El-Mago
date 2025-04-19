@@ -49,7 +49,6 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
         .createQueryBuilder(CartEntity, 'cart')
         .leftJoinAndSelect('cart.items', 'items')
         .where(`"${TABLE.cart}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.cart}"."deletedAt" IS NULL`)
         .getOne();
 
       return cart ?? null;
@@ -186,17 +185,18 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
     }
   }
 
-  async release(unqRef: CartUniqueRef, trx: QueryRunner): Promise<void> {
+  async release(cartId: string, trx: QueryRunner): Promise<void> {
     try {
-      const [key, value] = splitKeyAndValue(unqRef);
-
-      await trx.manager
+      const result = await trx.manager
         .createQueryBuilder()
         .delete()
         .from(CartItemEntity, TABLE.cart_item)
-        .where(`${TABLE.cart_item}."${key}" = :value`, { value })
-        .andWhere(`${TABLE.cart_item}."deletedAt" IS NULL`)
+        .where(`"${TABLE.cart_item}"."cartId" = :cartId`, { cartId })
         .execute();
+
+      if (result.affected === 0) {
+        throw new Error('Cart item not found');
+      }
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
