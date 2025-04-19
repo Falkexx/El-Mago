@@ -8,6 +8,7 @@ import {
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { ICartRepositoryContract } from 'src/Application/Infra/Repositories/CartRepository/ICartRepository.contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class GetCartUseCase {
@@ -17,23 +18,38 @@ export class GetCartUseCase {
 
     @Inject(KEY_INJECTION.CART_REPOSITORY)
     private readonly cartRepository: ICartRepositoryContract,
+
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
+    try {
+      await trx.startTransaction();
+
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
+
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+
+      const cart = await this.cartRepository.getBy({ userId: user.id }, trx);
+
+      if (!cart) {
+        throw new NotFoundException('user not have cart');
+
+        //then create a new cart to user
+      }
+
+      await trx.commitTransaction();
+
+      return cart;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
     }
-
-    const cart = await this.cartRepository.getBy({ userId: user.id });
-
-    if (!cart) {
-      throw new NotFoundException('user not have cart');
-
-      //then create a new cart to user
-    }
-
-    return cart;
   }
 }

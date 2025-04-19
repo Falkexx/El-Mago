@@ -13,7 +13,6 @@ import { AffiliateService } from '../Affiliate/Affiliate.service';
 import { ApiResponse } from '#types';
 import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { env } from '#utils';
-import { plainToInstance } from 'class-transformer';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { JwtAuthGuard } from '../../../@guards/jwt-auth.guard';
 import { RoleGuard } from '../../../@guards/role.guard';
@@ -28,20 +27,14 @@ export class AdminController {
   @RolesDecorator(ROLE.ADMIN)
   async createAffiliate(
     @Body() affiliateDto: CreateAffiliateDto,
-  ): Promise<ApiResponse<AffiliateEntity>> {
-    const result = plainToInstance(
-      AffiliateEntity,
-      await this.affiliateService.create(affiliateDto),
-      { exposeUnsetFields: true },
-    );
-
+  ): Promise<ApiResponse<any>> {
     return {
-      data: result,
+      data: await this.affiliateService.create(affiliateDto),
       href:
         env.BACKEND_BASE_URL +
         env.BACKEND_PORT +
         '/v1/admin/affiliate/id/' +
-        result.id,
+        '',
       message: 'created',
       status: 201,
       meta: null,

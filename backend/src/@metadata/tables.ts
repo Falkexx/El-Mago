@@ -12,6 +12,8 @@ export enum TABLE {
   order_item = 'order_item',
   order_in_progress = 'order_in_progress',
   digital_shipping = 'digital_shipping',
+  transaction = 'transaction',
+  wallet = 'wallet',
 
   /**
    * @deprecated

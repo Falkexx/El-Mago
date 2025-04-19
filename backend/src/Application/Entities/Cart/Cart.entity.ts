@@ -31,7 +31,7 @@ export class CartEntity {
   @Column({ type: 'varchar', unique: true })
   userId: string;
 
-  @OneToOne(() => UserEntity)
+  @OneToOne(() => UserEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
 }

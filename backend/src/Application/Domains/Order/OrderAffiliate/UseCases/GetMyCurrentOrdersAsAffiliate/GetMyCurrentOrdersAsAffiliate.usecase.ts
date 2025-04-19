@@ -11,6 +11,7 @@ import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class GetMyCurrentOrdersAsAffiliate {
@@ -21,32 +22,52 @@ export class GetMyCurrentOrdersAsAffiliate {
     private readonly affiliateRepository: IAffiliateRepositoryContract,
     @Inject(KEY_INJECTION.ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepositoryContract,
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, paginationDto: GenericPaginationDto) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
+    try {
+      await trx.startTransaction();
+
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
+
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+
+      const affiliate = await this.affiliateRepository.getBy(
+        {
+          id: user.affiliateId,
+        },
+        trx,
+      );
+
+      if (!affiliate || affiliate.deletedAt) {
+        throw new ForbiddenException('affiliate not exist or was deleted');
+      }
+
+      const orders = await this.orderRepository.getWithPaginationAndFilters(
+        {
+          ...paginationDto,
+          filters: {
+            ...paginationDto.filters,
+            // proofOfDelivery: null,
+            affiliateId: affiliate.id,
+          } as OrderEntity,
+        },
+        trx,
+      );
+
+      await trx.commitTransaction();
+
+      return orders;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
     }
-
-    const affiliate = await this.affiliateRepository.getBy({
-      id: user.affiliateId,
-    });
-
-    if (!affiliate || affiliate.isSoftDelete) {
-      throw new ForbiddenException();
-    }
-
-    const orders = await this.orderRepository.getWithPaginationAndFilters({
-      ...paginationDto,
-      filters: {
-        ...paginationDto.filters,
-        // proofOfDelivery: null,
-        affiliateId: affiliate.id,
-      } as OrderEntity,
-    });
-
-    return orders;
   }
 }

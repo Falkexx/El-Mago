@@ -7,11 +7,13 @@ import {
 import { GenericPaginationDto } from 'src/utils/validators';
 import { IRequestAffiliateRepositoryContract } from './IRequestAffiliate.repository-contract';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { splitKeyAndValue } from '#utils';
 import { SearchBuilderService } from '../SearchBuilder.service';
 import { TABLE } from 'src/@metadata/tables';
+import { UserEntity } from 'src/Application/Entities/User.entity';
+import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 
 @Injectable()
 export class RequestAffiliateTypeOrmRepository
@@ -23,22 +25,42 @@ export class RequestAffiliateTypeOrmRepository
     private readonly searchBuilder: SearchBuilderService,
   ) {}
 
-  create(entity: RequestAffiliateEntity): Promise<RequestAffiliateEntity> {
+  async create(
+    entity: RequestAffiliateEntity,
+    trx: QueryRunner,
+  ): Promise<RequestAffiliateEntity> {
     try {
-      const reqAffiliateEntity = this.reqAffiliateRepo.create(entity);
+      const result = await trx.manager
+        .createQueryBuilder()
+        .insert()
+        .into(RequestAffiliateEntity)
+        .values(entity)
+        .returning('*')
+        .execute();
 
-      return this.reqAffiliateRepo.save(reqAffiliateEntity);
+      return result.raw[0];
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
     }
   }
 
-  getBy(unqRef: RequestAffiliateUnqRef): Promise<RequestAffiliateEntity> {
+  async getBy(
+    unqRef: RequestAffiliateUnqRef,
+    trx: QueryRunner,
+  ): Promise<RequestAffiliateEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      return this.reqAffiliateRepo.findOne({ where: { [key]: value } });
+      const result = await trx.manager
+        .createQueryBuilder()
+        .select('*')
+        .from(RequestAffiliateEntity, TABLE.affiliate_queue)
+        .where(`${TABLE.affiliate_queue}."${key}" = :${value}`, { value })
+        .andWhere(`${TABLE.affiliate_queue}."deletedAt" IS NULL`)
+        .getOne();
+
+      return result ?? null;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -48,31 +70,52 @@ export class RequestAffiliateTypeOrmRepository
   async update(
     unqRef: RequestAffiliateUnqRef,
     updateEntity: RequestAffiliateUpdateEntity,
+    trx: QueryRunner,
   ): Promise<RequestAffiliateEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      const recAffiliate = await this.reqAffiliateRepo.findOne({
-        where: { [key]: value },
-      });
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(RequestAffiliateEntity)
+        .set(updateEntity)
+        .where(`${TABLE.affiliate_queue}."${key}" = :${value}`, { value })
+        .andWhere(`${TABLE.affiliate_queue}."deletedAt" IS NULL`)
+        .returning('*')
+        .execute();
 
-      const updateRecAffiliateEntity = Object.assign(
-        recAffiliate,
-        updateEntity,
-      );
+      if (result.affected === 0) {
+        throw new Error(
+          `rows affected is 0 when update affiliate with ${key}: ${value}`,
+        );
+      }
 
-      return this.reqAffiliateRepo.save(updateRecAffiliateEntity);
+      return result.raw[0];
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
     }
   }
 
-  async delete(unqRef: RequestAffiliateUnqRef): Promise<void> {
+  async delete(
+    unqRef: RequestAffiliateUnqRef,
+    trx: QueryRunner,
+  ): Promise<void> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      await this.reqAffiliateRepo.delete({ [key]: value });
+      const result = await trx.manager
+        .createQueryBuilder()
+        .delete()
+        .from(RequestAffiliateEntity, TABLE.affiliate_queue)
+        .where(`"${TABLE.affiliate_queue}"."${key}" = :${value}`, { value })
+        .execute();
+
+      if (result.affected === 0) {
+        throw new Error(
+          `error when delete affiliate in queue with ${key}: ${value}`,
+        );
+      }
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -81,34 +124,42 @@ export class RequestAffiliateTypeOrmRepository
 
   async softDelete(
     unqRef: RequestAffiliateUnqRef,
-  ): Promise<'success' | 'fail'> {
+    trx: QueryRunner,
+  ): Promise<RequestAffiliateEntity> {
     const [key, value] = splitKeyAndValue(unqRef);
 
     try {
-      const recAffiliate = await this.reqAffiliateRepo.findOne({
-        where: { [key]: value },
-      });
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(RequestAffiliateEntity)
+        .set({
+          deletedAt: new Date(),
+        } as RequestAffiliateEntity)
+        .where(`"${TABLE.affiliate_queue}."${key} = :${value}`, { value })
+        .andWhere(`"${TABLE.affiliate_queue}."deletedAt" IS NULL`)
+        .execute();
 
-      if (recAffiliate.deletedAt) {
-        return 'success';
+      if (result.affected === 0) {
+        throw new Error(`affected row is 0 when ${key}: ${value}`);
       }
 
-      const updateRecAffiliateEntity = Object.assign(recAffiliate, {
-        deletedAt: new Date(),
-      } as RequestAffiliateEntity);
-
-      await this.reqAffiliateRepo.save(updateRecAffiliateEntity);
-
-      return 'success';
+      return result.raw[0];
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
     }
   }
 
-  async getAll(): Promise<RequestAffiliateEntity[]> {
+  async getAll(trx: QueryRunner): Promise<RequestAffiliateEntity[]> {
     try {
-      return await this.reqAffiliateRepo.find();
+      const result = await trx.manager
+        .createQueryBuilder()
+        .select('*')
+        .from(RequestAffiliateEntity, TABLE.affiliate_queue)
+        .where(`"${TABLE.affiliate_queue}."deletedAt" IS NULL"`)
+        .getMany();
+
+      return result;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();
@@ -117,9 +168,11 @@ export class RequestAffiliateTypeOrmRepository
 
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
+    trx: QueryRunner,
   ): Promise<PaginationResult<RequestAffiliateEntity[]>> {
     try {
-      const queryBuilder = this.reqAffiliateRepo.createQueryBuilder(
+      const queryBuilder = trx.manager.createQueryBuilder(
+        RequestAffiliateEntity,
         TABLE.affiliate_queue,
       );
 

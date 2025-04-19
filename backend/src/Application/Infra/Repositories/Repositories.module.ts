@@ -19,6 +19,10 @@ import { OrderTypeOrmRepository } from './OrderRepository/OrderTypeOrm.repositor
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { RequestAffiliateEntity } from 'src/Application/Entities/Request-Affiliate.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
+import { WalletEntity } from 'src/Application/Entities/Wallet.entity';
+import { TransactionEntity } from 'src/Application/Entities/Transactions.entity';
+import { WalletTypeOrmRepository } from './WalletRepository/WalletTypeOrm.repository';
+import { TransactionTypeOrmRepository } from './TransactionRepository/TransactionTypeOrm.repository';
 
 @Module({
   imports: [
@@ -34,6 +38,8 @@ import { OrderItem } from 'src/Application/Entities/order-item.entity';
       OrderStatus,
       RequestAffiliateEntity,
       OrderItem,
+      WalletEntity,
+      TransactionEntity,
     ]),
   ],
   providers: [
@@ -45,7 +51,9 @@ import { OrderItem } from 'src/Application/Entities/order-item.entity';
     CartTypeOrmRepository,
     OrderTypeOrmRepository,
     SearchBuilderService,
+    WalletTypeOrmRepository,
+    TransactionTypeOrmRepository,
   ],
-  exports: [TypeOrmModule, SearchBuilderService],
+  exports: [TypeOrmModule, SearchBuilderService, OrderTypeOrmRepository],
 })
 export class RepositoriesModule {}

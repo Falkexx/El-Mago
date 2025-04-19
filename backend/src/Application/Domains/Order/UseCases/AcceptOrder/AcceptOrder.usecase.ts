@@ -13,9 +13,10 @@ import { PayloadType } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 import { generateShortId } from '#utils';
-import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
+import { IWalletRepositoryContract } from 'src/Application/Infra/Repositories/WalletRepository/IWallet.repository-contract';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AcceptOrderUseCase {
@@ -26,83 +27,121 @@ export class AcceptOrderUseCase {
     private readonly orderRepository: IOrderRepositoryContract,
     @Inject(KEY_INJECTION.AFFILIATE_REPOSITORY_CONTRACT)
     private readonly affiliateRepository: IAffiliateRepositoryContract,
+    @Inject(KEY_INJECTION.WALLET_REPOSITORY)
+    private readonly walletRepository: IWalletRepositoryContract,
     private readonly mainService: NodemailerService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, addAffiliateOnOrderDto: AcceptOrderDto) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    try {
+      await trx.startTransaction();
 
-    const affiliate = await this.affiliateRepository.getBy({
-      id: user.affiliateId,
-    });
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
 
-    if (!user.affiliateId || !affiliate) {
-      throw new ForbiddenException('only affiliate make this action');
-    }
+      if (!user) {
+        throw new UnauthorizedException();
+      }
 
-    const availableOrder = await this.orderRepository.getAvailableOrder(
-      addAffiliateOnOrderDto.orderId,
-    );
+      const affiliate = await this.affiliateRepository.getBy(
+        {
+          id: user.affiliateId,
+        },
+        trx,
+      );
 
-    if (!availableOrder) {
-      throw new NotFoundException('order not found');
-    }
+      if (!user.affiliateId || !affiliate) {
+        throw new ForbiddenException('only affiliate make this action');
+      }
 
-    const customer = await this.userRepository.getBy({
-      id: availableOrder.userId,
-    });
+      const affiliateWallet = await this.walletRepository.getBy(
+        {
+          affiliateId: affiliate.id,
+        },
+        trx,
+      );
 
-    if (!customer) {
-      throw new NotFoundException('customer not found');
-    }
+      if (!affiliateWallet || affiliateWallet.deletedAt) {
+        throw new NotAcceptableException('affiliate wallet not found');
+      }
 
-    await this.orderRepository.createOrderStatus({
-      id: generateShortId(20),
-      createdAt: new Date(),
-      title: `accept`,
-      orderId: availableOrder.id,
-      order: availableOrder,
-      status: 'ACCEPT',
-      description: `this order has been accept by ${affiliate.name}`,
-    } as OrderStatus);
+      const availableOrder = await this.orderRepository.getAvailableOrder(
+        addAffiliateOnOrderDto.orderId,
+        trx,
+      );
 
-    const orderUpdated = await this.orderRepository.update(
-      {
-        id: availableOrder.id,
-      },
-      {
-        Affiliate: affiliate,
-      },
-    );
+      if (!availableOrder) {
+        throw new NotFoundException('order not found');
+      }
 
-    this.mainService.send({
-      emails: [affiliate.email],
-      htmlContent: `
+      const customer = await this.userRepository.getBy(
+        {
+          id: availableOrder.userId,
+        },
+        trx,
+      );
+
+      if (!customer) {
+        throw new NotFoundException('customer not found');
+      }
+
+      await this.orderRepository.createOrderStatus(
+        {
+          id: generateShortId(20),
+          createdAt: new Date(),
+          title: `accept`,
+          orderId: availableOrder.id,
+          order: availableOrder,
+          status: 'ACCEPT',
+          description: `this order has been accept by ${affiliate.name}`,
+        } as OrderStatus,
+        trx,
+      );
+
+      const orderUpdated = await this.orderRepository.update(
+        {
+          id: availableOrder.id,
+        },
+        {
+          Affiliate: affiliate,
+        },
+        trx,
+      );
+
+      this.mainService.send({
+        emails: [affiliate.email],
+        htmlContent: `
         <h1>Você acabou de aceitar a ordem: ${orderUpdated.name} </h1>
         <p>id: ${orderUpdated.id} </p>
         <p>preço total: $${orderUpdated.totalPrice} </p>
       `,
-      name: 'EL-mago',
-      subject: 'accept order',
-      text: 'você aceitou a ordem x...',
-    });
+        name: 'EL-mago',
+        subject: 'accept order',
+        text: 'você aceitou a ordem x...',
+      });
 
-    this.mainService.send({
-      emails: [customer.email],
-      htmlContent: `
+      this.mainService.send({
+        emails: [customer.email],
+        htmlContent: `
         <h1>Boas noticias ${orderUpdated.nickName}, o ${affiliate.name} vai prosseguir com o seu pedido</h1>
         <p>id: ${orderUpdated.id} </p>
         <p>preço total: $${orderUpdated.totalPrice} </p>
       `,
-      name: 'EL-mago',
-      subject: 'accept order',
-      text: 'você aceitou a ordem x...',
-    });
+        name: 'EL-mago',
+        subject: 'accept order',
+        text: 'você aceitou a ordem x...',
+      });
 
-    return orderUpdated;
+      await trx.commitTransaction();
+
+      return orderUpdated;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
+    }
   }
 }

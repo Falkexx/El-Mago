@@ -22,9 +22,19 @@ import { PaymentModule } from 'src/Application/Infra/Payment/Payment.module';
 import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
 import { OrderAffiliateController } from './OrderAffiliate/OrderAffiliate.controller';
 import { GetMyCurrentOrdersAsAffiliate } from './OrderAffiliate/UseCases/GetMyCurrentOrdersAsAffiliate/GetMyCurrentOrdersAsAffiliate.usecase';
+import { WalletModule } from '../Wallet/Wallet.module';
+import { WalletTypeOrmRepository } from 'src/Application/Infra/Repositories/WalletRepository/WalletTypeOrm.repository';
+import { JobsModule } from 'src/Application/Infra/Jobs/Job.module';
 
 @Module({
-  imports: [RepositoriesModule, StorageModule, PaymentModule, MailModule],
+  imports: [
+    RepositoriesModule,
+    StorageModule,
+    PaymentModule,
+    MailModule,
+    WalletModule,
+    JobsModule,
+  ],
   controllers: [OrderController, OrderAffiliateController],
   providers: [
     {
@@ -51,7 +61,10 @@ import { GetMyCurrentOrdersAsAffiliate } from './OrderAffiliate/UseCases/GetMyCu
       provide: KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT,
       useClass: ImageTypeormRepository,
     },
-
+    {
+      provide: KEY_INJECTION.WALLET_REPOSITORY,
+      useClass: WalletTypeOrmRepository,
+    },
     // services
     OrderService,
 

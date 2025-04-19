@@ -9,26 +9,43 @@ import {
   OrderItemUniqueRefs,
 } from 'src/Application/Entities/order-item.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
-import { ItemEntity } from 'src/Application/Entities/Item.entity';
+import { QueryRunner } from 'typeorm';
 
 export type IOrderRepositoryContract = IBaseRepositoryContract<
   OrderEntity,
   Partial<OrderEntity>,
   OrderUniqueRefs
 > & {
-  getOrderWithRelations(orderId: string): Promise<OrderEntity>;
-  getOrderByUserId(userId: string): Promise<OrderEntity[]>;
-  createOrderStatus(orderStatus: OrderStatus): Promise<OrderEntity>;
-  getAvailableOrdersToAccept(paginationDto: GenericPaginationDto): Promise<{
+  getOrderWithRelations(
+    orderId: string,
+    trx: QueryRunner,
+  ): Promise<OrderEntity>;
+  getOrderByUserId(userId: string, trx: QueryRunner): Promise<OrderEntity[]>;
+  createOrderStatus(
+    orderStatus: OrderStatus,
+    trx: QueryRunner,
+  ): Promise<OrderStatus>;
+  getAvailableOrdersToAccept(
+    paginationDto: GenericPaginationDto,
+    trx: QueryRunner,
+  ): Promise<{
     data: OrderEntity[];
     meta: { totalItems: number; page: number; limit: number };
   }>;
-  getPendingOrdersFromAffiliate(affiliateId: string): Promise<OrderEntity>;
-  getOrderItemBy(uniqueRef: OrderItemUniqueRefs): Promise<OrderItem>;
+  getPendingOrdersFromAffiliate(
+    affiliateId: string,
+    trx: QueryRunner,
+  ): Promise<OrderEntity[]>;
+  getOrderItemBy(
+    uniqueRef: OrderItemUniqueRefs,
+    trx: QueryRunner,
+  ): Promise<OrderItem>;
   updateOrderItem(
     orderItemId: string,
     data: Partial<OrderItem>,
+    trx: QueryRunner,
   ): Promise<OrderItem>;
-  getAvailableOrder(orderId: string): Promise<OrderEntity>;
-  getItemsByOrderId(id: string): Promise<ItemEntity[]>;
+  getAvailableOrder(orderId: string, trx: QueryRunner): Promise<OrderEntity>;
+  getItemsByOrderId(id: string, trx: QueryRunner): Promise<OrderItem[]>;
+  createOrderItem(orderItem: OrderItem, trx: QueryRunner): Promise<OrderItem>;
 };

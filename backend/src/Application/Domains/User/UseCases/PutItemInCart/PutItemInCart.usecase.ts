@@ -15,6 +15,7 @@ import { ICartRepositoryContract } from 'src/Application/Infra/Repositories/Cart
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { PutItemInCartDto } from './PutItemInCart.dto';
 import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PutItemInCartUseCase {
@@ -25,69 +26,88 @@ export class PutItemInCartUseCase {
     private readonly cartRepository: ICartRepositoryContract,
     @Inject(KEY_INJECTION.ITEM_REPOSITORY_CONTRACT)
     private readonly itemRepository: IItemRepositoryContract,
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, putDto: PutItemInCartDto) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    try {
+      await trx.startTransaction();
 
-    const cart = await this.cartRepository.getBy({ userId: user.id });
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
 
-    if (!cart) {
-      throw new NotFoundException('cart not created');
-    }
-
-    const item = await this.itemRepository.getBy({ id: putDto.itemId });
-
-    if (!item) {
-      throw new NotFoundException('Item not found');
-    }
-
-    const itemIsAlreadyInTheCart = cart.items.find(
-      (_cartItem_) => _cartItem_.itemId === putDto.itemId,
-    );
-
-    if (!itemIsAlreadyInTheCart) {
-      // create
-
-      let id: string = shortId(15);
-      let existItemWithId = await this.cartRepository.getBy({ id });
-
-      while (existItemWithId) {
-        id = shortId(15);
-        existItemWithId = await this.cartRepository.getBy({ id });
+      if (!user) {
+        throw new UnauthorizedException();
       }
 
-      const newCartItem = Object.assign(new CartItemEntity(), {
-        id,
-        amount: putDto.amount ?? 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        item: item,
-        quantity: putDto.amount,
-        itemId: item.id,
-        cart: cart,
-      } as CartItemEntity);
+      const cart = await this.cartRepository.getBy({ userId: user.id }, trx);
 
-      return this.cartRepository.addCartItem(newCartItem);
+      if (!cart) {
+        throw new NotFoundException('cart not created');
+      }
+
+      const item = await this.itemRepository.getBy({ id: putDto.itemId }, trx);
+
+      if (!item) {
+        throw new NotFoundException('Item not found');
+      }
+
+      const itemIsAlreadyInTheCart = cart.items.find(
+        (_cartItem_) => _cartItem_.itemId === putDto.itemId,
+      );
+
+      if (!itemIsAlreadyInTheCart) {
+        // create
+
+        let id: string = shortId(15);
+        let existItemWithId = await this.cartRepository.getBy({ id }, trx);
+
+        while (existItemWithId) {
+          id = shortId(15);
+          existItemWithId = await this.cartRepository.getBy({ id }, trx);
+        }
+
+        const cartItemAdded = await this.cartRepository.addCartItem(
+          {
+            id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            item: item,
+            quantity: putDto.amount,
+            itemId: item.id,
+            cart: cart,
+            cartId: cart.id,
+          },
+          trx,
+        );
+
+        await trx.commitTransaction();
+
+        return cartItemAdded;
+      }
+
+      const cartItemUpdated = await this.cartRepository.updateCartItem(
+        {
+          id: itemIsAlreadyInTheCart.id,
+        },
+        {
+          quantity: putDto.amount
+            ? itemIsAlreadyInTheCart.quantity + putDto.amount
+            : itemIsAlreadyInTheCart.quantity + 1,
+          updatedAt: new Date(),
+        },
+        trx,
+      );
+
+      await trx.commitTransaction();
+
+      return cartItemUpdated;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
     }
-
-    // update
-    const updateCartItem: UpdateCartItemEntity = {
-      quantity: putDto.amount
-        ? itemIsAlreadyInTheCart.quantity + putDto.amount
-        : itemIsAlreadyInTheCart.quantity + 1,
-      updatedAt: new Date(),
-    };
-
-    return this.cartRepository.updateCartItem(
-      {
-        id: itemIsAlreadyInTheCart.id,
-      },
-      updateCartItem,
-    );
   }
 }

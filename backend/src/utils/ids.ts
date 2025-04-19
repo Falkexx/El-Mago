@@ -8,6 +8,7 @@ export function uuidV4() {
   return v4();
 }
 
+/**@deprecated */
 export function shortId(size: number = 10) {
   // return ShortId.rnd(size); // deprecated
   return generateShortId(size);

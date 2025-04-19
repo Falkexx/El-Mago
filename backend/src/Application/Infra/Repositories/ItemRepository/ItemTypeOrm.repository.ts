@@ -3,8 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import {
   ItemEntity,
   ItemUniquePrams,
@@ -19,80 +18,124 @@ import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 
 @Injectable()
 export class ItemTypeOrmRepository implements IItemRepositoryContract {
-  constructor(
-    @InjectRepository(ItemEntity)
-    private readonly itemRepository: Repository<ItemEntity>,
-  ) {}
+  constructor() {}
 
-  async create(entity: ItemEntity): Promise<ItemEntity> {
+  async create(entity: ItemEntity, trx: QueryRunner): Promise<ItemEntity> {
     try {
-      const itemTypeOrmEntity = this.itemRepository.create(entity);
-      const itemCreated = await this.itemRepository.save(itemTypeOrmEntity);
-      return itemCreated;
+      const result = await trx.manager
+        .createQueryBuilder()
+        .insert()
+        .into(ItemEntity)
+        .values(entity)
+        .returning('*')
+        .execute();
+
+      return result.raw[0];
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
     }
   }
 
-  async getBy(unqRef: ItemUniquePrams): Promise<ItemEntity | null> {
-    const [key, value] = splitKeyAndValue(unqRef);
+  async getBy(
+    unqRef: ItemUniquePrams,
+    trx: QueryRunner,
+  ): Promise<ItemEntity | null> {
+    try {
+      const [key, value] = splitKeyAndValue(unqRef);
 
-    const item = await this.itemRepository.findOneBy({ [key]: value });
-    return item ?? null;
+      const item = await trx.manager
+        .createQueryBuilder(ItemEntity, 'item')
+        .where(`"${TABLE.item}"."${key}" = :value`, { value })
+        .getOne();
+
+      return item ?? null;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async update(
     unqRef: ItemUniquePrams,
     updateEntity: ItemUpdateEntity,
+    trx: QueryRunner,
   ): Promise<ItemEntity> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
     try {
-      const itemToUpdate = await this.itemRepository.findOne({
-        where: { [key]: value },
-      });
+      const [key, value] = splitKeyAndValue(unqRef);
 
-      if (!itemToUpdate) {
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(ItemEntity)
+        .set(updateEntity)
+        .where(`"${TABLE.item}"."${key}" = :value`, { value })
+        .returning('*')
+        .execute();
+
+      if (!result.raw[0]) {
         throw new InternalServerErrorException('Item not found');
       }
 
-      const newItem = Object.assign(itemToUpdate, updateEntity);
-
-      const itemUpdated = await this.itemRepository.save(newItem);
-
-      return itemUpdated;
+      return result.raw[0];
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
     }
   }
 
-  async delete(unqRef: ItemUniquePrams): Promise<void> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
+  async delete(unqRef: ItemUniquePrams, trx: QueryRunner): Promise<void> {
     try {
-      await this.itemRepository.delete({ [key]: value });
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(ItemEntity)
+        .set({ deletedAt: new Date() })
+        .where(`"${TABLE.item}"."${key}" = :value`, { value })
+        .execute();
+
+      if (result.affected === 0) {
+        throw new InternalServerErrorException(
+          'Item not found or already deleted',
+        );
+      }
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
     }
   }
 
-  async softDelete(unqRef: ItemUniquePrams): Promise<'success' | 'fail'> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
+  async softDelete(
+    unqRef: ItemUniquePrams,
+    trx: QueryRunner,
+  ): Promise<ItemEntity> {
     try {
-      await this.itemRepository.softDelete({ [key]: value });
-      return 'success';
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(ItemEntity)
+        .set({ deletedAt: new Date() })
+        .where(`"${TABLE.item}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.item}"."deletedAt" IS NULL`)
+        .returning('*')
+        .execute();
+
+      if (!result.raw[0]) {
+        throw new Error('Item not found or already deleted');
+      }
+
+      return result.raw[0];
     } catch {
-      return 'fail';
+      throw new InternalServerErrorException();
     }
   }
-
-  async getAll(): Promise<ItemEntity[]> {
+  async getAll(trx: QueryRunner): Promise<ItemEntity[]> {
     try {
-      return this.itemRepository.find();
+      return await trx.manager
+        .createQueryBuilder(ItemEntity, 'item')
+        .where(`"${TABLE.item}"."deletedAt" IS NULL`)
+        .getMany();
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
@@ -101,10 +144,11 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
 
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
+    trx: QueryRunner,
   ): Promise<PaginationResult<ItemEntity[]>> {
     const { page, limit, search, filters, order } = paginationDto;
 
-    const queryBuilder = this.itemRepository.createQueryBuilder(TABLE.item);
+    const queryBuilder = trx.manager.createQueryBuilder(ItemEntity, TABLE.item);
 
     if (search) {
       queryBuilder.andWhere(`SIMILARITY(${TABLE.item}.name, :search) > 0.3`, {
@@ -165,16 +209,30 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
     Relations extends keyof ItemEntity,
   >(
     where: ItemUniquePrams,
-    fields: [],
-    relations?: [],
+    fields: Fields[],
+    trx: QueryRunner,
+    relations?: Relations[],
   ): Promise<SelectFieldsWithRelations<ItemEntity, Fields, Relations>[]> {
-    const items = await this.itemRepository.find({
-      where: { ...where },
-      select: fields,
-      relations: relations ?? [],
-    });
+    try {
+      const [key, value] = splitKeyAndValue(where);
 
-    return items;
+      const query = trx.manager
+        .createQueryBuilder(ItemEntity, 'item')
+        .select(fields.map((field) => `"item"."${field}"`))
+        .where(`"${TABLE.item}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.item}"."deletedAt" IS NULL`);
+
+      if (relations && relations.length > 0) {
+        relations.forEach((relation) =>
+          query.leftJoinAndSelect(`item.${relation}`, relation),
+        );
+      }
+
+      return await query.getMany();
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async getOneOptimized<
@@ -183,46 +241,88 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
   >(
     where: ItemUniquePrams,
     fields: Fields[],
+    trx: QueryRunner,
     relations?: Relations[],
   ): Promise<SelectFieldsWithRelations<ItemEntity, Fields, Relations>> {
-    const items = await this.itemRepository.findOne({
-      where: { ...where },
-      select: fields,
-      relations: relations ?? [],
-    });
+    try {
+      const [key, value] = splitKeyAndValue(where);
 
-    return items;
+      const query = trx.manager
+        .createQueryBuilder(ItemEntity, 'item')
+        .select(fields.map((field) => `"item"."${field}"`))
+        .where(`"${TABLE.item}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.item}"."deletedAt" IS NULL`);
+
+      if (relations && relations.length > 0) {
+        relations.forEach((relation) =>
+          query.leftJoinAndSelect(`item.${relation}`, relation),
+        );
+      }
+
+      const item = await query.getOne();
+
+      return item ?? null;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async pushCategory(
     unqRef: ItemUniquePrams,
     category: CategoryEntity,
+    trx: QueryRunner,
   ): Promise<ItemEntity> {
-    const [key, value] = splitKeyAndValue(unqRef);
+    try {
+      const [key, value] = splitKeyAndValue(unqRef);
 
-    const item = await this.itemRepository.findOne({
-      where: { [key]: value },
-      relations: ['Categories'],
-    });
+      const item = await trx.manager
+        .createQueryBuilder(ItemEntity, 'item')
+        .leftJoinAndSelect('item.Categories', 'categories')
+        .where(`"${TABLE.item}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.item}"."deletedAt" IS NULL`)
+        .getOne();
 
-    const isCategoryAlreadyAdded = item.Categories.some(
-      (_cat_) => _cat_.id === category.id,
-    );
+      if (!item) {
+        throw new InternalServerErrorException('Item not found');
+      }
 
-    if (!isCategoryAlreadyAdded) {
-      item.Categories.push(category);
+      const isCategoryAlreadyAdded = item.Categories.some(
+        (_cat_) => _cat_.id === category.id,
+      );
 
-      return this.itemRepository.save(item);
+      if (!isCategoryAlreadyAdded) {
+        item.Categories.push(category);
+
+        const result = await trx.manager
+          .createQueryBuilder()
+          .update(ItemEntity)
+          .set({ Categories: item.Categories })
+          .where(`"${TABLE.item}"."${key}" = :value`, { value })
+          .andWhere(`"${TABLE.item}"."deletedAt" IS NULL`)
+          .returning('*')
+          .execute();
+
+        return result.raw[0];
+      }
+
+      return item;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
     }
-
-    return item;
   }
 
-  async getManyByIds(ids: string[]): Promise<ItemEntity[]> {
-    return this.itemRepository.find({
-      where: {
-        id: In(ids),
-      },
-    });
+  async getManyByIds(ids: string[], trx: QueryRunner): Promise<ItemEntity[]> {
+    try {
+      return await trx.manager
+        .createQueryBuilder(ItemEntity, 'item')
+        .where(`"${TABLE.item}"."id" IN (:...ids)`, { ids })
+
+        .getMany();
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
   }
 }

@@ -91,3 +91,13 @@ export enum AffiliateOnHoldStatus {
   APPROVED = 'APPROVED',
   DECLINED = 'DECLINED',
 }
+
+export enum TransactionType {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAWAL = 'WITHDRAWAL',
+}
+
+export enum TransactionProvider {
+  SERVER = 'SERVER',
+  AFFILIATE = 'AFFILIATE',
+}

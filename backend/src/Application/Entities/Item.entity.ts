@@ -41,8 +41,8 @@ export class ItemEntity {
   @Column({ type: 'decimal', precision: 10, scale: 3 })
   price: string;
 
-  @Column({ type: 'boolean', default: false })
-  softDeleted: boolean;
+  @Column({ type: 'timestamptz', nullable: true, default: null })
+  deletedAt: Date | null;
 
   @Column({ type: 'varchar' })
   imageUrl: string;

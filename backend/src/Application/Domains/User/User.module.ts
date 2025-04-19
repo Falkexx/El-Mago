@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { UserService } from './User.service';
 import { UserController } from './User.controller';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
 import { KEY_INJECTION } from 'src/@metadata/keys';
@@ -26,11 +25,10 @@ import { ItemTypeOrmRepository } from 'src/Application/Infra/Repositories/ItemRe
       provide: KEY_INJECTION.ITEM_REPOSITORY_CONTRACT,
       useClass: ItemTypeOrmRepository,
     },
-    UserService,
     UpdateUserUseCase,
     GetCartUseCase,
     PutItemInCartUseCase,
   ],
-  exports: [UserService],
+  exports: [],
 })
 export class UserModule {}

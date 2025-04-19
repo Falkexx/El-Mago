@@ -9,6 +9,7 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { DataSource } from 'typeorm';
 
 export type GetOrderAsAffiliateUseCaseResult = {};
 
@@ -19,25 +20,41 @@ export class GetOrderAsAffiliateUseCase {
     private readonly orderRepository: IOrderRepositoryContract,
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, paginationDto: GenericPaginationDto) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
+    try {
+      await trx.startTransaction();
+
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
+
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+
+      if (!user.affiliateId) {
+        throw new ForbiddenException();
+      }
+
+      const result = await this.orderRepository.getAvailableOrdersToAccept(
+        paginationDto,
+        trx,
+      );
+
+      await trx.commitTransaction();
+
+      return {
+        orders: result.data,
+        meta: result.meta,
+      };
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
     }
-
-    if (!user.affiliateId) {
-      throw new ForbiddenException();
-    }
-
-    const result =
-      await this.orderRepository.getAvailableOrdersToAccept(paginationDto);
-
-    return {
-      orders: result.data,
-      meta: result.meta,
-    };
   }
 }
