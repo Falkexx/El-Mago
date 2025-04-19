@@ -449,4 +449,19 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
       throw new InternalServerErrorException();
     }
   }
+
+  async createOrderItem(
+    orderItem: OrderItem,
+    trx: QueryRunner,
+  ): Promise<OrderItem> {
+    const result = await trx.manager
+      .createQueryBuilder()
+      .insert()
+      .into(OrderItem)
+      .values(orderItem)
+      .returning('*')
+      .execute();
+
+    return result.raw[0];
+  }
 }

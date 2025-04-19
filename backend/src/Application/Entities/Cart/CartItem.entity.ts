@@ -18,7 +18,11 @@ export class CartItemEntity {
   updatedAt: Date;
 
   @ManyToOne(() => CartEntity, (cart) => cart.items)
+  @JoinColumn()
   cart: CartEntity;
+
+  @Column({ type: 'varchar', length: 40 })
+  cartId: string;
 
   @Column({ type: 'varchar' })
   itemId: string;

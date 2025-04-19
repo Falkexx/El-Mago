@@ -29,12 +29,15 @@ export class AuthService {
     const trx = this.dataSource.createQueryRunner();
 
     try {
-      trx.startTransaction();
+      await trx.startTransaction();
 
       // let user = await this.userService.create(userDto);
-      const checkIfEmailInUsed = await this.userRepository.getBy({
-        email: userDto.email,
-      });
+      const checkIfEmailInUsed = await this.userRepository.getBy(
+        {
+          email: userDto.email,
+        },
+        trx,
+      );
 
       if (checkIfEmailInUsed) {
         throw new UnauthorizedException('email in used');
@@ -74,14 +77,17 @@ export class AuthService {
         trx,
       );
 
-      await this.cartRepository.create({
-        id: generateShortId(10),
-        items: [],
-        user: user,
-        userId: user.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      await this.cartRepository.create(
+        {
+          id: generateShortId(10),
+          items: [],
+          user: user,
+          userId: user.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        trx,
+      );
 
       const isAdmin = this.isAdmin(userDto.email, userDto.password);
 
@@ -104,53 +110,68 @@ export class AuthService {
         password: isAdmin ? userDto.password : user.password,
       });
 
-      trx.commitTransaction();
+      await trx.commitTransaction();
 
       return {
         user: user,
         accessToken: token,
       };
     } catch (e) {
-      trx.rollbackTransaction();
+      await trx.rollbackTransaction();
       throw e;
+    } finally {
+      await trx.release();
     }
   }
 
   async sinIn(authDto: AuthDto) {
-    let user = await this.userRepository.getBy({ email: authDto.email });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
+    try {
+      await trx.startTransaction();
+
+      let user = await this.userRepository.getBy({ email: authDto.email }, trx);
+
+      if (!user) {
+        throw new UnauthorizedException();
+      }
+
+      const isAdmin = this.isAdmin(authDto.email, authDto.password);
+
+      if (!isAdmin) {
+        await this.isPasswordMatch(authDto.password, user.password);
+      }
+
+      if (isAdmin && !user.roles.includes(ROLE.ADMIN)) {
+        user = await this.userRepository.update(
+          {
+            id: user.id,
+          },
+          {
+            roles: [...user.roles, ROLE.ADMIN],
+          },
+          trx,
+        );
+      }
+
+      const token = await this.generateToken({
+        ...user,
+        password: isAdmin ? authDto.password : user.password,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      await trx.commitTransaction();
+
+      return {
+        user,
+        accessToken: token,
+      };
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
     }
-
-    const isAdmin = this.isAdmin(authDto.email, authDto.password);
-
-    if (!isAdmin) {
-      await this.isPasswordMatch(authDto.password, user.password);
-    }
-
-    if (isAdmin && !user.roles.includes(ROLE.ADMIN)) {
-      user = await this.userRepository.update(
-        {
-          id: user.id,
-        },
-        {
-          roles: [...user.roles, ROLE.ADMIN],
-        },
-      );
-    }
-
-    const token = await this.generateToken({
-      ...user,
-      password: isAdmin ? authDto.password : user.password,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
-    return {
-      user,
-      accessToken: token,
-    };
   }
 
   private async generateToken(

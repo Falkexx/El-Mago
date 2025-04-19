@@ -47,4 +47,5 @@ export type IOrderRepositoryContract = IBaseRepositoryContract<
   ): Promise<OrderItem>;
   getAvailableOrder(orderId: string, trx: QueryRunner): Promise<OrderEntity>;
   getItemsByOrderId(id: string, trx: QueryRunner): Promise<OrderItem[]>;
+  createOrderItem(orderItem: OrderItem, trx: QueryRunner): Promise<OrderItem>;
 };

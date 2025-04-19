@@ -15,6 +15,7 @@ import { env, generateShortId } from '#utils';
 import { ConfirmPaymentProps } from 'src/@types/job';
 import { HttpService } from '@nestjs/axios';
 import { InfraCredentialsManagerService } from '../../InfraCredentialsManager/infraCredentialsManager.service';
+import { DataSource } from 'typeorm';
 
 @Processor(KEY_OF_QUEUE.PAYMENT)
 export class JobConsumerService extends WorkerHost {
@@ -26,6 +27,7 @@ export class JobConsumerService extends WorkerHost {
     private readonly userRepository: IUserRepositoryContract,
     private readonly httpService: HttpService,
     private readonly infraCredentialsManagerModule: InfraCredentialsManagerService,
+    private readonly dataSource: DataSource,
   ) {
     super();
   }
@@ -42,38 +44,46 @@ export class JobConsumerService extends WorkerHost {
     await this.WebHookParser(data.body, data.headers);
 
     if (data.body.resource.status === 'APPROVED') {
-      // CALL QUEUE TO PROCESS ORDER
-      const orderId = data.body.resource.purchase_units[0].invoice_id;
+      const trx = this.dataSource.createQueryRunner();
 
-      const order = await this.orderRepository.getBy({ id: orderId });
+      try {
+        await trx.startTransaction();
 
-      if (!order) {
-        throw new NotFoundException('order not found, order id: ', order.id);
-      }
+        // CALL QUEUE TO PROCESS ORDER
+        const orderId = data.body.resource.purchase_units[0].invoice_id;
 
-      const user = await this.userRepository.getBy({ id: order.userId });
+        const order = await this.orderRepository.getBy({ id: orderId }, trx);
 
-      if (!user) {
-        throw new NotFoundException('user not found');
-      }
+        if (!order) {
+          throw new NotFoundException('order not found, order id: ', order.id);
+        }
 
-      // ATUALIZAR O STATUS DA ORDEM PARA PAGO
-      await this.orderRepository.createOrderStatus({
-        id: generateShortId(20),
-        createdAt: new Date(),
-        order: order,
-        status: 'PAID',
-        title: 'the order is paid',
-        orderId: order.id,
-      });
+        const user = await this.userRepository.getBy({ id: order.userId }, trx);
 
-      // SEND EMAIL TO CUSTOMER
-      await this.mailService.send({
-        emails: [user.email],
-        name: user.firstName,
-        subject: `confirmação do pagamento`,
-        text: `obrigado por tem comprado ${order.name}`,
-        htmlContent: `
+        if (!user) {
+          throw new NotFoundException('user not found');
+        }
+
+        // ATUALIZAR O STATUS DA ORDEM PARA PAGO
+        await this.orderRepository.createOrderStatus(
+          {
+            id: generateShortId(20),
+            createdAt: new Date(),
+            order: order,
+            status: 'PAID',
+            title: 'the order is paid',
+            orderId: order.id,
+          },
+          trx,
+        );
+
+        // SEND EMAIL TO CUSTOMER
+        await this.mailService.send({
+          emails: [user.email],
+          name: user.firstName,
+          subject: `confirmação do pagamento`,
+          text: `obrigado por tem comprado ${order.name}`,
+          htmlContent: `
         <h1>confirmação do pagamento</h1>
         <h3>${user.firstName} ficamos agradecidos pela compra</h3>
         <p>${order.name}<p/>
@@ -81,7 +91,15 @@ export class JobConsumerService extends WorkerHost {
         <span>total: R$ ${order.totalPrice}</span>
         <span>criado em: R$ ${order.createdAt}</span>
       `,
-      });
+        });
+
+        await trx.commitTransaction();
+      } catch (e) {
+        await trx.rollbackTransaction();
+        throw e;
+      } finally {
+        await trx.release();
+      }
     }
   }
 

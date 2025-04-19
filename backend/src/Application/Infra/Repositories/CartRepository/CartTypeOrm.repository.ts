@@ -185,4 +185,21 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
       throw new InternalServerErrorException();
     }
   }
+
+  async release(unqRef: CartUniqueRef, trx: QueryRunner): Promise<void> {
+    try {
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      await trx.manager
+        .createQueryBuilder()
+        .delete()
+        .from(CartItemEntity, TABLE.cart_item)
+        .where(`${TABLE.cart_item}."${key}" = :value`, { value })
+        .andWhere(`${TABLE.cart_item}."deletedAt" IS NULL`)
+        .execute();
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException();
+    }
+  }
 }

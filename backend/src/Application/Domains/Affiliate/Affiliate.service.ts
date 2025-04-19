@@ -39,9 +39,12 @@ export class AffiliateService {
     try {
       trx.startTransaction();
 
-      const affiliateExist = await this.affiliateRepository.getBy({
-        email: affiliateDto.email,
-      });
+      const affiliateExist = await this.affiliateRepository.getBy(
+        {
+          email: affiliateDto.email,
+        },
+        trx,
+      );
 
       if (affiliateExist) {
         throw new NotAcceptableException('affiliate already exist');
@@ -49,9 +52,12 @@ export class AffiliateService {
 
       await this.checkIfAffiliateExistOnThrow(affiliateDto);
 
-      const user = await this.userRepository.getBy({
-        email: affiliateDto.email,
-      });
+      const user = await this.userRepository.getBy(
+        {
+          email: affiliateDto.email,
+        },
+        trx,
+      );
 
       if (!user) {
         throw new NotFoundException('user not found');
@@ -112,36 +118,79 @@ export class AffiliateService {
         user: userUpdated,
       };
     } catch (e) {
-      trx.rollbackTransaction();
+      await trx.rollbackTransaction();
       throw e;
+    } finally {
+      await trx.release();
     }
   }
 
   async getById(id: string) {
-    const affiliate = await this.affiliateRepository.getBy({ id });
+    const trx = this.dataSource.createQueryRunner();
+    try {
+      await trx.startTransaction();
+      const affiliate = await this.affiliateRepository.getBy({ id }, trx);
 
-    return affiliate;
+      await trx.commitTransaction();
+      return affiliate;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
+    }
   }
 
   private async checkIfAffiliateExistOnThrow(affiliateDto: CreateAffiliateDto) {
-    const conficts = await this.affiliateRepository.findConflictingFields({
-      id: undefined,
-      characterName: affiliateDto.characterName,
-      cpfCnpj: affiliateDto.cpfCnpj,
-      email: affiliateDto.email,
-      battleTag: affiliateDto.battleTag,
-      phoneNumber: affiliateDto.phoneNumber,
-    } as AffiliateEntityUniqueRefs);
+    const trx = this.dataSource.createQueryRunner();
 
-    if (Object.keys(conficts).length > 0) {
-      throw new ConflictException({
-        conflicts: conficts,
-        message: 'Have conflict fields',
-      });
+    try {
+      await trx.startTransaction();
+
+      const conficts = await this.affiliateRepository.findConflictingFields(
+        {
+          id: undefined,
+          characterName: affiliateDto.characterName,
+          cpfCnpj: affiliateDto.cpfCnpj,
+          email: affiliateDto.email,
+          battleTag: affiliateDto.battleTag,
+          phoneNumber: affiliateDto.phoneNumber,
+        } as AffiliateEntityUniqueRefs,
+        trx,
+      );
+
+      if (Object.keys(conficts).length > 0) {
+        throw new ConflictException({
+          conflicts: conficts,
+          message: 'Have conflict fields',
+        });
+      }
+
+      await trx.commitTransaction();
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
     }
   }
 
   async findWithPaginationAndFilters(paginationDto: GenericPaginationDto) {
-    return this.affiliateRepository.getWithPaginationAndFilters(paginationDto);
+    const trx = this.dataSource.createQueryRunner();
+
+    try {
+      await trx.startTransaction();
+
+      await trx.commitTransaction();
+      return this.affiliateRepository.getWithPaginationAndFilters(
+        paginationDto,
+        trx,
+      );
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
+    }
   }
 }

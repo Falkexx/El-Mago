@@ -18,6 +18,7 @@ import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/Item
 import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { Status } from 'src/@metadata';
 import { CreateOrderDto } from './CreateOrder.dto';
+import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 
 @Injectable()
 export class CreateOrderUseCase {
@@ -28,19 +29,25 @@ export class CreateOrderUseCase {
     private readonly cartRepository: ICartRepositoryContract,
     @Inject(KEY_INJECTION.ITEM_REPOSITORY_CONTRACT)
     private readonly itemRepository: IItemRepositoryContract,
+    @Inject(KEY_INJECTION.ORDER_REPOSITORY)
+    private readonly orderRepository: IOrderRepositoryContract,
     private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, createOrderDto: CreateOrderDto) {
-    return await this.dataSource.transaction(async (manager) => {
+    const trx = this.dataSource.createQueryRunner();
+
+    try {
+      await trx.startTransaction();
       // Busca o usuário
-      const user = await this.userRepository.getBy({ id: payload.sub });
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
       if (!user) {
         throw new UnauthorizedException();
       }
 
       // Busca o carrinho
-      const cart = await this.cartRepository.getBy({ userId: user.id });
+      const cart = await this.cartRepository.getBy({ userId: user.id }, trx);
+
       if (!cart) {
         throw new NotFoundException('cart not created');
       }
@@ -52,7 +59,7 @@ export class CreateOrderUseCase {
       }
 
       // Busca os itens
-      const items = await this.itemRepository.getManyByIds(itemsIds);
+      const items = await this.itemRepository.getManyByIds(itemsIds, trx);
       if (!items || items.length <= 0) {
         throw new NotAcceptableException({
           ptBr: 'não ha itens no carrinho',
@@ -80,80 +87,83 @@ export class CreateOrderUseCase {
       const expiresAt: Date = new Date(now.setHours(now.getHours() + 3 * 24)); // expires in 3 days
 
       //Cria a entidade de pedido
-      const order = manager.create(OrderEntity, {
-        id: shortId(20),
-        name: `Compra dos itens: ${names.join(', ')}`,
-        coupon: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        userId: user.id,
-        battleTag: createOrderDto.battleTag,
-        nickName: createOrderDto.nickName,
-        platform: createOrderDto.platform ?? null,
-        totalPrice: totalPrice,
-        completedAt: null,
-        digitalShippingId: null,
-        paymentId: null,
-        paymentUrl: null,
-        DigitalShipping: null,
-        expiresAt,
-        user,
-      });
-
-      const orderCreated = (
-        await manager
-          .createQueryBuilder()
-          .insert()
-          .into(OrderEntity)
-          .values(order)
-          .returning('*') // Retorna todos os campos após a inserção
-          .execute()
-      ).raw;
+      const orderCreated = await this.orderRepository.create(
+        {
+          id: shortId(20),
+          name: `Compra dos itens: ${names.join(', ')}`,
+          coupon: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: user.id,
+          battleTag: createOrderDto.battleTag,
+          nickName: createOrderDto.nickName,
+          platform: createOrderDto.platform ?? null,
+          totalPrice: totalPrice,
+          completedAt: null,
+          paymentId: null,
+          paymentUrl: null,
+          proofOfDelivery: null,
+          Affiliate: null,
+          affiliateId: null,
+          expiresAt,
+          user,
+          OrderItems: undefined,
+          status: undefined,
+        },
+        trx,
+      );
 
       // Cria os itens do pedido
       const itemsEntityList = items.map((item) => {
         const quantity = cart.items.find(
           (_cart_item_) => _cart_item_.itemId === item.id,
         ).quantity;
-        return manager.create(OrderItem, {
-          id: shortId(20),
-          currency: 'USD',
-          Item: item,
-          price: item.price.toString(),
-          itemId: item.id,
-          name: item.name,
-          description: '  ',
-          imageUrl: '',
-          orderId: order.id,
-          price_per_unit: item.price,
-          quantity: quantity,
-          Order: order,
-          proofOfDelivery: null,
-        } as OrderItem);
+
+        return this.orderRepository.createOrderItem(
+          {
+            id: shortId(20),
+            currency: 'USD',
+            Item: item,
+            price: item.price.toString(),
+            itemId: item.id,
+            name: item.name,
+            description: '  ',
+            imageUrl: '',
+            price_per_unit: item.price,
+            quantity: quantity,
+            Order: orderCreated,
+            orderId: orderCreated.id,
+            proofOfDelivery: null,
+          } as OrderItem,
+          trx,
+        );
       });
 
-      // Salva os itens do pedido
-      await manager.save(OrderItem, itemsEntityList);
-
       // Cria o status do pedido
-      const status = manager.create(OrderStatus, {
-        id: shortId(10),
-        createdAt: new Date(),
-        status: Status.CREATED,
-        title: 'Aguardando o pagamento',
-        description: null,
-        orderId: order.id, // Relaciona o status ao pedido
-        Order: order, // Relaciona explicitamente a entidade Order
-        order: order,
-      } as OrderStatus);
+      const status = this.orderRepository.createOrderStatus(
+        {
+          id: shortId(10),
+          createdAt: new Date(),
+          status: Status.CREATED,
+          title: 'Aguardando o pagamento',
+          description: null,
+          orderId: orderCreated.id, // Relaciona o status ao pedido
+          order: orderCreated,
+        } as OrderStatus,
+        trx,
+      );
 
-      // Salva o status
-      await manager.save(OrderStatus, status);
+      // Remove os itens do carrinho
+      await this.cartRepository.release({ userId: user.id }, trx);
 
-      // // Remove os itens do carrinho
-      await manager.delete(CartItemEntity, { cart: { id: cart.id } });
+      await trx.commitTransaction();
 
       return orderCreated;
-    });
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
+    }
   }
 }

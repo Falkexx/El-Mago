@@ -24,4 +24,5 @@ export type ICartRepositoryContract = IBaseRepositoryContract<
     updateEntity: UpdateCartItemEntity,
     trx: QueryRunner,
   ): Promise<CartItemEntity>;
+  release(unqRef: CartUniqueRef, trx: QueryRunner): Promise<void>;
 };

@@ -38,7 +38,7 @@ export class WalletService {
     try {
       await trx.startTransaction();
 
-      const user = await this.userRepository.getBy({ id: payload.sub });
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
 
       if (!user) {
         throw new NotFoundException('user not found');
@@ -48,9 +48,12 @@ export class WalletService {
         throw new ForbiddenException('only affiliate to be access');
       }
 
-      const affiliate = await this.affiliateRepository.getBy({
-        id: user.affiliateId,
-      });
+      const affiliate = await this.affiliateRepository.getBy(
+        {
+          id: user.affiliateId,
+        },
+        trx,
+      );
 
       if (!affiliate) {
         throw new NotFoundException('affiliate not found');
@@ -86,7 +89,7 @@ export class WalletService {
     const trx = this.dataSource.createQueryRunner();
 
     try {
-      trx.startTransaction();
+      await trx.startTransaction();
       const wallet = await this.walletRepository.getBy({ id: walletId }, trx);
 
       if (!wallet) {
@@ -134,15 +137,21 @@ export class WalletService {
 
       await trx.startTransaction();
 
-      const affiliate = await this.affiliateRepository.getBy({
-        id: affiliateDto.affiliateId,
-      });
+      const affiliate = await this.affiliateRepository.getBy(
+        {
+          id: affiliateDto.affiliateId,
+        },
+        trx,
+      );
 
       if (!affiliate || affiliate.deletedAt) {
         throw new NotFoundException('affiliate not found');
       }
 
-      const user = await this.userRepository.getBy({ email: affiliate.email });
+      const user = await this.userRepository.getBy(
+        { email: affiliate.email },
+        trx,
+      );
 
       if (!user || user.isDeleted) {
         throw new NotFoundException('user not found');
