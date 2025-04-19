@@ -54,6 +54,6 @@ import { TransactionTypeOrmRepository } from './TransactionRepository/Transactio
     WalletTypeOrmRepository,
     TransactionTypeOrmRepository,
   ],
-  exports: [TypeOrmModule, SearchBuilderService],
+  exports: [TypeOrmModule, SearchBuilderService, OrderTypeOrmRepository],
 })
 export class RepositoriesModule {}

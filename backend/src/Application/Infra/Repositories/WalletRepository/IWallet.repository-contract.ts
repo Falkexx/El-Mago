@@ -10,4 +10,6 @@ export interface IWalletRepositoryContract
     WalletEntity,
     WalletUpdateEntity,
     WalletUniqueRefs
-  > {}
+  > {
+  getWalletByAffiliateId(affiliateId: string): Promise<WalletEntity>;
+}

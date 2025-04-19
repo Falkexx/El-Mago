@@ -1,13 +1,8 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { AppService } from './app.service';
-import { InfraCredentialsManagerService } from './Application/Infra/InfraCredentialsManager/infraCredentialsManager.service';
+import { Controller, Get } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly infraCredentialsManager: InfraCredentialsManagerService,
-  ) {}
+  constructor() {}
 
   @Get()
   async getHello() {

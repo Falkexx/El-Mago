@@ -114,7 +114,7 @@ export class CreateOrderUseCase {
       );
 
       // Cria os itens do pedido
-      const itemsEntityListAsPromise = items.map((item) => {
+      items.map((item) => {
         const quantity = cart.items.find(
           (_cart_item_) => _cart_item_.itemId === item.id,
         ).quantity;
@@ -139,8 +139,6 @@ export class CreateOrderUseCase {
         );
       });
 
-      const itemsEntityList = await Promise.all(itemsEntityListAsPromise);
-
       // Cria o status do pedido
       const status = await this.orderRepository.createOrderStatus(
         {
@@ -154,8 +152,6 @@ export class CreateOrderUseCase {
         } as OrderStatus,
         trx,
       );
-
-      console.log('status', status);
 
       // Remove os itens do carrinho
       await this.cartRepository.release(cart.id, trx);

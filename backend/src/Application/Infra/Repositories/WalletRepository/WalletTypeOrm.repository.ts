@@ -54,7 +54,6 @@ export class WalletTypeOrmRepository implements IWalletRepositoryContract {
         .select(TABLE.wallet)
         .from(WalletEntity, TABLE.wallet)
         .where(`"${TABLE.wallet}"."${key}" = :value`, { value })
-        .andWhere(`"${TABLE.wallet}"."deletedAt" IS NULL`)
         .getOne();
 
       return wallet;
@@ -172,5 +171,20 @@ export class WalletTypeOrmRepository implements IWalletRepositoryContract {
     //     console.error(e);
     //     throw new InternalServerErrorException();
     //   }
+  }
+
+  async getWalletByAffiliateId(affiliateId: string): Promise<WalletEntity> {
+    try {
+      const wallet = await this.walletRepository
+        .createQueryBuilder()
+        .andWhere(`"${TABLE.wallet}"."affiliateId" = :affiliateId`, {
+          affiliateId,
+        })
+        .getOne();
+      return wallet;
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException();
+    }
   }
 }

@@ -85,6 +85,7 @@ export class SendProofToOrderItemUseCase {
       }
 
       const items = await this.orderRepository.getItemsByOrderId(order.id, trx);
+
       const itemsIds = items.map((item) => item.id);
 
       if (items.length <= 0) {

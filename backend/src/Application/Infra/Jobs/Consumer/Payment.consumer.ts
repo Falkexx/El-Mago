@@ -54,6 +54,8 @@ export class JobConsumerService extends WorkerHost {
 
         const order = await this.orderRepository.getBy({ id: orderId }, trx);
 
+        console.log('order', order);
+
         if (!order) {
           throw new NotFoundException('order not found, order id: ', order.id);
         }
@@ -95,6 +97,7 @@ export class JobConsumerService extends WorkerHost {
 
         await trx.commitTransaction();
       } catch (e) {
+        console.error('Error in the payment consumer job: ', e);
         await trx.rollbackTransaction();
         throw e;
       } finally {

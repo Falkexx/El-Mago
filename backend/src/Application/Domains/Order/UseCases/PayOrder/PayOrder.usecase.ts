@@ -167,14 +167,12 @@ export class PayOrderUseCase {
             (_link_) => _link_.rel === 'payer-action',
           );
 
-          const orderUpdateEntity = Object.assign(order, {
-            paymentUrl: approveLink.href,
-            paymentId: paymentResult.id,
-          } as OrderEntity);
-
           order = await this.orderRepository.update(
             { id: order.id },
-            orderUpdateEntity,
+            {
+              paymentUrl: approveLink.href,
+              paymentId: paymentResult.id,
+            } as OrderEntity,
             trx,
           );
         }

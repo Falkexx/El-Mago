@@ -59,9 +59,9 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
     try {
       const result = await trx.manager
         .createQueryBuilder()
-        .select('*')
+        .select(TABLE.order)
         .from(OrderEntity, TABLE.order)
-        .where(`"${TABLE.order}"."${key}" = :${key}`, { [key]: value })
+        .where(`"${TABLE.order}"."${key}" = :value`, { value })
         .getOne();
 
       return result ?? null;
@@ -79,6 +79,7 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
       const result = await trx.manager
         .createQueryBuilder(OrderEntity, 'order')
         .leftJoinAndSelect('order.status', 'status')
+        .leftJoinAndSelect('order.OrderItems', 'OrderItems')
         .where(`order.id = :id`, { id: orderId })
         .getOne();
 
@@ -344,7 +345,20 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
             )
             FROM "${TABLE.order_status}" s
             WHERE s."orderId" = o."id"
-          ) AS status
+          ) AS status,
+          (
+            SELECT jsonb_agg(
+              json_build_object(
+                'id', oi."id",
+                'name', oi."name",
+                'quantity', oi."quantity",
+                'imageUrl', oi."imageUrl",
+                'proofOfDelivery', oi."proofOfDelivery"
+              )
+            )
+            FROM "${TABLE.order_item}" oi
+            WHERE oi."orderId" = o."id"
+          ) AS items
        FROM "${TABLE.order}" o
        WHERE o."affiliateId" = $1
       `,
@@ -438,7 +452,7 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
     try {
       const result = await trx.manager
         .createQueryBuilder()
-        .select('*')
+        .select(TABLE.order_item)
         .from(OrderItem, TABLE.order_item)
         .where(`"${TABLE.order_item}"."orderId" = :id`, { id })
         .getMany();

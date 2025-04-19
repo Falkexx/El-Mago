@@ -63,7 +63,7 @@ export class AcceptOrderUseCase {
         trx,
       );
 
-      if (!affiliateWallet || !affiliateWallet.deletedAt) {
+      if (!affiliateWallet || affiliateWallet.deletedAt) {
         throw new NotAcceptableException('affiliate wallet not found');
       }
 
