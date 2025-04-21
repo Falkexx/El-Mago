@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import {
   ImageEntity,
   ImageUniqueRef,
@@ -14,80 +13,122 @@ import { TABLE } from 'src/@metadata/tables';
 
 @Injectable()
 export class ImageTypeormRepository implements IIMageRepositoryContract {
-  constructor(
-    @InjectRepository(ImageEntity)
-    private readonly imageRepository: Repository<ImageEntity>,
-  ) {}
+  constructor() {}
 
-  async create(entity: ImageEntity): Promise<ImageEntity> {
+  async create(entity: ImageEntity, trx: QueryRunner): Promise<ImageEntity> {
     try {
-      const imageEntity = this.imageRepository.create(entity);
-      const imageCreated = await this.imageRepository.save(imageEntity);
-      return imageCreated;
+      const result = await trx.manager
+        .createQueryBuilder()
+        .insert()
+        .into(ImageEntity)
+        .values(entity)
+        .returning('*')
+        .execute();
+
+      return result.raw[0];
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
     }
   }
+  async getBy(
+    unqRef: ImageUniqueRef,
+    trx: QueryRunner,
+  ): Promise<ImageEntity | null> {
+    try {
+      const [key, value] = splitKeyAndValue(unqRef);
 
-  async getBy(unqRef: ImageUniqueRef): Promise<ImageEntity | null> {
-    const [key, value] = splitKeyAndValue(unqRef);
+      const image = await trx.manager
+        .createQueryBuilder(ImageEntity, 'image')
+        .where(`"${TABLE.image}"."${key}" = :value`, { value })
+        .getOne();
 
-    const image = await this.imageRepository.findOneBy({ [key]: value });
-    return image ?? null;
+      return image ?? null;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async update(
     unqRef: ImageUniqueRef,
     updateEntity: ImageUpdateEntity,
+    trx: QueryRunner,
   ): Promise<ImageEntity> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
     try {
-      const imageToUpdate = await this.imageRepository.findOne({
-        where: { [key]: value },
-      });
+      const [key, value] = splitKeyAndValue(unqRef);
 
-      if (!imageToUpdate) {
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(ImageEntity)
+        .set(updateEntity)
+        .where(`"${TABLE.image}"."${key}" = :value`, { value })
+        .returning('*')
+        .execute();
+
+      if (!result.raw[0]) {
         throw new InternalServerErrorException('Image not found');
       }
 
-      const newImage = Object.assign(imageToUpdate, updateEntity);
-
-      const imageUpdated = await this.imageRepository.save(newImage);
-
-      return imageUpdated;
+      return result.raw[0];
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
     }
   }
 
-  async delete(unqRef: ImageUniqueRef): Promise<void> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
+  async delete(unqRef: ImageUniqueRef, trx: QueryRunner): Promise<void> {
     try {
-      await this.imageRepository.delete({ [key]: value });
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      const result = await trx.manager
+        .createQueryBuilder()
+        .delete()
+        .from(ImageEntity)
+        .where(`"${TABLE.image}"."${key}" = :value`, { value })
+        .execute();
+
+      if (result.affected === 0) {
+        throw new InternalServerErrorException('Image not found');
+      }
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
     }
   }
 
-  async softDelete(unqRef: ImageUniqueRef): Promise<'success' | 'fail'> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
+  async softDelete(
+    unqRef: ImageUniqueRef,
+    trx: QueryRunner,
+  ): Promise<ImageEntity> {
     try {
-      await this.imageRepository.softDelete({ [key]: value });
-      return 'success';
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(ImageEntity)
+        .set({ deletedAt: new Date() })
+        .where(`"${TABLE.image}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.image}"."deletedAt" IS NULL`)
+        .returning('*')
+        .execute();
+
+      if (!result.raw[0]) {
+        throw new Error('Image not found or already deleted');
+      }
+
+      return result.raw[0];
     } catch {
-      return 'fail';
+      throw new InternalServerErrorException();
     }
   }
 
-  async getAll(): Promise<ImageEntity[]> {
+  async getAll(trx: QueryRunner): Promise<ImageEntity[]> {
     try {
-      return this.imageRepository.find();
+      return await trx.manager
+        .createQueryBuilder(ImageEntity, 'image')
+        .where(`"${TABLE.image}"."deletedAt" IS NULL`)
+        .getMany();
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();
@@ -96,10 +137,14 @@ export class ImageTypeormRepository implements IIMageRepositoryContract {
 
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
+    trx: QueryRunner,
   ): Promise<PaginationResult<ImageEntity[]>> {
     const { page, limit, search, filters, order } = paginationDto;
 
-    const queryBuilder = this.imageRepository.createQueryBuilder(TABLE.image);
+    const queryBuilder = trx.manager.createQueryBuilder(
+      ImageEntity,
+      TABLE.image,
+    );
 
     if (search) {
       queryBuilder.andWhere(`SIMILARITY(${TABLE.image}.name, :search) > 0.3`, {

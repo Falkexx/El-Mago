@@ -1,7 +1,8 @@
 import { TABLE } from 'src/@metadata/tables';
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { OrderEntity } from './Order.entity';
 import { ItemEntity } from './Item.entity';
+import { RequireOnlyOne } from '#types';
 
 @Entity({ name: TABLE.order_item })
 export class OrderItem {
@@ -21,17 +22,27 @@ export class OrderItem {
   price: string;
 
   @Column({ type: 'varchar' })
-  currency: 'USD' | 'BRL' | 'EUR';
+  currency: 'USD';
+
+  @Column({ type: 'varchar' })
+  imageUrl: string;
+
+  @ManyToOne(() => OrderEntity, (order) => order.OrderItems)
+  @JoinColumn({ name: 'orderId' })
+  Order: OrderEntity;
+
+  @Column({ type: 'varchar' })
+  orderId: string;
+
+  @ManyToOne(() => ItemEntity, (item) => item.OrderItem)
+  @JoinColumn({ name: 'itemId' })
+  Item: ItemEntity;
 
   @Column({ type: 'varchar' })
   itemId: string;
 
-  // @Column({ type: 'varchar', length: 120 })
-  // server: string;
-
-  @ManyToOne(() => OrderEntity, (order) => order.OrderItems)
-  Order: OrderEntity;
-
-  @ManyToOne(() => ItemEntity, (item) => item.OrderItem)
-  Item: ItemEntity;
+  @Column({ type: 'jsonb', nullable: true, default: null })
+  proofOfDelivery: any;
 }
+
+export type OrderItemUniqueRefs = RequireOnlyOne<Pick<OrderItem, 'id'>>;

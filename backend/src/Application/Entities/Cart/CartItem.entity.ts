@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { ItemEntity } from '../Item.entity';
 import { CartEntity } from './Cart.entity';
 import { TABLE } from 'src/@metadata/tables';
+import { RequireOnlyOne } from '#types';
 
 @Entity({ name: TABLE.cart_item })
 export class CartItemEntity {
@@ -9,7 +10,7 @@ export class CartItemEntity {
   id: string;
 
   @Column({ type: 'int' })
-  amount: number;
+  quantity: number;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -18,7 +19,11 @@ export class CartItemEntity {
   updatedAt: Date;
 
   @ManyToOne(() => CartEntity, (cart) => cart.items)
+  @JoinColumn()
   cart: CartEntity;
+
+  @Column({ type: 'varchar', length: 40 })
+  cartId: string;
 
   @Column({ type: 'varchar' })
   itemId: string;
@@ -29,5 +34,9 @@ export class CartItemEntity {
 }
 
 export type UpdateCartItemEntity =
-  | Pick<CartItemEntity, 'amount'>
+  | Pick<CartItemEntity, 'quantity'>
   | Pick<CartItemEntity, 'updatedAt'>;
+
+export type CartItemEntityUniqueRef = RequireOnlyOne<
+  Pick<CartItemEntity, 'id'>
+>;

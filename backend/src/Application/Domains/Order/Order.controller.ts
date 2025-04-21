@@ -2,15 +2,18 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
+  NotImplementedException,
   Param,
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OrderService } from './Order.service';
 import { CreateOrderUseCase } from './UseCases/CreateOrder/CreateOrder.usecase';
 import { User } from '../Auth/decorators/User.decorator';
-import { PayloadType } from '#types';
+import { ApiResponse, PayloadType } from '#types';
 import { JwtAuthGuard } from 'src/@guards/jwt-auth.guard';
 import { RoleGuard } from 'src/@guards/role.guard';
 import { ROLE, RolesDecorator } from 'src/utils/role';
@@ -19,6 +22,17 @@ import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth
 import { GenericPaginationDto } from 'src/utils/validators';
 import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecase';
 import { CreateOrderDto } from './UseCases/CreateOrder/CreateOrder.dto';
+import { GetOrderAsAffiliateUseCase } from './UseCases/GetOrderAsAffiliate/GetOrderAsAffiliate.usecase';
+import { plainToInstance } from 'class-transformer';
+import { UserEntity } from 'src/Application/Entities/User.entity';
+import { env } from '#utils';
+import { AcceptOrderUseCase } from './UseCases/AcceptOrder/AcceptOrder.usecase';
+import { AcceptOrderDto } from './UseCases/AcceptOrder/AcceptOrder.dto';
+import { OrderEntity } from 'src/Application/Entities/Order.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
+import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
+import { SendProofToOrder } from './UseCases/SendProofToOrderItem/SendProofToOrdemItem.dto';
 
 @Controller({ path: 'order', version: '1' })
 export class OrderController {
@@ -31,6 +45,10 @@ export class OrderController {
     private readonly createOrderUseCase: CreateOrderUseCase,
     private readonly payOrderUseCase: PayOrderUseCase,
     private readonly getOrderById: GetOrderByIdUseCase,
+    private readonly getOrderAsAffiliateUseCase: GetOrderAsAffiliateUseCase,
+    private readonly addAffiliateOnOrderUseCase: AcceptOrderUseCase,
+    private readonly sendProofToOrderItemUseCase: SendProofToOrderItemUseCase,
+    private readonly getPendingOrdersUseCase: GetPendingOrdersUseCase,
   ) {}
 
   @Get('many')
@@ -46,18 +64,37 @@ export class OrderController {
   @Post()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.ADMIN, ROLE.USER)
-  createOrder(
+  async createOrder(
     @User() payload: PayloadType,
     @Body() createOrderDto: CreateOrderDto,
-  ) {
-    return this.createOrderUseCase.execute(payload, createOrderDto);
+  ): Promise<ApiResponse<any>> {
+    const orderCreated = await this.createOrderUseCase.execute(
+      payload,
+      createOrderDto,
+    );
+
+    return {
+      data: orderCreated,
+      message: 'created',
+      status: 201,
+      href: `${env.BACKEND_BASE_URL}:${env.BACKEND_PORT}/order/check/${orderCreated.id}`,
+    };
   }
 
   @Post('pay/:orderId')
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.ADMIN, ROLE.USER)
-  payOrder(@User() payload: PayloadType, @Param('orderId') orderId: string) {
-    return this.payOrderUseCase.execute(payload, { orderId });
+  async payOrder(
+    @User() payload: PayloadType,
+    @Param('orderId') orderId: string,
+  ) {
+    const result = await this.payOrderUseCase.execute(payload, { orderId });
+
+    return {
+      data: result,
+      message: 'payment link created',
+      status: 201,
+    };
   }
 
   @Get('check/:id')
@@ -65,5 +102,51 @@ export class OrderController {
   @RolesDecorator(ROLE.ADMIN, ROLE.USER, ROLE.AFFILIATE)
   get(@User() payload: PayloadType, @Param('id') orderId: string) {
     return this.getOrderById.execute(payload, orderId);
+  }
+
+  @Get('affiliate/available-orders-to-accept')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.AFFILIATE)
+  getAvailableOrders(
+    @User() user: PayloadType,
+    @Query() paginationDto: GenericPaginationDto,
+  ) {
+    return this.getOrderAsAffiliateUseCase.execute(user, paginationDto);
+  }
+
+  @Get('affiliate/pending')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.AFFILIATE)
+  getPendingOrders(@User() user: PayloadType) {
+    return this.getPendingOrdersUseCase.execute(user);
+  }
+
+  @Post('affiliate/accept/:orderId')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.AFFILIATE)
+  async addAffiliateOnOrder(
+    @User() payload: PayloadType,
+    @Param() addAffiliateOnOrder: AcceptOrderDto,
+  ): Promise<ApiResponse<any>> {
+    const result = await this.addAffiliateOnOrderUseCase.execute(
+      payload,
+      addAffiliateOnOrder,
+    );
+
+    return {
+      data: result,
+      message: 'affiliate accept order successfully',
+      status: 200,
+    };
+  }
+
+  @Post('send-proof-delivery-for-order')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RolesDecorator(ROLE.AFFILIATE)
+  sendProofImageDto(
+    @User() payload: PayloadType,
+    @Body() sendProofDto: SendProofToOrder,
+  ) {
+    return this.sendProofToOrderItemUseCase.execute(payload, sendProofDto);
   }
 }

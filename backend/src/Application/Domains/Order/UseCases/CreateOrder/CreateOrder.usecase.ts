@@ -9,18 +9,14 @@ import { KEY_INJECTION } from 'src/@metadata/keys';
 import { ICartRepositoryContract } from 'src/Application/Infra/Repositories/CartRepository/ICartRepository.contract';
 import { PayloadType } from '#types';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
-import { OrderEntity } from 'src/Application/Entities/Order.entity';
 import { shortId } from '#utils';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
-import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';
-import { DataSource } from 'typeorm';
-import { UserEntity } from 'src/Application/Entities/User.entity';
-import { ItemEntity } from 'src/Application/Entities/Item.entity';
+import { DataSource, Table } from 'typeorm';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
 import { IItemRepositoryContract } from 'src/Application/Infra/Repositories/ItemRepository/IItem.repository-contract';
-import { CartItemEntity } from 'src/Application/Entities/Cart/CartItem.entity';
 import { Status } from 'src/@metadata';
 import { CreateOrderDto } from './CreateOrder.dto';
+import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 
 @Injectable()
 export class CreateOrderUseCase {
@@ -31,92 +27,143 @@ export class CreateOrderUseCase {
     private readonly cartRepository: ICartRepositoryContract,
     @Inject(KEY_INJECTION.ITEM_REPOSITORY_CONTRACT)
     private readonly itemRepository: IItemRepositoryContract,
-
+    @Inject(KEY_INJECTION.ORDER_REPOSITORY)
+    private readonly orderRepository: IOrderRepositoryContract,
     private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, createOrderDto: CreateOrderDto) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    try {
+      await trx.startTransaction();
+      // Busca o usuário
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
+      if (!user) {
+        throw new UnauthorizedException();
+      }
 
-    const cart = await this.cartRepository.getBy({ userId: user.id });
+      // Busca o carrinho
+      const cart = await this.cartRepository.getBy({ userId: user.id }, trx);
 
-    if (!cart) {
-      throw new NotFoundException('cart not created');
-    }
+      if (!cart) {
+        throw new NotFoundException('cart not created');
+      }
 
-    const itemsIds = cart.items.map((_item_) => _item_.itemId);
+      // Verifica se há itens no carrinho
+      const itemsIds = cart.items.map((item) => item.itemId);
+      if (itemsIds.length <= 0) {
+        throw new NotAcceptableException('no items in cart');
+      }
 
-    if (itemsIds.length <= 0) {
-      throw new NotAcceptableException('no have items in cart');
-    }
+      // Busca os itens
+      const items = await this.itemRepository.getManyByIds(itemsIds, trx);
 
-    const items = await this.itemRepository.getManyByIds(itemsIds);
-
-    // if (cart.items.length <= 0) {
-    //   throw new NotAcceptableException('no have items in card');
-    // }
-
-    return this.createOrderTransaction(user, cart, items, createOrderDto);
-  }
-
-  private async createOrderTransaction(
-    user: UserEntity,
-    cart: CartEntity,
-    items: ItemEntity[],
-    createOrderDto: CreateOrderDto,
-  ) {
-    return await this.dataSource.transaction(async (manager) => {
-      const itemsEntityList = items.map((_item_) => {
-        return Object.assign(new OrderItem(), {
-          id: shortId(20),
-          currency: 'USD',
-          Item: _item_,
-          price: _item_.price.toString(),
-          itemId: _item_.id,
-          name: _item_.name,
-          description: '  ',
+      console.log(items);
+      if (!items || items.length <= 0) {
+        throw new NotAcceptableException({
+          ptBr: 'não ha itens no carrinho',
+          enUs: 'no have itens in cart',
+          esp: 'no hay artículos en el carrito',
         });
+      }
+
+      const totalPrice = parseFloat(
+        items
+          .reduce((acc, curr) => {
+            const itemInCard = cart.items.find(
+              (cartItem) => cartItem.itemId === curr.id,
+            );
+
+            return acc + parseFloat(curr.price) * itemInCard.quantity;
+          }, 0)
+          .toString(),
+      ).toFixed(2);
+
+      const names = items.map((item) => item.name);
+
+      const now = new Date();
+
+      const expiresAt: Date = new Date(now.setHours(now.getHours() + 3 * 24)); // expires in 3 days
+
+      //Cria a entidade de pedido
+      const orderCreated = await this.orderRepository.create(
+        {
+          id: shortId(20),
+          name: `Compra dos itens: ${names.join(', ')}`,
+          coupon: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: user.id,
+          battleTag: createOrderDto.battleTag,
+          nickName: createOrderDto.nickName,
+          platform: createOrderDto.platform ?? null,
+          totalPrice: totalPrice,
+          completedAt: null,
+          paymentId: null,
+          paymentUrl: null,
+          proofOfDelivery: null,
+          Affiliate: null,
+          affiliateId: null,
+          expiresAt,
+          user,
+          OrderItems: undefined,
+          status: undefined,
+        },
+        trx,
+      );
+
+      // Cria os itens do pedido
+      items.map((item) => {
+        const quantity = cart.items.find(
+          (_cart_item_) => _cart_item_.itemId === item.id,
+        ).quantity;
+
+        return this.orderRepository.createOrderItem(
+          {
+            id: shortId(20),
+            currency: 'USD',
+            Item: item,
+            price: item.price.toString(),
+            itemId: item.id,
+            name: item.name,
+            description: '  ',
+            imageUrl: '',
+            price_per_unit: item.price,
+            quantity: quantity,
+            Order: orderCreated,
+            orderId: orderCreated.id,
+            proofOfDelivery: null,
+          } as OrderItem,
+          trx,
+        );
       });
 
-      const status = Object.assign(new OrderStatus(), {
-        id: shortId(10),
-        createdAt: new Date(),
-        status: Status.CREATED,
-        title: 'Aguardando o pagamento',
-        description: null,
-      } as OrderStatus);
+      // Cria o status do pedido
+      const status = await this.orderRepository.createOrderStatus(
+        {
+          id: shortId(10),
+          createdAt: new Date(),
+          status: Status.CREATED,
+          title: 'Aguardando o pagamento',
+          description: null,
+          orderId: orderCreated.id, // Relaciona o status ao pedido
+          order: orderCreated,
+        } as OrderStatus,
+        trx,
+      );
 
-      const order = Object.assign(new OrderEntity(), {
-        id: shortId(10),
-        coupon: ' ',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        name: 'Compra dos items...',
-        userId: user.id,
-        user: user,
-        status: [status],
-        OrderItems: itemsEntityList,
-        battleTag: createOrderDto.battleTag,
-        nickName: createOrderDto.nickName,
-        platform: createOrderDto.platform ?? null,
-      } as OrderEntity);
+      // Remove os itens do carrinho
+      await this.cartRepository.release(cart.id, trx);
 
-      await manager.save(order.OrderItems);
+      await trx.commitTransaction();
 
-      await manager.save(order.status);
-
-      const orderEntity = manager.create(OrderEntity, order);
-      console.log(orderEntity);
-
-      const savedOrder = await manager.save(OrderEntity, orderEntity);
-
-      await manager.delete(CartItemEntity, { cart: { id: cart.id } });
-
-      return savedOrder;
-    });
+      return orderCreated;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
+    }
   }
 }

@@ -12,6 +12,7 @@ import {
 import { IRequestAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/RequestAffiliate/IRequestAffiliate.repository-contract';
 import { NodemailerService } from 'src/Application/Infra/Mail/Nodemailer/Nodemailer.service';
 import { RequestAffiliateEntity } from 'src/Application/Entities/Request-Affiliate.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class RefuseAffiliateOnWaitingListUseCase {
@@ -23,56 +24,75 @@ export class RefuseAffiliateOnWaitingListUseCase {
     @Inject(KEY_INJECTION.REQUEST_AFFILIATE_REPOSITORY)
     private readonly requestAffiliateRepository: IRequestAffiliateRepositoryContract,
     private readonly mailService: NodemailerService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute({ email }: RefuseAffiliateOnWaitingListDto) {
-    const user = await this.userRepository.getBy({ email });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    try {
+      await trx.startTransaction();
 
-    const affiliate = await this.affiliateRepository.getBy({ email });
+      const user = await this.userRepository.getBy({ email }, trx);
 
-    const affiliateOnWaitingList = await this.requestAffiliateRepository.getBy({
-      email,
-    });
+      if (!user) {
+        throw new UnauthorizedException();
+      }
 
-    if (!affiliateOnWaitingList) {
-      throw new NotFoundException('affiliate in the queue was not found');
-    }
+      const affiliate = await this.affiliateRepository.getBy({ email }, trx);
 
-    if (affiliateOnWaitingList.status === 'APPROVED' || affiliate) {
-      throw new NotAcceptableException(
-        'affiliate has already been approved, you can only ban him',
-      );
-    }
+      const affiliateOnWaitingList =
+        await this.requestAffiliateRepository.getBy(
+          {
+            email,
+          },
+          trx,
+        );
 
-    // update affiliate on list has declined
+      if (!affiliateOnWaitingList) {
+        throw new NotFoundException('affiliate in the queue was not found');
+      }
 
-    const affiliateOnWaitingListUpdateEntity = Object.assign(
-      new RequestAffiliateEntity(),
-      {
-        status: 'DECLINED',
-      } as RequestAffiliateEntity,
-    );
+      if (affiliateOnWaitingList.status === 'APPROVED' || affiliate) {
+        throw new NotAcceptableException(
+          'affiliate has already been approved, you can only ban him',
+        );
+      }
 
-    const affiliateOnWaitingListUpdated =
-      await this.requestAffiliateRepository.update(
+      // update affiliate on list has declined
+
+      const affiliateOnWaitingListUpdateEntity = Object.assign(
+        new RequestAffiliateEntity(),
         {
-          id: affiliateOnWaitingList.id,
-        },
-        affiliateOnWaitingListUpdateEntity,
+          status: 'DECLINED',
+        } as RequestAffiliateEntity,
       );
 
-    this.mailService.send({
-      emails: [user.email],
-      htmlContent: ``,
-      name: affiliateOnWaitingList.name,
-      subject: 'Not possible to become affiliate',
-      text: 'Unfortunately it was not possible to become an affiliate, perhaps it will be possible at another time',
-    });
+      const affiliateOnWaitingListUpdated =
+        await this.requestAffiliateRepository.update(
+          {
+            id: affiliateOnWaitingList.id,
+          },
+          affiliateOnWaitingListUpdateEntity,
+          trx,
+        );
 
-    return affiliateOnWaitingListUpdated;
+      this.mailService.send({
+        emails: [user.email],
+        htmlContent: ``,
+        name: affiliateOnWaitingList.name,
+        subject: 'Not possible to become affiliate',
+        text: 'Unfortunately it was not possible to become an affiliate, perhaps it will be possible at another time',
+      });
+
+      await trx.commitTransaction();
+
+      return affiliateOnWaitingListUpdated;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
+    }
   }
 }

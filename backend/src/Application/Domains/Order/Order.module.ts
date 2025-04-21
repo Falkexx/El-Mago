@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { OrderService } from './Order.service';
 import { OrderController } from './Order.controller';
-import { PaypalModule } from 'src/Application/Infra/Payment/Paypal/Paypal.module';
 import { CreateOrderUseCase } from './UseCases/CreateOrder/CreateOrder.usecase';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
 import { KEY_INJECTION } from 'src/@metadata/keys';
@@ -12,10 +11,31 @@ import { PayOrderUseCase } from './UseCases/PayOrder/PayOrder.usecase';
 import { OrderTypeOrmRepository } from 'src/Application/Infra/Repositories/OrderRepository/OrderTypeOrm.repository';
 import { GetOrderByAuthUseCase } from './UseCases/GetOrdersByAuth/GetOrderByAuth.usecase';
 import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecase';
+import { GetOrderAsAffiliateUseCase } from './UseCases/GetOrderAsAffiliate/GetOrderAsAffiliate.usecase';
+import { AcceptOrderUseCase } from './UseCases/AcceptOrder/AcceptOrder.usecase';
+import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/AffiliateRepository/AffiliateTypeOrm.repository';
+import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
+import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
+import { ImageTypeormRepository } from 'src/Application/Infra/Repositories/ImageRepository/ImageTypeOrm.repository';
+import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
+import { PaymentModule } from 'src/Application/Infra/Payment/Payment.module';
+import { MailModule } from 'src/Application/Infra/Mail/Mail.module';
+import { OrderAffiliateController } from './OrderAffiliate/OrderAffiliate.controller';
+import { GetMyCurrentOrdersAsAffiliate } from './OrderAffiliate/UseCases/GetMyCurrentOrdersAsAffiliate/GetMyCurrentOrdersAsAffiliate.usecase';
+import { WalletModule } from '../Wallet/Wallet.module';
+import { WalletTypeOrmRepository } from 'src/Application/Infra/Repositories/WalletRepository/WalletTypeOrm.repository';
+import { JobsModule } from 'src/Application/Infra/Jobs/Job.module';
 
 @Module({
-  imports: [RepositoriesModule, PaypalModule],
-  controllers: [OrderController],
+  imports: [
+    RepositoriesModule,
+    StorageModule,
+    PaymentModule,
+    MailModule,
+    WalletModule,
+    JobsModule,
+  ],
+  controllers: [OrderController, OrderAffiliateController],
   providers: [
     {
       provide: KEY_INJECTION.USER_REPOSITORY_CONTRACT,
@@ -33,7 +53,18 @@ import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecas
       provide: KEY_INJECTION.ORDER_REPOSITORY,
       useClass: OrderTypeOrmRepository,
     },
-
+    {
+      provide: KEY_INJECTION.AFFILIATE_REPOSITORY_CONTRACT,
+      useClass: AffiliateTypeOrmRepository,
+    },
+    {
+      provide: KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT,
+      useClass: ImageTypeormRepository,
+    },
+    {
+      provide: KEY_INJECTION.WALLET_REPOSITORY,
+      useClass: WalletTypeOrmRepository,
+    },
     // services
     OrderService,
 
@@ -42,6 +73,11 @@ import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecas
     PayOrderUseCase,
     GetOrderByAuthUseCase,
     GetOrderByIdUseCase,
+    GetOrderAsAffiliateUseCase,
+    AcceptOrderUseCase,
+    SendProofToOrderItemUseCase,
+    GetPendingOrdersUseCase,
+    GetMyCurrentOrdersAsAffiliate,
   ],
 })
 export class OrderModule {}

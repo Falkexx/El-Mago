@@ -12,6 +12,7 @@ import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { PaypalService } from 'src/Application/Infra/Payment/Paypal/Paypal.service';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class GetOrderByIdUseCase {
@@ -20,49 +21,35 @@ export class GetOrderByIdUseCase {
     private readonly userRepository: IUserRepositoryContract,
     @Inject(KEY_INJECTION.ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepositoryContract,
-    private readonly paypalService: PaypalService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(payload: PayloadType, orderId: string) {
-    const user = await this.userRepository.getBy({ id: payload.sub });
+    const trx = this.dataSource.createQueryRunner();
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    try {
+      await trx.startTransaction();
 
-    const order = await this.orderRepository.getBy({ id: orderId });
+      const user = await this.userRepository.getBy({ id: payload.sub }, trx);
 
-    if (!order || order.userId !== payload.sub) {
-      throw new NotFoundException('order not found');
-    }
+      if (!user) {
+        throw new UnauthorizedException();
+      }
 
-    if (!order.paymentId) {
+      const order = await this.orderRepository.getBy({ id: orderId }, trx);
+
+      if (!order || order.userId !== payload.sub) {
+        throw new NotFoundException('order not found');
+      }
+
+      await trx.commitTransaction();
+
       return order;
+    } catch (e) {
+      await trx.rollbackTransaction();
+      throw e;
+    } finally {
+      await trx.release();
     }
-
-    const isPaid = order.status.find(
-      (_status_) => _status_.status === Status.PAID,
-    );
-
-    if (isPaid) {
-      return order;
-    }
-
-    const paypalOrder = await this.paypalService.checkOrder(order.paymentId);
-
-    if (paypalOrder.status === 'APPROVED') {
-      const newOrderStatus = Object.assign(new OrderStatus(), {
-        id: shortId(),
-        order: order,
-        status: Status.PAID,
-        title: 'order is paid',
-        description: 'paid successful',
-        createdAt: new Date(),
-      } as OrderStatus);
-
-      return this.orderRepository.createOrderStatus(newOrderStatus);
-    }
-
-    return order;
   }
 }

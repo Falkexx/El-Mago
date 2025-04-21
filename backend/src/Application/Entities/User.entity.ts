@@ -1,5 +1,13 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Check,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { AffiliateEntity } from './Affiliate.entity';
 import { ItemEntity } from './Item.entity';
 import { CartEntity } from './Cart/Cart.entity';
@@ -7,8 +15,9 @@ import { OrderEntity } from './Order.entity';
 import { RequestAffiliateEntity } from './Request-Affiliate.entity';
 import { ROLE } from 'src/@metadata/roles';
 import { Languages } from 'src/@metadata';
+import { TABLE } from 'src/@metadata/tables';
 
-@Entity('user')
+@Entity({ name: TABLE.user })
 export class UserEntity {
   @PrimaryColumn('varchar')
   id: string;
@@ -59,8 +68,8 @@ export class UserEntity {
   @Column({ type: 'numeric', precision: 150, nullable: true, default: null })
   age: number | null;
 
-  @Column({ type: 'varchar', length: 20 })
-  role: ROLE; // default: user
+  @Column({ type: 'varchar', length: 20, array: true })
+  roles: ROLE[]; // default: user
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -75,12 +84,16 @@ export class UserEntity {
   isDeleted: boolean;
 
   @OneToOne(() => AffiliateEntity, (affiliate) => affiliate.user)
+  @JoinColumn({ name: 'affiliateId' })
   affiliate: AffiliateEntity | null;
+
+  @Column({ type: 'varchar', nullable: true, default: null })
+  affiliateId: string;
 
   @OneToMany(() => ItemEntity, (items) => items.user)
   items: ItemEntity[];
 
-  @OneToOne(() => CartEntity)
+  @OneToOne(() => CartEntity, { onDelete: 'CASCADE' })
   cart: CartEntity;
 
   @OneToMany(() => OrderEntity, (order) => order.user)
@@ -100,10 +113,11 @@ export class UserUpdateEntity {
   password: string;
   discord: string;
   numberPhone: string;
-  role: ROLE; // default: user
+  roles: ROLE[]; // default: user
   isBanned: boolean;
   isDeleted: boolean;
   fluentLanguages: Languages[];
+  affiliateId: string;
 }
 
 export type UserEntityUniqueRefs =

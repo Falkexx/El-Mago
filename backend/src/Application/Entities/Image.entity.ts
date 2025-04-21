@@ -2,6 +2,7 @@ import { TABLE } from 'src/@metadata/tables';
 import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { ItemEntity } from './Item.entity';
 import { STORAGE_PROVIDER } from 'src/@metadata';
+import { OrderItem } from './order-item.entity';
 
 @Entity(TABLE.image)
 export class ImageEntity {
@@ -31,9 +32,6 @@ export class ImageEntity {
 
   @Column({ type: 'boolean', default: false })
   isDeleted: boolean;
-
-  @OneToOne(() => ItemEntity, (item) => item.image)
-  item: ItemEntity;
 }
 
 export class ImageUpdateEntity {

@@ -22,7 +22,7 @@ export class SearchBuilderService {
 
     if (search && config.createdField) {
       queryBuilder.andWhere(
-        `SIMILARITY(${tableName}."${config.searchField}", :search) > 0.3`,
+        `SIMILARITY("${tableName}"."${config.searchField}", :search) > 0.3`,
         {
           search: `%${search}%`,
         },
@@ -31,14 +31,14 @@ export class SearchBuilderService {
 
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
-        queryBuilder.andWhere(`${tableName}.${key} = :${key}`, {
+        queryBuilder.andWhere(`"${tableName}"."${key}" = :${key}`, {
           [key]: value,
         });
       });
     }
 
     if (config.createdField) {
-      queryBuilder.orderBy(`${tableName}."${config.createdField}"`, 'DESC');
+      queryBuilder.orderBy(`"${config.createdField}"`, 'DESC');
     }
 
     const [data, total] = await queryBuilder

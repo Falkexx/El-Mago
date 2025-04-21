@@ -12,11 +12,12 @@ export enum STORAGE_PROVIDER {
 }
 
 export const Status = {
-  CREATED: 'created',
-  PAID: 'paid',
-  ACCEPT: 'accept',
-  CANCELED: 'canceled',
-  RETURNED: 'returned',
+  CREATED: 'CREATED', // when create the order
+  PAID: 'PAID', // when paid the order
+  ACCEPT: 'ACCEPT', // when affiliate accept the order
+  CANCELED: 'CANCELED', // when a customer cancel the order
+  RETURNED: 'RETURNED', // when admin or affiliate return the order
+  COMPLETED: 'COMPLETED',
 };
 
 export const OrderAction = {
@@ -90,4 +91,14 @@ export enum AffiliateOnHoldStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   DECLINED = 'DECLINED',
+}
+
+export enum TransactionType {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAWAL = 'WITHDRAWAL',
+}
+
+export enum TransactionProvider {
+  SERVER = 'SERVER',
+  AFFILIATE = 'AFFILIATE',
 }

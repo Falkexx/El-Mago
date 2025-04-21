@@ -1,9 +1,18 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { UserEntity } from './User.entity';
 import { Exclude } from 'class-transformer';
 import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';
 import { Languages } from 'src/@metadata';
+import { OrderEntity } from './Order.entity';
+import { WalletEntity } from './Wallet.entity';
 
 @Entity(TABLE.affiliate)
 export class AffiliateEntity {
@@ -40,8 +49,8 @@ export class AffiliateEntity {
   @Column({ type: 'timestamptz', update: true })
   updatedAt: Date;
 
-  @Column({ type: 'boolean' })
-  isSoftDelete: boolean;
+  @Column({ type: 'timestamptz', nullable: true, default: null })
+  deletedAt: Date | null;
 
   @Column({ type: 'varchar', length: 50 })
   discord: string;
@@ -50,9 +59,19 @@ export class AffiliateEntity {
   fluentLanguages: string[];
 
   @OneToOne(() => UserEntity, (user) => user.affiliate)
-  @JoinColumn()
+  @JoinColumn({ name: 'userId' })
   @Exclude()
   user: UserEntity;
+
+  @Column({ type: 'varchar' })
+  userId: string;
+
+  @OneToMany(() => OrderEntity, (order) => order.Affiliate)
+  @JoinColumn()
+  orders: OrderEntity[];
+
+  @OneToOne(() => WalletEntity, (account) => account.Affiliate)
+  Account: WalletEntity;
 }
 
 export class AffiliateUpdateEntity {
@@ -65,6 +84,13 @@ export class AffiliateUpdateEntity {
 export type AffiliateEntityUniqueRefs = RequireOnlyOne<
   Pick<
     AffiliateEntity,
-    'id' | 'email' | 'characterName' | 'shortId' | 'cpfCnpj'
+    | 'id'
+    | 'email'
+    | 'characterName'
+    | 'shortId'
+    | 'cpfCnpj'
+    | 'userId'
+    | 'battleTag'
+    | 'phoneNumber'
   >
 >;

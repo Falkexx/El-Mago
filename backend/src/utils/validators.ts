@@ -34,3 +34,7 @@ export class GenericPaginationDto {
   @IsIn(['ASC', 'DESC'], { message: 'Order must be ASC or DESC' })
   order?: 'ASC' | 'DESC' = 'DESC';
 }
+
+export class ImageDto {
+  image: Express.Multer.File;
+}

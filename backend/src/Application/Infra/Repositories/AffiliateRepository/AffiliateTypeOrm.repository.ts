@@ -5,7 +5,7 @@ import {
   AffiliateEntityUniqueRefs,
   AffiliateUpdateEntity,
 } from 'src/Application/Entities/Affiliate.entity';
-import { Repository } from 'typeorm';
+import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
 import { IAffiliateRepositoryContract } from './IAffiliate.repository-contract';
 import { PaginationResult } from '#types';
 import { splitKeyAndValue } from '#utils';
@@ -16,66 +16,97 @@ import { TABLE } from 'src/@metadata/tables';
 export class AffiliateTypeOrmRepository
   implements IAffiliateRepositoryContract
 {
-  constructor(
-    @InjectRepository(AffiliateEntity)
-    private readonly affiliateRepository: Repository<AffiliateEntity>,
-  ) {}
+  constructor() {}
 
-  async create(entity: AffiliateEntity): Promise<AffiliateEntity> {
+  async create(
+    entity: AffiliateEntity,
+    trx?: QueryRunner,
+  ): Promise<AffiliateEntity> {
     try {
-      const affiliateTypeOrmEntity = this.affiliateRepository.create(entity);
+      const result = await trx.manager
+        .createQueryBuilder()
+        .insert()
+        .into(AffiliateEntity)
+        .values(entity)
+        .returning('*')
+        .execute();
 
-      const affiliateCreated = await this.affiliateRepository.save(
-        affiliateTypeOrmEntity,
-      );
-
-      return affiliateCreated;
+      return result.raw[0];
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
     }
   }
+  async getBy(
+    unqRef: AffiliateEntityUniqueRefs,
+    trx: QueryRunner,
+  ): Promise<AffiliateEntity | null> {
+    try {
+      const [key, value] = splitKeyAndValue(unqRef);
 
-  async getBy(unqRef: AffiliateEntityUniqueRefs): Promise<AffiliateEntity> {
-    const [key, value] = splitKeyAndValue(unqRef);
+      const affiliate = await trx.manager
+        .createQueryBuilder(AffiliateEntity, 'affiliate')
+        .where(`"${TABLE.affiliate}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.affiliate}"."deletedAt" IS NULL`)
+        .getOne();
 
-    const affiliate = await this.affiliateRepository.findOneBy({
-      [key]: value,
-    });
-
-    return affiliate ?? null;
+      return affiliate ?? null;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async update(
     unqRef: AffiliateEntityUniqueRefs,
     updateEntity: AffiliateUpdateEntity,
+    trx: QueryRunner,
   ): Promise<AffiliateEntity> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
     try {
-      const affiliateToUpdate = await this.affiliateRepository.findOne({
-        where: { [key]: value },
-      });
+      const [key, value] = splitKeyAndValue(unqRef);
 
-      const newAffiliate = Object.assign(affiliateToUpdate, {
-        ...updateEntity,
-      } as AffiliateUpdateEntity);
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(AffiliateEntity)
+        .set(updateEntity)
+        .where(`"${TABLE.affiliate}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.affiliate}"."deletedAt" IS NULL`)
+        .returning('*')
+        .execute();
 
-      const affiliateUpdated =
-        await this.affiliateRepository.save(newAffiliate);
+      if (!result.raw[0]) {
+        throw new InternalServerErrorException(
+          'Affiliate not found or deleted',
+        );
+      }
 
-      return affiliateUpdated;
+      return result.raw[0];
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
     }
   }
 
-  async delete(unqRef: AffiliateEntityUniqueRefs): Promise<void> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
+  async delete(
+    unqRef: AffiliateEntityUniqueRefs,
+    trx: QueryRunner,
+  ): Promise<void> {
     try {
-      await this.affiliateRepository.delete({ [key]: value });
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      const result = await trx.manager
+        .createQueryBuilder()
+        .delete()
+        .from(AffiliateEntity)
+        .where(`"${TABLE.affiliate}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.affiliate}"."deletedAt" IS NULL`)
+        .execute();
+
+      if (result.affected === 0) {
+        throw new InternalServerErrorException(
+          'Affiliate not found or deleted',
+        );
+      }
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
@@ -84,27 +115,50 @@ export class AffiliateTypeOrmRepository
 
   async softDelete(
     unqRef: AffiliateEntityUniqueRefs,
-  ): Promise<'success' | 'fail'> {
-    const [key, value] = splitKeyAndValue(unqRef);
-
+    trx: QueryRunner,
+  ): Promise<AffiliateEntity> {
     try {
-      await this.affiliateRepository.delete({ [key]: value });
-      return 'success';
+      const [key, value] = splitKeyAndValue(unqRef);
+
+      const result = await trx.manager
+        .createQueryBuilder()
+        .update(AffiliateEntity)
+        .set({ deletedAt: new Date() })
+        .where(`"${TABLE.affiliate}"."${key}" = :value`, { value })
+        .andWhere(`"${TABLE.affiliate}"."deletedAt" IS NULL`)
+        .returning('*')
+        .execute();
+
+      if (!result.raw[0]) {
+        throw new Error('Affiliate not found or already deleted');
+      }
+
+      return result.raw[0];
     } catch {
-      return 'fail';
+      throw new InternalServerErrorException();
     }
   }
 
-  getAll(): Promise<AffiliateEntity[]> {
-    return this.affiliateRepository.find();
+  async getAll(trx: QueryRunner): Promise<AffiliateEntity[]> {
+    try {
+      return await trx.manager
+        .createQueryBuilder(AffiliateEntity, 'affiliate')
+        .where(`"${TABLE.affiliate}"."deletedAt" IS NULL`)
+        .getMany();
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
   }
 
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
+    trx: QueryRunner,
   ): Promise<PaginationResult<AffiliateEntity[]>> {
     const { page, limit, search, filters, order } = paginationDto;
 
-    const queryBuilder = this.affiliateRepository.createQueryBuilder(
+    const queryBuilder = trx.manager.createQueryBuilder(
+      AffiliateEntity,
       TABLE.affiliate,
     );
     if (search) {
@@ -142,15 +196,23 @@ export class AffiliateTypeOrmRepository
 
   async findConflictingFields(
     data: Partial<AffiliateEntity>,
+    trx: QueryRunner,
   ): Promise<Partial<Record<keyof AffiliateEntity, string>>> {
-    const queryBuilder = this.affiliateRepository.createQueryBuilder(
+    const queryBuilder = trx.manager.createQueryBuilder(
+      AffiliateEntity,
       TABLE.affiliate,
     );
 
-    Object.keys(data).forEach((key) => {
-      queryBuilder.orWhere(`${TABLE.affiliate}."${key}" = :${key}`, {
-        [key]: data[key],
-      });
+    Object.keys(data).forEach((key, index) => {
+      if (index === 0) {
+        queryBuilder.where(`${TABLE.affiliate}."${key}" = :${key}`, {
+          [key]: data[key],
+        });
+      } else {
+        queryBuilder.orWhere(`${TABLE.affiliate}."${key}" = :${key}`, {
+          [key]: data[key],
+        });
+      }
     });
 
     const result = await queryBuilder
@@ -160,6 +222,7 @@ export class AffiliateTypeOrmRepository
         `${TABLE.affiliate}.phoneNumber`,
         `${TABLE.affiliate}.cpfCnpj`,
         `${TABLE.affiliate}.characterName`,
+        `${TABLE.affiliate}.discord`,
       ])
       .getOne();
 
@@ -167,7 +230,9 @@ export class AffiliateTypeOrmRepository
 
     if (result) {
       Object.keys(data).forEach((key) => {
-        if (result[key] === data[key]) {
+        console.log(data[key], result[key]);
+
+        if (data[key] === result[key]) {
           conflictFields[key as keyof AffiliateEntity] = result[key];
         }
       });
