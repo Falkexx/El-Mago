@@ -11,12 +11,12 @@ import { SendProofToOrder } from './SendProofToOrdemItem.dto';
 import { KEY_INJECTION } from 'src/@metadata/keys';
 import { IOrderRepositoryContract } from 'src/Application/Infra/Repositories/OrderRepository/IOrderRepository.contract';
 import { StorageService } from 'src/Application/Infra/Storage/Storage.service';
-import { IIMageRepositoryContract } from 'src/Application/Infra/Repositories/ImageRepository/IImage.repository-contract';
 import { PayloadType } from '#types';
 import { IAffiliateRepositoryContract } from 'src/Application/Infra/Repositories/AffiliateRepository/IAffiliate.repository-contract';
 import { IUserRepositoryContract } from 'src/Application/Infra/Repositories/UserRepository/IUserRepository.contract';
 import { TransactionProducer } from 'src/Application/Infra/Jobs/Producer/Transaction.producer';
 import { DataSource } from 'typeorm';
+import { generateShortId } from '#utils';
 
 @Injectable()
 export class SendProofToOrderItemUseCase {
@@ -26,8 +26,6 @@ export class SendProofToOrderItemUseCase {
     private readonly storageService: StorageService,
     @Inject(KEY_INJECTION.AFFILIATE_REPOSITORY_CONTRACT)
     private readonly affiliateRepository: IAffiliateRepositoryContract,
-    @Inject(KEY_INJECTION.IMAGE_REPOSITORY_CONTRACT)
-    private readonly imageRepository: IIMageRepositoryContract,
     @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
     private readonly userRepository: IUserRepositoryContract,
     private readonly transactionProducer: TransactionProducer,
@@ -115,13 +113,28 @@ export class SendProofToOrderItemUseCase {
         trx,
       );
 
+      await this.orderRepository.createOrderStatus(
+        {
+          id: generateShortId(15),
+          createdAt: new Date(),
+          order: orderUpdated,
+          orderId: orderUpdated.id,
+          status: 'COMPLETED',
+          title: 'the affiliate confirmed delivery of the items',
+        },
+        trx,
+      );
+
       await this.transactionProducer.makeDeposit({
         orderId: orderUpdated.id,
       });
 
       await trx.commitTransaction();
 
-      return orderUpdated;
+      const { userId, paymentId, paymentUrl, affiliateId, ...rest } =
+        orderUpdated;
+
+      return rest;
     } catch (e) {
       await trx.rollbackTransaction();
       throw e;

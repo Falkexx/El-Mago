@@ -12,9 +12,8 @@ export class TransactionProducer {
   ) {}
 
   async makeDeposit(data: MakeDepositProps) {
-    // const delay = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
-
-    const delay = 1 * 60 * 1000; // 1 min in milliseconds
+    // const delay = 1 * 60 * 1000; // 1 min in milliseconds
+    const delay = 3 * 1000; // TODO: remove in the production.
 
     await this.queue.add(KEY_OF_JOB.MAKE_DEPOSIT, data, {
       delay,

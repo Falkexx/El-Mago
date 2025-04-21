@@ -361,6 +361,11 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
           ) AS items
        FROM "${TABLE.order}" o
        WHERE o."affiliateId" = $1
+       AND NOT EXISTS (
+          SELECT 1 
+          FROM "${TABLE.order_status}" s
+          WHERE s."orderId" = o."id" AND s."status" = 'COMPLETED'
+       )
       `,
         [affiliateId],
       );

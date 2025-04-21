@@ -12,9 +12,9 @@ import { IOrderRepositoryContract } from '../../Repositories/OrderRepository/IOr
 import { IWalletRepositoryContract } from '../../Repositories/WalletRepository/IWallet.repository-contract';
 import { ITransactionRepositoryContract } from '../../Repositories/TransactionRepository/ITransaction.repository-contract';
 import { DataSource } from 'typeorm';
-import { generateShortId } from '#utils';
 import { TransactionEntity } from 'src/Application/Entities/Transactions.entity';
 import { TransactionProvider, TransactionType } from 'src/@metadata';
+import { generateShortId } from '#utils';
 
 @Processor(KEY_OF_QUEUE.TRANSACTION)
 export class TransactionConsumer extends WorkerHost {
@@ -40,46 +40,71 @@ export class TransactionConsumer extends WorkerHost {
   }
 
   private async makeDeposit(data: MakeDepositProps) {
+    console.log('make deposit job called', data);
     const trx = this.dataSource.createQueryRunner();
 
-    console.log('make deposit job ', data);
-
     try {
-      // await trx.startTransaction();
-      // const order = await this.orderRepository.getBy({ id: data.orderId });
-      // if (!order) {
-      //   throw new NotFoundException('Order not found');
-      // }
-      // const affiliate = await this.affiliateRepository.getBy(
-      //   {
-      //     id: order.affiliateId,
-      //   },
-      //   trx,
-      // );
-      // if (!affiliate) {
-      //   throw new NotFoundException('affiliate not found');
-      // }
-      // const wallet = await this.walletRepository.getBy(
-      //   {
-      //     affiliateId: affiliate.id,
-      //   },
-      //   trx,
-      // );
-      // if (!wallet) {
-      //   throw new NotAcceptableException('affiliate not have wallet');
-      // }
-      // await this.transactionRepository.create({
-      //   id: generateShortId(20),
-      //   createdAt: new Date(),
-      //   from: TransactionProvider.SERVER,
-      //   to: TransactionProvider.AFFILIATE,
-      //   type: TransactionType.DEPOSIT,
-      //   value: order.totalPrice, // TODO: implement discount value
-      //   walletId: wallet.id,
-      //   orderId: order.id,
-      // } as TransactionEntity);
-      // await trx.commitTransaction();
+      await trx.startTransaction();
+      const order = await this.orderRepository.getBy({ id: data.orderId }, trx);
+
+      if (!order) {
+        console.error('order not found', data.orderId);
+        throw new NotFoundException('Order not found');
+      }
+
+      const affiliate = await this.affiliateRepository.getBy(
+        {
+          id: order.affiliateId,
+        },
+        trx,
+      );
+
+      if (!affiliate) {
+        console.error('affiliate not found');
+        throw new NotFoundException('affiliate not found');
+      }
+
+      const wallet = await this.walletRepository.getBy(
+        {
+          affiliateId: affiliate.id,
+        },
+        trx,
+      );
+
+      if (!wallet) {
+        console.error('wallet not found');
+        throw new NotAcceptableException('affiliate not have wallet');
+      }
+
+      await this.walletRepository.update(
+        {
+          id: wallet.id,
+        },
+        {
+          balance: (
+            parseFloat(wallet.balance) + parseFloat(order.totalPrice)
+          ).toString(), // TODO: create payment split
+          updatedAt: new Date(),
+        },
+        trx,
+      );
+
+      await this.transactionRepository.create(
+        {
+          id: generateShortId(20),
+          createdAt: new Date(),
+          from: TransactionProvider.SERVER,
+          to: TransactionProvider.AFFILIATE,
+          type: TransactionType.DEPOSIT,
+          value: order.totalPrice, // TODO: implement discount value
+          walletId: wallet.id,
+          orderId: order.id,
+        } as TransactionEntity,
+        trx,
+      );
+      await trx.commitTransaction();
     } catch (error) {
+      console.error('error when make deposit', error);
       await trx.rollbackTransaction();
       throw error;
     } finally {

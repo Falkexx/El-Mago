@@ -17,6 +17,7 @@ export const Status = {
   ACCEPT: 'ACCEPT', // when affiliate accept the order
   CANCELED: 'CANCELED', // when a customer cancel the order
   RETURNED: 'RETURNED', // when admin or affiliate return the order
+  COMPLETED: 'COMPLETED',
 };
 
 export const OrderAction = {

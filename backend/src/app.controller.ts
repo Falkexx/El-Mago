@@ -5,9 +5,7 @@ export class AppController {
   constructor() {}
 
   @Get()
-  async getHello() {
-    return {
-      message: 'Accessed',
-    };
+  hello() {
+    return 'hello world!!!';
   }
 }

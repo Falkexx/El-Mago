@@ -136,7 +136,10 @@ export class AcceptOrderUseCase {
 
       await trx.commitTransaction();
 
-      return orderUpdated;
+      const { userId, paymentId, paymentUrl, affiliateId, ...rest } =
+        orderUpdated;
+
+      return rest;
     } catch (e) {
       await trx.rollbackTransaction();
       throw e;
