@@ -22,7 +22,7 @@ export class SearchBuilderService {
 
     if (search && config.createdField) {
       queryBuilder.andWhere(
-        `SIMILARITY("${tableName}"."${config.searchField}", :search) > 0.3`,
+        `SIMILARITY("${tableName}"."${config.searchField}", :search) > 0.2`,
         {
           search: `%${search}%`,
         },

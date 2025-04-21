@@ -5,6 +5,8 @@ import { TransactionProvider, TransactionType } from 'src/@metadata';
 import { RequireOnlyOne } from '#types';
 import { OrderEntity } from './Order.entity';
 
+type ValueOfEnum<T extends object> = T[keyof T];
+
 @Entity({ name: TABLE.transaction })
 export class TransactionEntity {
   @PrimaryColumn({ type: 'varchar', length: 40 })
@@ -14,16 +16,16 @@ export class TransactionEntity {
   value: string;
 
   @Column({ type: 'enum', enum: TransactionType })
-  type: TransactionType;
+  type: keyof typeof TransactionType;
 
   @Column({ type: 'enum', enum: TransactionProvider })
-  from: TransactionProvider;
+  from: keyof typeof TransactionProvider;
 
   @Column({ type: 'enum', enum: TransactionProvider })
-  to: TransactionProvider;
+  to: keyof typeof TransactionProvider;
 
-  @Column({ type: 'varchar', length: 40 })
-  orderId: string;
+  @Column({ type: 'varchar', length: 40, nullable: true })
+  orderId: string | null;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;

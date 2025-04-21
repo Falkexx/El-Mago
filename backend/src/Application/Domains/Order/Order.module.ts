@@ -25,6 +25,7 @@ import { GetMyCurrentOrdersAsAffiliate } from './OrderAffiliate/UseCases/GetMyCu
 import { WalletModule } from '../Wallet/Wallet.module';
 import { WalletTypeOrmRepository } from 'src/Application/Infra/Repositories/WalletRepository/WalletTypeOrm.repository';
 import { JobsModule } from 'src/Application/Infra/Jobs/Job.module';
+import { TransactionTypeOrmRepository } from 'src/Application/Infra/Repositories/TransactionRepository/TransactionTypeOrm.repository';
 
 @Module({
   imports: [
@@ -64,6 +65,10 @@ import { JobsModule } from 'src/Application/Infra/Jobs/Job.module';
     {
       provide: KEY_INJECTION.WALLET_REPOSITORY,
       useClass: WalletTypeOrmRepository,
+    },
+    {
+      provide: KEY_INJECTION.TRANSACTION_REPOSITORY,
+      useClass: TransactionTypeOrmRepository,
     },
     // services
     OrderService,

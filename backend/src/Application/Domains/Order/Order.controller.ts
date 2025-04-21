@@ -33,6 +33,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
 import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
 import { SendProofToOrder } from './UseCases/SendProofToOrderItem/SendProofToOrdemItem.dto';
+import { MakeBankWithdrawalUseCase } from '../Wallet/UseCases/ MakeBankWithdrawal/ MakeBankWithdrawal.usecase';
+import { MakeBankWithdrawalDto } from '../Wallet/UseCases/ MakeBankWithdrawal/ MakeBankWithdrawal.dto';
 
 @Controller({ path: 'order', version: '1' })
 export class OrderController {

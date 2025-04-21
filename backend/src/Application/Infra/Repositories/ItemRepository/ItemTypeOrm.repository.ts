@@ -45,7 +45,9 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
       const [key, value] = splitKeyAndValue(unqRef);
 
       const item = await trx.manager
-        .createQueryBuilder(ItemEntity, 'item')
+        .createQueryBuilder()
+        .select(TABLE.item)
+        .from(ItemEntity, TABLE.item)
         .where(`"${TABLE.item}"."${key}" = :value`, { value })
         .getOne();
 
