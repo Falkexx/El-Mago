@@ -3,9 +3,6 @@ import { WalletEntity } from './Wallet.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { TransactionProvider, TransactionType } from 'src/@metadata';
 import { RequireOnlyOne } from '#types';
-import { OrderEntity } from './Order.entity';
-
-type ValueOfEnum<T extends object> = T[keyof T];
 
 @Entity({ name: TABLE.transaction })
 export class TransactionEntity {
