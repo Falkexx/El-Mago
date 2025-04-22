@@ -7,6 +7,7 @@ import SwordIcon from "@/midias/Icons/CardIcons/sword.svg";
 import AffiliateSec from "@/app/[locale]/components/Home/AffiliateSection/index";
 import FAQSection from "@/app/[locale]/components/Home/FAQSection";
 import { useTranslations } from "next-intl";
+import Header from "./components/Header";
 
 export default function HomePage() {
   const t = useTranslations("HomePage");
@@ -50,53 +51,58 @@ export default function HomePage() {
   ];
 
   return (
-    <main>
-      {/*HERO SECTION*/}
-      <section>
-        <Hero />
-      </section>
+    <section>
 
-      {/*CARDS SECTION*/}
-      <section className="md:w-full bg-white h-[641px] md:flex md:flex-col md:justify-center ">
-        <div className="w-full  flex flex-col gap-16 px-32">
-          <section className="w-full text-center">
-            <article className="flex flex-col gap-4 ">
-              <h1 className="text-[#111111] text-5xl font-bold font-['Jost'] leading-[48px]">
-                {t("cardSecTitle")}
-              </h1>
+      <Header/>
+      
+      <main>
+        {/*HERO SECTION*/}
+        <section>
+          <Hero />
+        </section>
 
-              <h2 className="text-center text-[#343a40] text-base font-normal font-['Jost'] leading-normal tracking-tight">
-                {t("cardSecSubtitle")}
-              </h2>
-            </article>
-          </section>
+        {/*CARDS SECTION*/}
+        <section className="md:w-full bg-white h-[641px] md:flex md:flex-col md:justify-center ">
+          <div className="w-full  flex flex-col gap-16 px-32">
+            <section className="w-full text-center">
+              <article className="flex flex-col gap-4 ">
+                <h1 className="text-[#111111] text-5xl font-bold font-['Jost'] leading-[48px]">
+                  {t("cardSecTitle")}
+                </h1>
 
-          <section className="w-full flex flex-row gap-8">
-            {Cards.map((e) => {
-              return (
-                <HomeCard
-                  icon={e.icon}
-                  title={e.title}
-                  description={e.description}
-                  btnContent={e.btnContent}
-                  btnUrl={e.btnUrl}
-                  key={e.id}
-                />
-              );
-            })}
-          </section>
-        </div>
-      </section>
+                <h2 className="text-center text-[#343a40] text-base font-normal font-['Jost'] leading-normal tracking-tight">
+                  {t("cardSecSubtitle")}
+                </h2>
+              </article>
+            </section>
 
-      {/*AFFILIATE SECTION*/}
-      <section className="md:full md:h-[557px] md:px-32 flex items-center">
-        <AffiliateSec />
-      </section>
+            <section className="w-full flex flex-row gap-8">
+              {Cards.map((e) => {
+                return (
+                  <HomeCard
+                    icon={e.icon}
+                    title={e.title}
+                    description={e.description}
+                    btnContent={e.btnContent}
+                    btnUrl={e.btnUrl}
+                    key={e.id}
+                  />
+                );
+              })}
+            </section>
+          </div>
+        </section>
 
-      {/*FAQ SECTION*/}
-      <section className="bg-white md:w-full md:px-32 md:py-20">
-        <FAQSection />
-      </section>
-    </main>
+        {/*AFFILIATE SECTION*/}
+        <section className="md:full md:h-[557px] md:px-32 flex items-center">
+          <AffiliateSec />
+        </section>
+
+        {/*FAQ SECTION*/}
+        <section className="bg-white md:w-full md:px-32 md:py-20">
+          <FAQSection />
+        </section>
+      </main>
+    </section>
   );
 }
