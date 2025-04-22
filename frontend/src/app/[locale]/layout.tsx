@@ -1,39 +1,22 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
-import "@/app/globals.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+import React from "react";
+import RootLayoutClient from "@/app/layout"; // Componente de layout no lado do cliente
+// Definição das metadatas
 
 export default async function LocaleLayout({
   children,
-  params,
+  params: { locale },
 }: {
   children: React.ReactNode;
-  params: { locale: any };
+  params: { locale: string };
 }) {
-  const locale = params?.locale; // Garantir que params existe antes de acessar locale
-
-  // Validação do locale
-  if (!locale || !routing.locales.includes(locale)) {
-    notFound();
-  }
-
-  // Obtém mensagens com base no locale
-  const messages = await getMessages(locale);
+  const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale}>
-      <body className="min-h-screen flex flex-col bg-[#111111] fontDefault">
-        <Header />
-        <main className="flex-1">
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            {children}
-          </NextIntlClientProvider>
-        </main>
-        <Footer />
-      </body>
-    </html>
+      <NextIntlClientProvider messages={messages}>
+        {/* Passa o children para o layout no lado do cliente */}
+        <RootLayoutClient locale={locale}>{children}</RootLayoutClient>
+      </NextIntlClientProvider>
   );
 }
