@@ -1,6 +1,13 @@
 import { env } from '#utils';
 import { HttpService } from '@nestjs/axios';
-import { Injectable, NotImplementedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  NotImplementedException,
+} from '@nestjs/common';
 import { PayPalCreateOrder, PayPalGetOrderResponse } from 'src/@types/paypal';
 import { InfraCredentialsManagerService } from '../../InfraCredentialsManager/infraCredentialsManager.service';
 
@@ -22,6 +29,39 @@ export type PayOrderProps = {
     currencyCode: 'USD';
   };
 };
+
+interface MakeBankWithdrawalProps {
+  value: string;
+  email: string;
+}
+
+interface PayoutRequest {
+  sender_batch_header: {
+    sender_batch_id: string;
+    email_subject: string;
+    email_message: string;
+  };
+  items: PayoutItem[];
+}
+
+interface PayoutItem {
+  recipient_type: 'EMAIL' | 'PHONE' | 'PAYPAL_ID';
+  amount: {
+    value: string;
+    currency: string;
+  };
+  note?: string;
+  sender_item_id?: string;
+  receiver: string;
+  alternate_notification_method?: {
+    phone: {
+      country_code: string;
+      national_number: string;
+    };
+  };
+  notification_language?: string;
+  purpose?: string;
+}
 
 @Injectable()
 export class PaypalService {
@@ -176,6 +216,66 @@ export class PaypalService {
     } catch (err) {
       console.error('Erro ao validar o pedido:', err.message);
       return null;
+    }
+  }
+
+  async makeBankWithdrawal(props: MakeBankWithdrawalProps) {
+    const body: PayoutRequest = {
+      sender_batch_header: {
+        sender_batch_id: 'Payouts_2018_100007',
+        email_subject: 'You have a payout!',
+        email_message:
+          'You have received a payout! Thanks for using our service!',
+      },
+      items: [
+        {
+          amount: {
+            currency: 'USD',
+            value: props.value,
+          },
+          receiver: props.email,
+          recipient_type: 'EMAIL',
+        },
+      ],
+    };
+
+    const url = `${env.PAYPAL_BASE_URL}/v1/payments/payouts`;
+
+    const paypalAccessToken =
+      await this.infraCredentialsManagerService.getPaypalAccessToken();
+
+    try {
+      const response = await this.httpService.axiosRef(url, {
+        data: body,
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${paypalAccessToken}`,
+        },
+      });
+
+      console.log(response.data);
+
+      return response.data;
+    } catch (e) {
+      const { status, data } = e.response;
+
+      switch (status) {
+        case 400:
+          console.error('bad request ', data);
+          throw new BadRequestException();
+        case 403:
+          console.error('unauthorized ', data);
+          throw new ForbiddenException();
+        case 404:
+          console.error('route not found ', data);
+          throw new NotFoundException('paypal endpoint not found');
+        case 500:
+          console.error('papal internal server exception ', data);
+          throw new InternalServerErrorException();
+        default:
+          console.error('error when make transfer', data);
+          throw new InternalServerErrorException();
+      }
     }
   }
 }

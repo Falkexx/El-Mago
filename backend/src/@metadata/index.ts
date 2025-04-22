@@ -101,4 +101,5 @@ export enum TransactionType {
 export enum TransactionProvider {
   SERVER = 'SERVER',
   AFFILIATE = 'AFFILIATE',
+  ADMIN = 'ADMIN',
 }

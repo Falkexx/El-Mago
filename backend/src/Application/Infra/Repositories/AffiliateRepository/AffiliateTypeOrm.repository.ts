@@ -1,11 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   AffiliateEntity,
   AffiliateEntityUniqueRefs,
   AffiliateUpdateEntity,
 } from 'src/Application/Entities/Affiliate.entity';
-import { DataSource, EntityManager, QueryRunner, Repository } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { IAffiliateRepositoryContract } from './IAffiliate.repository-contract';
 import { PaginationResult } from '#types';
 import { splitKeyAndValue } from '#utils';
@@ -45,7 +44,9 @@ export class AffiliateTypeOrmRepository
       const [key, value] = splitKeyAndValue(unqRef);
 
       const affiliate = await trx.manager
-        .createQueryBuilder(AffiliateEntity, 'affiliate')
+        .createQueryBuilder()
+        .select(TABLE.affiliate)
+        .from(AffiliateEntity, TABLE.affiliate)
         .where(`"${TABLE.affiliate}"."${key}" = :value`, { value })
         .andWhere(`"${TABLE.affiliate}"."deletedAt" IS NULL`)
         .getOne();

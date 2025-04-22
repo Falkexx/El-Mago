@@ -4,6 +4,7 @@ import { KEY_INJECTION, KEY_OF_JOB, KEY_OF_QUEUE } from 'src/@metadata/keys';
 import { MakeDepositProps } from '../Producer/Transaction.producer';
 import {
   Inject,
+  InternalServerErrorException,
   NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,7 +15,8 @@ import { ITransactionRepositoryContract } from '../../Repositories/TransactionRe
 import { DataSource } from 'typeorm';
 import { TransactionEntity } from 'src/Application/Entities/Transactions.entity';
 import { TransactionProvider, TransactionType } from 'src/@metadata';
-import { generateShortId } from '#utils';
+import { env, generateShortId } from '#utils';
+import { IUserRepositoryContract } from '../../Repositories/UserRepository/IUserRepository.contract';
 
 @Processor(KEY_OF_QUEUE.TRANSACTION)
 export class TransactionConsumer extends WorkerHost {
@@ -27,6 +29,8 @@ export class TransactionConsumer extends WorkerHost {
     private readonly walletRepository: IWalletRepositoryContract,
     @Inject(KEY_INJECTION.TRANSACTION_REPOSITORY)
     private readonly transactionRepository: ITransactionRepositoryContract,
+    @Inject(KEY_INJECTION.USER_REPOSITORY_CONTRACT)
+    private readonly userRepository: IUserRepositoryContract,
     private readonly dataSource: DataSource,
   ) {
     super();
@@ -52,6 +56,7 @@ export class TransactionConsumer extends WorkerHost {
         throw new NotFoundException('Order not found');
       }
 
+      //make deposit to affiliate
       const affiliate = await this.affiliateRepository.getBy(
         {
           id: order.affiliateId,
@@ -102,6 +107,50 @@ export class TransactionConsumer extends WorkerHost {
         } as TransactionEntity,
         trx,
       );
+
+      // make deposit to admin
+      const admin = await this.userRepository.getBy(
+        { email: env.ADMIN_EMAIL },
+        trx,
+      );
+
+      if (!admin) {
+        throw new InternalServerErrorException('admin not found');
+      }
+
+      const adminWallet = await this.walletRepository.getBy(
+        { affiliateId: admin.id },
+        trx,
+      );
+
+      await this.transactionRepository.create(
+        {
+          id: generateShortId(20),
+          createdAt: new Date(),
+          from: TransactionProvider.SERVER,
+          to: TransactionProvider.ADMIN,
+          orderId: order.id,
+          type: TransactionType.DEPOSIT,
+          value: order.totalPrice, // TODO: calculate value to admin receive
+          walletId: adminWallet.id,
+          Wallet: adminWallet,
+        },
+        trx,
+      );
+
+      await this.walletRepository.update(
+        {
+          id: wallet.id,
+        },
+        {
+          balance: (
+            parseFloat(adminWallet.balance) + parseFloat(order.totalPrice)
+          ).toString(), // TODO: create payment split
+          updatedAt: new Date(),
+        },
+        trx,
+      );
+
       await trx.commitTransaction();
     } catch (error) {
       console.error('error when make deposit', error);

@@ -1,12 +1,10 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryColumn,
 } from 'typeorm';
 import { ImageEntity } from './Image.entity';
