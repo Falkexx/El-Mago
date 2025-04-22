@@ -33,7 +33,8 @@
     "passwordLowercase": "A senha deve conter pelo menos uma letra minúscula.",
     "passwordNumber": "A senha deve conter pelo menos um número.",
     "passwordSpecial": "A senha deve conter pelo menos um caractere especial.",
-    "passwordsDoNotMatch": "As senhas não coincidem."
+    "passwordsDoNotMatch": "As senhas não coincidem.",
+    "loading":"Carregando"
   },
 
   "Affiliates": {
@@ -60,6 +61,11 @@
   "Server":{
     "title":"Selecione um servidor"
   }
+},
+
+"Navbar": {
+  "MyAccount": "Minha conta",
+  "Cart": "Carrinho"
 }
   
 }
