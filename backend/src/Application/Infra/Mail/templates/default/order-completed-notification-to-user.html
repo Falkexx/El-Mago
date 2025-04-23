@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrega Confirmada - Seu Pedido Foi Finalizado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#FDEEFF',
+                100: '#F5CCFF',
+                200: '#E8AAFF',
+                300: '#D68AFF',
+                400: '#C06AFF',
+                500: '#A84DFF',
+                600: '#8E33FF',
+                700: '#751EF4',
+                800: '#5D11CC',
+                900: '#480E9D',
+              },
+            },
+            boxShadow: {
+              'lg-purple':
+                '0 10px 25px -5px rgba(168, 77, 255, 0.3), 0 10px 10px -5px rgba(168, 77, 255, 0.1)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #a84dff 0%, #8e33ff 100%);
+      }
+
+      @media only screen and (max-width: 600px) {
+        .mobile-stack {
+          display: block !important;
+          width: 100% !important;
+        }
+
+        .mobile-px-4 {
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+        }
+
+        .mobile-text-center {
+          text-align: center !important;
+        }
+      }
+
+      .divider {
+        border-top: 1px dashed #e5e7eb;
+        margin: 1.5rem 0;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="max-w-2xl mx-auto my-8">
+      <!-- Header -->
+      <div class="gradient-bg text-white rounded-t-2xl p-6 text-center">
+        <h1 class="text-3xl font-bold">Entrega Confirmada!</h1>
+        <p class="mt-2 opacity-90">
+          Seu afiliado finalizou o pedido com sucesso
+        </p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="bg-white rounded-b-2xl shadow-lg-purple p-8">
+        <!-- Greeting -->
+        <div class="mb-6">
+          <p class="text-gray-700">Olá [Nome do Cliente],</p>
+          <p class="text-gray-700 mt-2">
+            É com satisfação que informamos que seu afiliado confirmou a entrega
+            do pedido abaixo:
+          </p>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="mb-8 border border-gray-200 rounded-lg p-4">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            Resumo do Pedido
+          </h2>
+
+          <div class="flex justify-between mb-2">
+            <span class="text-gray-600">Número do Pedido:</span>
+            <span class="font-medium">#PED123456</span>
+          </div>
+
+          <div class="flex justify-between mb-2">
+            <span class="text-gray-600">Afiliado Responsável:</span>
+            <span class="font-medium">[Nome do Afiliado]</span>
+          </div>
+
+          <div class="flex justify-between mb-2">
+            <span class="text-gray-600">Data de Entrega:</span>
+            <span class="font-medium">[Data de Entrega]</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="mb-4">
+            <p class="text-gray-600 mb-2">Itens Entregues:</p>
+            <div class="bg-gray-50 rounded p-3">
+              <div class="flex items-center mb-2">
+                <div
+                  class="w-10 h-10 bg-primary-100 rounded flex items-center justify-center mr-3"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 text-primary-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-medium">[Nome do Produto/Serviço]</p>
+                  <p class="text-sm text-gray-500">Quantidade: 1</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-primary-50 rounded-lg p-3 mt-4">
+            <div class="flex items-start">
+              <div class="bg-primary-100 p-2 rounded-full">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-primary-600"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-gray-700">
+                  O afiliado confirmou que todas as etapas foram concluídas
+                  conforme combinado. Caso tenha alguma dúvida sobre a entrega,
+                  responda este e-mail.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            Próximos Passos
+          </h2>
+
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div
+                class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5"
+              >
+                <span class="text-primary-600 font-bold">1</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-gray-800">Avalie a entrega</h3>
+                <p class="text-sm text-gray-600">
+                  Verifique se tudo foi entregue conforme o combinado.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div
+                class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5"
+              >
+                <span class="text-primary-600 font-bold">2</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-gray-800">
+                  Confirme o recebimento
+                </h3>
+                <p class="text-sm text-gray-600">
+                  Acesse sua conta para confirmar o recebimento e liberar o
+                  pagamento do afiliado.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div
+                class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5"
+              >
+                <span class="text-primary-600 font-bold">3</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-gray-800">Deixe seu feedback</h3>
+                <p class="text-sm text-gray-600">
+                  Avalie o serviço do afiliado para nos ajudar a melhorar.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="text-center mb-8">
+          <a
+            href="#"
+            class="inline-block gradient-bg text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition duration-200"
+          >
+            Acessar Minha Conta
+          </a>
+        </div>
+
+        <!-- Support Info -->
+        <div class="bg-gray-50 rounded-lg p-4 text-center">
+          <p class="text-sm text-gray-600 mb-2">
+            Precisa de ajuda? Entre em contato com nosso suporte:
+          </p>
+          <a
+            href="mailto:suporte@empresa.com"
+            class="text-primary-600 font-medium hover:underline"
+            >suporte@empresa.com</a
+          >
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-gray-200 pt-6 text-center">
+        <div class="flex justify-center space-x-4 mb-4">
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"
+              />
+            </svg>
+          </a>
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"
+              />
+            </svg>
+          </a>
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"
+              />
+            </svg>
+          </a>
+        </div>
+        <p class="text-xs text-gray-400">
+          © 2023 Nome da Empresa. Todos os direitos reservados.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

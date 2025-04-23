@@ -2,13 +2,10 @@ import {
   Body,
   Controller,
   Get,
-  InternalServerErrorException,
-  NotImplementedException,
   Param,
   Post,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { OrderService } from './Order.service';
 import { CreateOrderUseCase } from './UseCases/CreateOrder/CreateOrder.usecase';
@@ -23,13 +20,10 @@ import { GenericPaginationDto } from 'src/utils/validators';
 import { GetOrderByIdUseCase } from './UseCases/GetOrderById/GetOrderById.usecase';
 import { CreateOrderDto } from './UseCases/CreateOrder/CreateOrder.dto';
 import { GetOrderAsAffiliateUseCase } from './UseCases/GetOrderAsAffiliate/GetOrderAsAffiliate.usecase';
-import { plainToInstance } from 'class-transformer';
 import { UserEntity } from 'src/Application/Entities/User.entity';
 import { env } from '#utils';
 import { AcceptOrderUseCase } from './UseCases/AcceptOrder/AcceptOrder.usecase';
 import { AcceptOrderDto } from './UseCases/AcceptOrder/AcceptOrder.dto';
-import { OrderEntity } from 'src/Application/Entities/Order.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { SendProofToOrderItemUseCase } from './UseCases/SendProofToOrderItem/SendProofToOrderItem.usecase';
 import { GetPendingOrdersUseCase } from './UseCases/GetPendingOrders/GetPendingOrders.usecase';
 import { SendProofToOrder } from './UseCases/SendProofToOrderItem/SendProofToOrdemItem.dto';

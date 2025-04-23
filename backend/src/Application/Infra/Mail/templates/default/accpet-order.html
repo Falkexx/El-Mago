@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirmação de Ordem Aceita</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#FDEEFF',
+                100: '#F5CCFF',
+                200: '#E8AAFF',
+                300: '#D68AFF',
+                400: '#C06AFF',
+                500: '#A84DFF',
+                600: '#8E33FF',
+                700: '#751EF4',
+                800: '#5D11CC',
+                900: '#480E9D',
+              },
+            },
+            boxShadow: {
+              'lg-purple':
+                '0 10px 25px -5px rgba(168, 77, 255, 0.3), 0 10px 10px -5px rgba(168, 77, 255, 0.1)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #a84dff 0%, #8e33ff 100%);
+      }
+
+      @media only screen and (max-width: 600px) {
+        .mobile-stack {
+          display: block !important;
+          width: 100% !important;
+        }
+
+        .mobile-px-4 {
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+        }
+
+        .mobile-text-center {
+          text-align: center !important;
+        }
+      }
+
+      .progress-bar {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #8e33ff 0%, #c06aff 100%);
+        width: 0%;
+        transition: width 1s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="max-w-2xl mx-auto my-8">
+      <!-- Header -->
+      <div class="gradient-bg text-white rounded-t-2xl p-6 text-center">
+        <h1 class="text-3xl font-bold">Ordem Aceita com Sucesso!</h1>
+        <p class="mt-2 opacity-90">
+          Você está um passo mais perto do seu ganho
+        </p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="bg-white rounded-b-2xl shadow-lg-purple p-8">
+        <!-- Order Info -->
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">
+            Detalhes da Ordem
+          </h2>
+          <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <!-- Order Summary -->
+            <div class="p-4 border-b border-gray-200 flex items-center">
+              <div
+                class="w-16 h-16 bg-primary-100 rounded-md flex items-center justify-center"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-primary-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+              </div>
+              <div class="ml-4">
+                <h3 class="font-medium text-gray-800">[Nome da Ordem]</h3>
+                <p class="text-sm text-gray-500">ID: #ORD123456</p>
+              </div>
+              <div class="ml-auto">
+                <span
+                  class="inline-block bg-primary-100 text-primary-800 text-xs px-2 py-1 rounded-full font-medium"
+                  >Ativa</span
+                >
+              </div>
+            </div>
+
+            <!-- Order Details -->
+            <div class="p-4">
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-sm text-gray-500 mb-1">Valor da Ordem</p>
+                  <p class="font-bold text-primary-600">R$ 1.250,00</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 mb-1">Seu Ganho</p>
+                  <p class="font-bold text-green-600">R$ 125,00</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 mb-1">Prazo para conclusão</p>
+                  <p class="font-bold">7 dias</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500 mb-1">Data Limite</p>
+                  <p class="font-bold">01/06/2023</p>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <p class="text-sm text-gray-500 mb-1">Progresso</p>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 10%"></div>
+                </div>
+              </div>
+
+              <div class="bg-primary-50 rounded-lg p-3">
+                <div class="flex items-start">
+                  <div class="bg-primary-100 p-2 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5 text-primary-600"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-gray-700">
+                      Você tem até
+                      <span class="font-semibold">01/06/2023</span> para
+                      concluir esta ordem e garantir seu ganho de
+                      <span class="font-semibold">R$ 125,00</span>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="mb-8">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">
+            Próximos Passos
+          </h2>
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div
+                class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5"
+              >
+                <span class="text-primary-600 font-bold">1</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-gray-800">Acesse a plataforma</h3>
+                <p class="text-sm text-gray-600">
+                  Visualize os detalhes completos da ordem em sua área de
+                  afiliado.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div
+                class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5"
+              >
+                <span class="text-primary-600 font-bold">2</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-gray-800">Execute as tarefas</h3>
+                <p class="text-sm text-gray-600">
+                  Siga todas as instruções fornecidas para concluir a ordem.
+                </p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <div
+                class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center mr-3 mt-0.5"
+              >
+                <span class="text-primary-600 font-bold">3</span>
+              </div>
+              <div>
+                <h3 class="font-medium text-gray-800">Envie os comprovantes</h3>
+                <p class="text-sm text-gray-600">
+                  Após conclusão, envie os comprovantes necessários para
+                  validação.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="text-center mb-8">
+          <a
+            href="#"
+            class="inline-block gradient-bg text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition duration-200"
+          >
+            Acessar Ordem
+          </a>
+        </div>
+
+        <!-- Support Info -->
+        <div class="bg-gray-50 rounded-lg p-4 text-center">
+          <p class="text-sm text-gray-600 mb-2">
+            Precisa de ajuda? Entre em contato com nosso suporte:
+          </p>
+          <a
+            href="mailto:suporte@empresa.com"
+            class="text-primary-600 font-medium hover:underline"
+            >suporte@empresa.com</a
+          >
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-gray-200 pt-6 text-center">
+        <div class="flex justify-center space-x-4 mb-4">
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"
+              />
+            </svg>
+          </a>
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"
+              />
+            </svg>
+          </a>
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"
+              />
+            </svg>
+          </a>
+        </div>
+        <p class="text-xs text-gray-400">
+          © 2023 Nome da Empresa. Todos os direitos reservados.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Animação simples para a barra de progresso
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+          document.querySelector('.progress-fill').style.width = '10%';
+        }, 300);
+      });
+    </script>
+  </body>
+</html>

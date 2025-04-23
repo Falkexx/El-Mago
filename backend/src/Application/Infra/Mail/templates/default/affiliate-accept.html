@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parabéns! Você foi aprovado como Afiliado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#FDEEFF',
+                100: '#F5CCFF',
+                200: '#E8AAFF',
+                300: '#D68AFF',
+                400: '#C06AFF',
+                500: '#A84DFF',
+                600: '#8E33FF',
+                700: '#751EF4',
+                800: '#5D11CC',
+                900: '#480E9D',
+              },
+            },
+            boxShadow: {
+              'lg-purple':
+                '0 10px 25px -5px rgba(168, 77, 255, 0.3), 0 10px 10px -5px rgba(168, 77, 255, 0.1)',
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #8e33ff 0%, #a84dff 100%);
+      }
+
+      .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #f00;
+        opacity: 0;
+      }
+
+      @media only screen and (max-width: 600px) {
+        .mobile-stack {
+          display: block !important;
+          width: 100% !important;
+        }
+
+        .mobile-px-4 {
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+        }
+
+        .mobile-text-center {
+          text-align: center !important;
+        }
+      }
+
+      .divider {
+        border-top: 1px dashed #e5e7eb;
+        margin: 1.5rem 0;
+      }
+
+      .welcome-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #f5ccff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+      }
+
+      .trophy-icon {
+        animation: pulse 1.5s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .feature-icon {
+        transition: all 0.3s ease;
+      }
+
+      .feature-card:hover .feature-icon {
+        transform: translateY(-5px);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <div class="max-w-2xl mx-auto my-8">
+      <!-- Header -->
+      <div
+        class="gradient-bg text-white rounded-t-2xl p-6 text-center relative overflow-hidden"
+      >
+        <div class="welcome-circle mb-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-12 w-12 text-primary-800 trophy-icon"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 12a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+            />
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold">Parabéns!</h1>
+        <p class="mt-2 opacity-90">Você foi aprovado como Afiliado</p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="bg-white rounded-b-2xl shadow-lg-purple p-8">
+        <!-- Greeting -->
+        <div class="mb-6">
+          <p class="text-gray-700">Olá [Nome do Afiliado],</p>
+          <p class="text-gray-700 mt-2">
+            Estamos muito felizes em tê-lo como parte do nosso programa de
+            afiliados! Sua conta foi aprovada e agora você pode começar a ganhar
+            dinheiro indicando nossos produtos.
+          </p>
+        </div>
+
+        <!-- Welcome Package -->
+        <div class="mb-8 border border-gray-200 rounded-lg p-4">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            Seu Kit de Boas-vindas
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              class="feature-card bg-primary-50 rounded-lg p-4 flex items-start"
+            >
+              <div class="feature-icon bg-primary-100 p-2 rounded-full mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-primary-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-medium">Link de Afiliado Exclusivo</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Seu link pessoal:
+                  <span class="text-primary-600 font-medium"
+                    >site.com/afiliado/[seu-id]</span
+                  >
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="feature-card bg-primary-50 rounded-lg p-4 flex items-start"
+            >
+              <div class="feature-icon bg-primary-100 p-2 rounded-full mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-primary-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-medium">Painel de Controle</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Acompanhe suas vendas, comissões e desempenho
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="feature-card bg-primary-50 rounded-lg p-4 flex items-start"
+            >
+              <div class="feature-icon bg-primary-100 p-2 rounded-full mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-primary-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-medium">Comissão de 20%</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Em todas as vendas geradas por você
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="feature-card bg-primary-50 rounded-lg p-4 flex items-start"
+            >
+              <div class="feature-icon bg-primary-100 p-2 rounded-full mr-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-primary-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-medium">Materiais de Divulgação</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Banners, textos e posts prontos para usar
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            Primeiros Passos
+          </h2>
+
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div
+                class="bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-1 flex-shrink-0"
+              >
+                1
+              </div>
+              <div>
+                <h3 class="font-medium">Acesse seu Painel</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Faça login em sua conta para acessar todas as ferramentas de
+                  afiliado.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div
+                class="bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-1 flex-shrink-0"
+              >
+                2
+              </div>
+              <div>
+                <h3 class="font-medium">Configure Seu Perfil</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Adicione seus dados bancários para receber seus pagamentos.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div
+                class="bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-1 flex-shrink-0"
+              >
+                3
+              </div>
+              <div>
+                <h3 class="font-medium">Comece a Divulgar</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Use seu link exclusivo e os materiais de divulgação.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start">
+              <div
+                class="bg-primary-100 text-primary-800 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-1 flex-shrink-0"
+              >
+                4
+              </div>
+              <div>
+                <h3 class="font-medium">Acompanhe Seu Desempenho</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Monitore suas vendas e comissões em tempo real.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="text-center mb-8">
+          <a
+            href="#"
+            class="inline-block gradient-bg text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition duration-200 shadow-lg-purple"
+          >
+            Acessar Meu Painel de Afiliado
+          </a>
+        </div>
+
+        <!-- Support Info -->
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="flex items-start">
+            <div class="bg-primary-100 p-2 rounded-full mr-3">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-primary-600"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">Precisa de ajuda?</h3>
+              <p class="text-sm text-gray-600 mt-1">
+                Temos um time pronto para te ajudar a começar. Acesse nosso
+                <a href="#" class="text-primary-600 hover:underline"
+                  >Guia do Afiliado</a
+                >
+                ou entre em contato pelo email
+                <a
+                  href="mailto:suporte@empresa.com"
+                  class="text-primary-600 hover:underline"
+                  >suporte@empresa.com</a
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="border-t border-gray-200 pt-6 text-center">
+        <div class="flex justify-center space-x-4 mb-4">
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"
+              />
+            </svg>
+          </a>
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.066 9.645c.183 4.04-2.83 8.544-8.164 8.544-1.622 0-3.131-.476-4.402-1.291 1.524.18 3.045-.244 4.252-1.189-1.256-.023-2.317-.854-2.684-1.995.451.086.895.061 1.298-.049-1.381-.278-2.335-1.522-2.304-2.853.388.215.83.344 1.301.359-1.279-.855-1.641-2.544-.889-3.835 1.416 1.738 3.533 2.881 5.92 3.001-.419-1.796.944-3.527 2.799-3.527.825 0 1.572.349 2.096.907.654-.128 1.27-.368 1.824-.697-.215.671-.67 1.233-1.263 1.589.581-.07 1.135-.224 1.649-.453-.384.578-.87 1.084-1.433 1.489z"
+              />
+            </svg>
+          </a>
+          <a href="#" class="text-primary-600 hover:text-primary-800">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z"
+              />
+            </svg>
+          </a>
+        </div>
+        <p class="text-xs text-gray-400">
+          © 2023 Nome da Empresa. Programa de Afiliados.
+        </p>
+        <p class="text-xs text-gray-400 mt-1">
+          Caso não queira mais receber nossos emails,
+          <a href="#" class="text-primary-500 hover:underline">clique aqui</a>.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -7,9 +7,11 @@ import { AffiliateTypeOrmRepository } from 'src/Application/Infra/Repositories/A
 import { WalletTypeOrmRepository } from 'src/Application/Infra/Repositories/WalletRepository/WalletTypeOrm.repository';
 import { TransactionTypeOrmRepository } from 'src/Application/Infra/Repositories/TransactionRepository/TransactionTypeOrm.repository';
 import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositories.module';
+import { MakeBankWithdrawalUseCase } from './UseCases/ MakeBankWithdrawal/ MakeBankWithdrawal.usecase';
+import { PaymentModule } from 'src/Application/Infra/Payment/Payment.module';
 
 @Module({
-  imports: [RepositoriesModule],
+  imports: [RepositoriesModule, PaymentModule],
   controllers: [WalletController],
   providers: [
     {
@@ -29,6 +31,7 @@ import { RepositoriesModule } from 'src/Application/Infra/Repositories/Repositor
       useClass: TransactionTypeOrmRepository,
     },
     WalletService,
+    MakeBankWithdrawalUseCase,
   ],
   exports: [],
 })

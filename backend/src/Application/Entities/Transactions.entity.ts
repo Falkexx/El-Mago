@@ -3,7 +3,6 @@ import { WalletEntity } from './Wallet.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { TransactionProvider, TransactionType } from 'src/@metadata';
 import { RequireOnlyOne } from '#types';
-import { OrderEntity } from './Order.entity';
 
 @Entity({ name: TABLE.transaction })
 export class TransactionEntity {
@@ -14,16 +13,16 @@ export class TransactionEntity {
   value: string;
 
   @Column({ type: 'enum', enum: TransactionType })
-  type: TransactionType;
+  type: keyof typeof TransactionType;
 
   @Column({ type: 'enum', enum: TransactionProvider })
-  from: TransactionProvider;
+  from: keyof typeof TransactionProvider;
 
   @Column({ type: 'enum', enum: TransactionProvider })
-  to: TransactionProvider;
+  to: keyof typeof TransactionProvider;
 
-  @Column({ type: 'varchar', length: 40 })
-  orderId: string;
+  @Column({ type: 'varchar', length: 40, nullable: true })
+  orderId: string | null;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
