@@ -1,6 +1,13 @@
 version: "3.8"
 
 services:
+  el-mago-backend:
+    container_name: el-mago-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+  
+
   el-mago-postgres:
     container_name: el-mago-postgres
     image: postgres:15-alpine

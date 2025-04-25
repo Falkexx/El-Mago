@@ -12,6 +12,8 @@ import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import { OrderItem } from 'src/Application/Entities/order-item.entity';
 import { RequestAffiliateEntity } from 'src/Application/Entities/Request-Affiliate.entity';
 import { TransactionEntity } from 'src/Application/Entities/Transactions.entity';
+import { CaryRunEntity } from 'src/Application/Entities/CaryRun/CaryRun.entity';
+import { CaryRunCategoryEntity } from 'src/Application/Entities/CaryRun/CaryRunCategory.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres', // ou o banco de dados que você está usando
@@ -33,6 +35,8 @@ export const AppDataSource = new DataSource({
     OrderItem,
     RequestAffiliateEntity,
     TransactionEntity,
+    CaryRunEntity,
+    CaryRunCategoryEntity,
   ],
   migrations: ['./src/migrations/**/*.ts'],
   synchronize: false,
