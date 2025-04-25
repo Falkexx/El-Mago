@@ -1,6 +1,6 @@
 import { PaginationResult } from '#types';
 import { GenericPaginationDto } from 'src/utils/validators';
-import { EntityManager, QueryRunner } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 
 export interface IBaseRepositoryContract<
   Entity,
@@ -14,7 +14,7 @@ export interface IBaseRepositoryContract<
     updateEntity: UpdateEntity,
     trx: QueryRunner,
   ): Promise<Entity>;
-  delete(unqRef: UniqueEntityRefs, trx?: QueryRunner): Promise<void>;
+  delete(unqRef: UniqueEntityRefs, trx: QueryRunner): Promise<void>;
   softDelete(unqRef: UniqueEntityRefs, trx: QueryRunner): Promise<Entity>;
   getAll(trx: QueryRunner): Promise<Entity[]>;
   getWithPaginationAndFilters(

@@ -18,6 +18,7 @@ import { InfraCredentialsManagerModule } from './Application/Infra/InfraCredenti
 import { BullModule } from '@nestjs/bullmq';
 import { JobsModule } from './Application/Infra/Jobs/Job.module';
 import { WalletModule } from './Application/Domains/Wallet/Wallet.module';
+import { CaryRunModule } from './Application/Domains/CaryRun/CaryRun.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { WalletModule } from './Application/Domains/Wallet/Wallet.module';
     OrderModule,
     JobsModule,
     WalletModule,
+    CaryRunModule,
   ],
   controllers: [AppController],
   providers: [

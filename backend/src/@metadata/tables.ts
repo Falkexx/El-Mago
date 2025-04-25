@@ -14,6 +14,8 @@ export enum TABLE {
   digital_shipping = 'digital_shipping',
   transaction = 'transaction',
   wallet = 'wallet',
+  cary_run = 'cary_run',
+  cary_run_category = 'cary_run_category',
 
   /**
    * @deprecated

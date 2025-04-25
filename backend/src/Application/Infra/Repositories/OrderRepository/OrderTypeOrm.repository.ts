@@ -25,16 +25,7 @@ import { QueryRunner } from 'typeorm';
 
 @Injectable()
 export class OrderTypeOrmRepository implements IOrderRepositoryContract {
-  constructor(
-    @InjectRepository(OrderEntity)
-    private readonly orderRepository: Repository<OrderEntity>,
-    @InjectRepository(OrderStatus)
-    private readonly orderStatusRepository: Repository<OrderStatus>,
-    @InjectRepository(OrderItem)
-    private readonly orderItemRepository: Repository<OrderItem>,
-    private readonly dataSource: DataSource,
-    private readonly searchBuilderService: SearchBuilderService,
-  ) {}
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
 
   async create(entity: OrderEntity, trx: QueryRunner): Promise<OrderEntity> {
     try {

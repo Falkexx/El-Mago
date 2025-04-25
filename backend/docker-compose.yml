@@ -1,6 +1,17 @@
-version: "3.8"
-
 services:
+  el-mago-backend:
+    container_name: el-mago-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - el-mago-network
+
   el-mago-postgres:
     container_name: el-mago-postgres
     image: postgres:15-alpine
@@ -19,9 +30,9 @@ services:
   el-mago-redis:
     image: redis:7-alpine
     container_name: el-mago-bank-redis
-    env_file:
-      - path: "./backend/.env"
-        required: true
+    # env_file:
+    #   - path: "./backend/.env"
+    #     required: true
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     command: >

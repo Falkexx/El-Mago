@@ -15,8 +15,6 @@ import { TABLE } from 'src/@metadata/tables';
 export class AffiliateTypeOrmRepository
   implements IAffiliateRepositoryContract
 {
-  constructor() {}
-
   async create(
     entity: AffiliateEntity,
     trx?: QueryRunner,

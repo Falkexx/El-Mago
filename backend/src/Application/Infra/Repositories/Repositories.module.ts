@@ -23,6 +23,9 @@ import { WalletEntity } from 'src/Application/Entities/Wallet.entity';
 import { TransactionEntity } from 'src/Application/Entities/Transactions.entity';
 import { WalletTypeOrmRepository } from './WalletRepository/WalletTypeOrm.repository';
 import { TransactionTypeOrmRepository } from './TransactionRepository/TransactionTypeOrm.repository';
+import { CaryRunTypeOrmRepository } from './CaryRunRepository/CaryRunTypeorm.repository';
+import { CaryRunEntity } from 'src/Application/Entities/CaryRun/CaryRun.entity';
+import { CaryRunCategoryEntity } from 'src/Application/Entities/CaryRun/CaryRunCategory.entity';
 
 @Module({
   imports: [
@@ -40,9 +43,12 @@ import { TransactionTypeOrmRepository } from './TransactionRepository/Transactio
       OrderItem,
       WalletEntity,
       TransactionEntity,
+      CaryRunEntity,
+      CaryRunCategoryEntity,
     ]),
   ],
   providers: [
+    SearchBuilderService,
     UserTypeOrmRepository,
     AffiliateTypeOrmRepository,
     ItemTypeOrmRepository,
@@ -50,9 +56,9 @@ import { TransactionTypeOrmRepository } from './TransactionRepository/Transactio
     CategoryTypeOrmRepository,
     CartTypeOrmRepository,
     OrderTypeOrmRepository,
-    SearchBuilderService,
     WalletTypeOrmRepository,
     TransactionTypeOrmRepository,
+    CaryRunTypeOrmRepository,
   ],
   exports: [TypeOrmModule, SearchBuilderService, OrderTypeOrmRepository],
 })
