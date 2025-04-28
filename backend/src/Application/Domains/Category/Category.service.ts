@@ -78,12 +78,14 @@ export class CategoryService {
     try {
       await trx.startTransaction();
 
-      await trx.commitTransaction();
-
-      return this.categoryRepository.getWithPaginationAndFilters(
+      const result = await this.categoryRepository.getWithPaginationAndFilters(
         paginationDto,
         trx,
       );
+
+      await trx.commitTransaction();
+
+      return result;
     } catch (e) {
       await trx.rollbackTransaction();
       throw e;

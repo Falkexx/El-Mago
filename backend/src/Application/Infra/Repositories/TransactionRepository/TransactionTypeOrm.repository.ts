@@ -11,13 +11,16 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { splitKeyAndValue } from '#utils';
-import { PaginationResult } from '#types';
 import { TABLE } from 'src/@metadata/tables';
+import { SearchBuilderService } from '../SearchBuilder.service';
+import { SearchBuilderResult } from '#types';
 
 @Injectable()
 export class TransactionTypeOrmRepository
   implements ITransactionRepositoryContract
 {
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
+
   async create(
     entity: TransactionEntity,
     trx?: QueryRunner,
@@ -162,8 +165,22 @@ export class TransactionTypeOrmRepository
 
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
-    trx?: QueryRunner,
-  ): Promise<PaginationResult<TransactionEntity[]>> {
-    throw new InternalServerErrorException('method not implmeneted');
+    trx: QueryRunner,
+  ): Promise<SearchBuilderResult<TransactionEntity>> {
+    try {
+      const queryBuilder = trx.manager.createQueryBuilder();
+
+      const result = await this.searchBuilderService.search(
+        paginationDto,
+        TransactionEntity,
+        TABLE.transaction,
+        queryBuilder,
+      );
+
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException();
+    }
   }
 }

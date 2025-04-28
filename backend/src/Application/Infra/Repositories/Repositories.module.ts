@@ -27,6 +27,7 @@ import { CaryRunTypeOrmRepository } from './CaryRunRepository/CaryRunTypeorm.rep
 import { CaryRunEntity } from 'src/Application/Entities/CaryRun/CaryRun.entity';
 import { CaryRunCategoryEntity } from 'src/Application/Entities/CaryRun/CaryRunCategory.entity';
 import { GameServerTypeOrmRepository } from './GameServerRepository/GameServerTypeorm.repository';
+import { GameServerEntity } from 'src/Application/Entities/GameServer.entity';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { GameServerTypeOrmRepository } from './GameServerRepository/GameServerTy
       TransactionEntity,
       CaryRunEntity,
       CaryRunCategoryEntity,
+      GameServerEntity,
     ]),
   ],
   providers: [

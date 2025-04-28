@@ -9,8 +9,8 @@ import {
   CaryRunCategoryUniqueRefs,
 } from 'src/Application/Entities/CaryRun/CaryRunCategory.entity';
 import { QueryRunner } from 'typeorm';
-import { PaginationResult } from '#types';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { SearchBuilderResult } from '#types';
 
 export interface ICaryRunRepositoryContract
   extends IBaseRepositoryContract<
@@ -30,5 +30,5 @@ export interface ICaryRunRepositoryContract
   getManyCategories(
     pagination: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<CaryRunCategoryEntity[]>>;
+  ): Promise<SearchBuilderResult<CaryRunCategoryEntity>>;
 }

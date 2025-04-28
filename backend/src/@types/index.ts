@@ -1,16 +1,17 @@
 import { Status } from 'src/@metadata';
 
-export class PaginationProps {
+export type PaginationProps = {
   page: number;
   limit: number;
   sortBy?: string;
   order?: 'ASC' | 'DESC';
-}
+};
 
-export type PaginationResult<D> = {
+type PaginationResult = PaginationProps & {
   total: number;
-  data: D;
-} & PaginationProps;
+  totalPages: number;
+  remainingPages: number;
+};
 
 export type PayloadType = {
   sub: string;
@@ -19,18 +20,18 @@ export type PayloadType = {
   isDeleted: boolean;
 };
 
+export type SearchBuilderResult<D> = {
+  data: D[];
+  meta: PaginationResult;
+};
+
 export type Auth = { id: string; roles: string[] };
 
 export interface ApiResponse<T> {
   status: number;
   message: string;
   data: T;
-  meta?: {
-    total?: number;
-    page?: number;
-    per_page?: number;
-    order: 'ASC' | 'DESC';
-  };
+  meta?: PaginationResult;
   href?: string;
 }
 

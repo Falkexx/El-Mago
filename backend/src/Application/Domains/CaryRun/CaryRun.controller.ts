@@ -44,10 +44,12 @@ export class CaryRunController {
       message: 'success',
       status: 200,
       meta: {
-        order: result.order,
-        page: result.page,
-        per_page: result.limit,
-        total: result.total,
+        limit: result.meta.limit,
+        order: result.meta.order,
+        page: result.meta.page,
+        remainingPages: result.meta.remainingPages,
+        total: result.meta.total,
+        totalPages: result.meta.totalPages,
       },
     };
   }
@@ -77,12 +79,7 @@ export class CaryRunController {
       data: result.data,
       message: 'success',
       status: 200,
-      meta: {
-        order: result.order,
-        page: result.page,
-        per_page: result.limit,
-        total: result.total,
-      },
+      meta: result.meta,
     };
   }
 }

@@ -7,12 +7,12 @@ import {
   HttpStatus,
   Inject,
   Param,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { GameServerService } from './GameServer.service';
 import { CreateGameServerDto } from './dtos/CreateGameServer.dto';
-import { KEY_INJECTION } from 'src/@metadata/keys';
 import { JwtAuthGuard } from 'src/@guards/jwt-auth.guard';
 import { RoleGuard } from 'src/@guards/role.guard';
 import { ROLE, RolesDecorator } from 'src/utils/role';
@@ -21,16 +21,14 @@ import { GameServerEntity } from 'src/Application/Entities/GameServer.entity';
 import { env } from '#utils';
 import { GenericPaginationDto } from 'src/utils/validators';
 
-@Controller({ path: 'gamer-server', version: '1' })
+@Controller({ path: 'game-server', version: '1' })
 export class GamerServerController {
-  constructor(
-    @Inject(KEY_INJECTION.GAME_SERVER_REPOSITORY)
-    private readonly gameServer: GameServerService,
-  ) {}
+  constructor(private readonly gameServer: GameServerService) {}
 
+  @Post()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RolesDecorator(ROLE.ADMIN, ROLE.AFFILIATE)
-  @HttpCode(201)
+  @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() gameServerDto: CreateGameServerDto,
   ): Promise<ApiResponse<GameServerEntity>> {
@@ -45,6 +43,7 @@ export class GamerServerController {
   }
 
   @Get('id/:id')
+  @HttpCode(HttpStatus.ACCEPTED)
   async getById(
     @Param('id') id: string,
   ): Promise<ApiResponse<GameServerEntity>> {
@@ -62,6 +61,7 @@ export class GamerServerController {
   }
 
   @Get('name/:name')
+  @HttpCode(HttpStatus.ACCEPTED)
   async getByName(@Param('name') name: string) {
     if (!name) {
       throw new BadRequestException('require name to get game server');
@@ -87,12 +87,7 @@ export class GamerServerController {
       data: result.data,
       message: 'get many game server successfully',
       status: 200,
-      meta: {
-        order: result.order,
-        page: result.page,
-        per_page: result.limit,
-        total: result.total,
-      },
+      meta: result.meta,
     };
   }
 }

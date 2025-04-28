@@ -4,6 +4,7 @@ import {
   WalletUpdateEntity,
 } from 'src/Application/Entities/Wallet.entity';
 import { IBaseRepositoryContract } from '../IBase.repository-contract';
+import { QueryRunner } from 'typeorm';
 
 export interface IWalletRepositoryContract
   extends IBaseRepositoryContract<
@@ -11,5 +12,8 @@ export interface IWalletRepositoryContract
     WalletUpdateEntity,
     WalletUniqueRefs
   > {
-  getWalletByAffiliateId(affiliateId: string): Promise<WalletEntity>;
+  getWalletByAffiliateId(
+    affiliateId: string,
+    trx: QueryRunner,
+  ): Promise<WalletEntity>;
 }

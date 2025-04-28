@@ -49,7 +49,7 @@ export class GameServerTypeOrmRepository
     try {
       const result = await trx.manager
         .createQueryBuilder()
-        .select()
+        .select(TABLE.game_server)
         .from(GameServerEntity, TABLE.game_server)
         .where(`"${TABLE.game_server}"."${key}" = :value`, { value })
         .getOne();
@@ -159,11 +159,14 @@ export class GameServerTypeOrmRepository
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
   ) {
+    const queryBuilder = trx.manager.createQueryBuilder();
+
     try {
       const result = await this.searchBuilder.search(
         paginationDto,
+        GameServerEntity,
         TABLE.game_server,
-        trx.manager.createQueryBuilder(),
+        queryBuilder,
       );
 
       return result;

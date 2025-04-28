@@ -182,11 +182,15 @@ export class AffiliateService {
     try {
       await trx.startTransaction();
 
+      const affiliates =
+        await this.affiliateRepository.getWithPaginationAndFilters(
+          paginationDto,
+          trx,
+        );
+
       await trx.commitTransaction();
-      return this.affiliateRepository.getWithPaginationAndFilters(
-        paginationDto,
-        trx,
-      );
+
+      return affiliates;
     } catch (e) {
       await trx.rollbackTransaction();
       throw e;

@@ -1,4 +1,4 @@
-import { PaginationResult } from '#types';
+import { SearchBuilderResult } from '#types';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { QueryRunner } from 'typeorm';
 
@@ -20,5 +20,5 @@ export interface IBaseRepositoryContract<
   getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<Entity[]>>;
+  ): Promise<SearchBuilderResult<Entity>>;
 }

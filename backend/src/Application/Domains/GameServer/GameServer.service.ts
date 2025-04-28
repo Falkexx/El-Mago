@@ -10,6 +10,7 @@ import { CreateGameServerDto } from './dtos/CreateGameServer.dto';
 import { DataSource } from 'typeorm';
 import { generateShortId } from '#utils';
 import { GenericPaginationDto } from 'src/utils/validators';
+import { Omics } from 'aws-sdk';
 
 @Injectable()
 export class GameServerService {
@@ -33,6 +34,8 @@ export class GameServerService {
         trx,
       );
 
+      console.log(gameServerAlreadyExist);
+
       if (gameServerAlreadyExist) {
         throw new ConflictException('game server already exist');
       }
@@ -55,6 +58,7 @@ export class GameServerService {
       return gameServerCreated;
     } catch (e) {
       await trx.rollbackTransaction();
+      throw e;
     } finally {
       await trx.release();
     }
@@ -77,6 +81,7 @@ export class GameServerService {
       return gameServer;
     } catch (e) {
       await trx.rollbackTransaction();
+      throw e;
     } finally {
       await trx.release();
     }
@@ -99,6 +104,7 @@ export class GameServerService {
       return gameServer;
     } catch (e) {
       await trx.rollbackTransaction();
+      throw e;
     } finally {
       await trx.release();
     }
@@ -121,6 +127,7 @@ export class GameServerService {
       return result;
     } catch (e) {
       await trx.rollbackTransaction();
+      throw e;
     } finally {
       await trx.release();
     }
