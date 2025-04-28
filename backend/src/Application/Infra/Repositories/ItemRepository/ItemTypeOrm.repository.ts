@@ -8,7 +8,7 @@ import {
   ItemEntity,
   ItemUniquePrams,
   ItemUpdateEntity,
-} from 'src/Application/Entities/Item.entity';
+} from 'src/Application/Entities/Item/Item.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { SearchBuilderResult, SelectFieldsWithRelations } from '#types';
 import { IItemRepositoryContract } from './IItem.repository-contract';

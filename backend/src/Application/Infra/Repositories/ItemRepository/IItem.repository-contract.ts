@@ -2,7 +2,7 @@ import {
   ItemEntity,
   ItemUniquePrams,
   ItemUpdateEntity,
-} from 'src/Application/Entities/Item.entity';
+} from 'src/Application/Entities/Item/Item.entity';
 import { IBaseRepositoryContract } from '../IBase.repository-contract';
 import { SelectFieldsWithRelations } from '#types';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';

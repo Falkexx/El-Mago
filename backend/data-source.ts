@@ -2,7 +2,7 @@ import { env } from './src/utils';
 import { UserEntity } from './src/Application/Entities/User.entity';
 import { DataSource } from 'typeorm';
 import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
-import { ItemEntity } from 'src/Application/Entities/Item.entity';
+import { ItemEntity } from 'src/Application/Entities/Item/Item.entity';
 import { ImageEntity } from 'src/Application/Entities/Image.entity';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';
 import { CartEntity } from 'src/Application/Entities/Cart/Cart.entity';

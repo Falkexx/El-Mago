@@ -9,7 +9,7 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { ItemType } from 'src/@metadata';
+import { ItemModel, ItemType } from 'src/@metadata';
 import { ImageDto } from 'src/utils/validators';
 
 export class CreateItemBodyDto {
@@ -52,6 +52,15 @@ export class CreateItemBodyDto {
   @IsString()
   @IsNotEmpty()
   categoryId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  server: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(ItemModel)
+  itemModel: ItemModel;
 }
 
 export type CreateItemDto = CreateItemBodyDto & ImageDto;

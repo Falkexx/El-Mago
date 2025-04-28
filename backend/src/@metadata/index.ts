@@ -1,5 +1,3 @@
-import e from 'express';
-
 export enum ItemType {
   COMMON = 'COMMON',
   UNIQUE = 'UNIQUE',
@@ -102,4 +100,11 @@ export enum TransactionProvider {
   SERVER = 'SERVER',
   AFFILIATE = 'AFFILIATE',
   ADMIN = 'ADMIN',
+}
+
+export enum ItemModel {
+  item = 'item',
+  cary_run = 'cary_run',
+  boosting = 'boosting',
+  gold = 'gold',
 }

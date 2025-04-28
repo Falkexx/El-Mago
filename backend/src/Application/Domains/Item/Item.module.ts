@@ -10,6 +10,7 @@ import { CategoryTypeOrmRepository } from 'src/Application/Infra/Repositories/Ca
 import { StorageModule } from 'src/Application/Infra/Storage/Storage.module';
 import { AssignCategoryUseCase } from './UseCases/AssinCategory/AsssignCategory.usecase';
 import { GetManyItemsUseCase } from './UseCases/GetMany/GetManyItems.usecase';
+import { GameServerTypeOrmRepository } from 'src/Application/Infra/Repositories/GameServerRepository/GameServerTypeorm.repository';
 
 @Module({
   imports: [RepositoriesModule, StorageModule],
@@ -30,6 +31,10 @@ import { GetManyItemsUseCase } from './UseCases/GetMany/GetManyItems.usecase';
     {
       provide: KEY_INJECTION.CATEGORY_REPOSITORY,
       useClass: CategoryTypeOrmRepository,
+    },
+    {
+      provide: KEY_INJECTION.GAME_SERVER_REPOSITORY,
+      useClass: GameServerTypeOrmRepository,
     },
     CreateItemService,
 
