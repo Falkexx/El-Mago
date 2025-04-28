@@ -57,7 +57,7 @@ export class SearchBuilderService {
 
     // Select all columns of the aliased table
     const [data, total] = await queryBuilder
-      .select(`${tableName}.*`)
+      .select(tableName)
       .from(entity, tableName)
       .take(limit)
       .skip(offset)
