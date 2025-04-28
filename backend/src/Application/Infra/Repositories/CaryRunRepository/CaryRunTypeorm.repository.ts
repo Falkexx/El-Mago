@@ -1,4 +1,3 @@
-import { PaginationResult } from '#types';
 import {
   CaryRunEntity,
   CaryRunUniqueRefs,
@@ -19,6 +18,7 @@ import {
 import { splitKeyAndValue } from '#utils';
 import { TABLE } from 'src/@metadata/tables';
 import { SearchBuilderService } from '../SearchBuilder.service';
+import { SearchBuilderResult } from '#types';
 
 @Injectable()
 export class CaryRunTypeOrmRepository implements ICaryRunRepositoryContract {
@@ -136,30 +136,18 @@ export class CaryRunTypeOrmRepository implements ICaryRunRepositoryContract {
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<CaryRunEntity[]>> {
+  ): Promise<SearchBuilderResult<CaryRunEntity>> {
     try {
-      const { page, limit, filters } = paginationDto;
-      const skip = (page - 1) * limit;
+      const queryBuilder = await trx.manager.createQueryBuilder();
 
-      const queryBuilder = trx.manager
-        .createQueryBuilder(CaryRunEntity, 'cary_run')
-        .take(limit)
-        .skip(skip);
+      const result = this.searchBuilderService.search(
+        paginationDto,
+        CaryRunEntity,
+        TABLE.cary_run,
+        queryBuilder,
+      );
 
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          queryBuilder.andWhere(`cary_run.${key} = :${key}`, { [key]: value });
-        });
-      }
-
-      const [data, total] = await queryBuilder.getManyAndCount();
-
-      return {
-        data,
-        total,
-        page,
-        limit,
-      };
+      return result;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException(
@@ -245,10 +233,11 @@ export class CaryRunTypeOrmRepository implements ICaryRunRepositoryContract {
   async getManyCategories(
     pagination: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<CaryRunCategoryEntity[]>> {
+  ): Promise<SearchBuilderResult<CaryRunCategoryEntity>> {
     try {
       const result = await this.searchBuilderService.search(
         pagination,
+        CaryRunEntity,
         TABLE.cary_run_category,
         trx.manager.createQueryBuilder(),
       );

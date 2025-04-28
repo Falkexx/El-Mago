@@ -7,13 +7,14 @@ import {
 import { QueryRunner } from 'typeorm';
 import { IUserRepositoryContract } from './IUserRepository.contract';
 import { splitKeyAndValue } from '#utils';
-import { PaginationResult } from '#types';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { TABLE } from 'src/@metadata/tables';
+import { SearchBuilderResult } from '#types';
+import { SearchBuilderService } from '../SearchBuilder.service';
 
 @Injectable()
 export class UserTypeOrmRepository implements IUserRepositoryContract {
-  constructor() {} // private readonly userRepository: Repository<UserEntity>, // @InjectRepository(UserEntity)
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
 
   async getByEmail(
     email: string,
@@ -172,38 +173,21 @@ export class UserTypeOrmRepository implements IUserRepositoryContract {
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<UserEntity[]>> {
-    const { page, limit, search, filters, order } = paginationDto;
+  ): Promise<SearchBuilderResult<UserEntity>> {
+    try {
+      const queryBuilder = trx.manager.createQueryBuilder();
 
-    const queryBuilder = trx.manager.createQueryBuilder(UserEntity, TABLE.user);
+      const result = await this.searchBuilderService.search(
+        paginationDto,
+        UserEntity,
+        TABLE.user,
+        queryBuilder,
+      );
 
-    if (search) {
-      queryBuilder.andWhere(`SIMILARITY(${TABLE.user}.name, :search) > 0.3`, {
-        search: `%${search}`,
-      });
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException();
     }
-
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        queryBuilder.andWhere(`${TABLE.user}.${key} = :${key}`, {
-          [key]: value,
-        });
-      });
-    }
-
-    queryBuilder.orderBy(`${TABLE.user}.createdAt`, order || 'DESC');
-
-    const [users, total] = await queryBuilder
-      .take(limit)
-      .skip((page - 1) * limit)
-      .getManyAndCount();
-
-    return {
-      data: users,
-      page,
-      limit,
-      total,
-      order,
-    };
   }
 }

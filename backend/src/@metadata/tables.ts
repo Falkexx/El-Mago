@@ -16,6 +16,7 @@ export enum TABLE {
   wallet = 'wallet',
   cary_run = 'cary_run',
   cary_run_category = 'cary_run_category',
+  game_server = 'game_server',
 
   /**
    * @deprecated

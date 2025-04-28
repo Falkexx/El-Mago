@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotImplementedException,
-} from '@nestjs/common';
-import { PaginationResult } from '#types';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   WalletEntity,
   WalletUniqueRefs,
@@ -11,16 +6,19 @@ import {
 } from 'src/Application/Entities/Wallet.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { splitKeyAndValue } from '#utils';
-import { EntityManager, QueryRunner, Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TABLE } from 'src/@metadata/tables';
 import { IWalletRepositoryContract } from './IWallet.repository-contract';
+import { SearchBuilderService } from '../SearchBuilder.service';
+import { SearchBuilderResult } from '#types';
 
 @Injectable()
 export class WalletTypeOrmRepository implements IWalletRepositoryContract {
   constructor(
     @InjectRepository(WalletEntity)
     private readonly walletRepository: Repository<WalletEntity>,
+    private readonly searchBuilderService: SearchBuilderService,
   ) {}
 
   async create(entity: WalletEntity, trx: QueryRunner): Promise<WalletEntity> {
@@ -146,31 +144,23 @@ export class WalletTypeOrmRepository implements IWalletRepositoryContract {
 
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
-  ): Promise<PaginationResult<WalletEntity[]>> {
-    throw new NotImplementedException('method not implemented');
-    //   const { page = 1, limit = 10 } = paginationDto;
+    trx: QueryRunner,
+  ): Promise<SearchBuilderResult<WalletEntity>> {
+    try {
+      const queryBuilder = trx.manager.createQueryBuilder();
 
-    //   try {
-    //     const queryBuilder = this.accountRepository
-    //       .createQueryBuilder(TABLE.account)
-    //       .where(`"${TABLE.account}"."deletedAt" IS NULL`);
+      const result = await this.searchBuilderService.search(
+        paginationDto,
+        WalletEntity,
+        TABLE.wallet,
+        queryBuilder,
+      );
 
-    //     const [data, total] = await queryBuilder
-    //       .skip((page - 1) * limit)
-    //       .take(limit)
-    //       .getManyAndCount();
-
-    //     return {
-    //       data,
-    //       total,
-    //       page,
-    //       limit,
-    //       totalPages: Math.ceil(total / limit),
-    //     };
-    //   } catch (e) {
-    //     console.error(e);
-    //     throw new InternalServerErrorException();
-    //   }
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException();
+    }
   }
 
   async getWalletByAffiliateId(affiliateId: string): Promise<WalletEntity> {

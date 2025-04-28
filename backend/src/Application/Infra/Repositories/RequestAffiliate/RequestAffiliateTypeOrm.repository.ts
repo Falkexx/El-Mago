@@ -1,4 +1,3 @@
-import { PaginationResult } from '#types';
 import {
   RequestAffiliateEntity,
   RequestAffiliateUnqRef,
@@ -12,18 +11,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { splitKeyAndValue } from '#utils';
 import { SearchBuilderService } from '../SearchBuilder.service';
 import { TABLE } from 'src/@metadata/tables';
-import { UserEntity } from 'src/Application/Entities/User.entity';
-import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
+import { SearchBuilderResult } from '#types';
 
 @Injectable()
 export class RequestAffiliateTypeOrmRepository
   implements IRequestAffiliateRepositoryContract
 {
-  constructor(
-    @InjectRepository(RequestAffiliateEntity)
-    private readonly reqAffiliateRepo: Repository<RequestAffiliateEntity>,
-    private readonly searchBuilder: SearchBuilderService,
-  ) {}
+  constructor(private readonly searchBuilder: SearchBuilderService) {}
 
   async create(
     entity: RequestAffiliateEntity,
@@ -169,7 +163,7 @@ export class RequestAffiliateTypeOrmRepository
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<RequestAffiliateEntity[]>> {
+  ): Promise<SearchBuilderResult<RequestAffiliateEntity>> {
     try {
       const queryBuilder = trx.manager.createQueryBuilder(
         RequestAffiliateEntity,
@@ -178,6 +172,7 @@ export class RequestAffiliateTypeOrmRepository
 
       return this.searchBuilder.search(
         paginationDto,
+        RequestAffiliateEntity,
         TABLE.affiliate_queue,
         queryBuilder,
         { createdField: 'createdAt', searchField: 'name' },

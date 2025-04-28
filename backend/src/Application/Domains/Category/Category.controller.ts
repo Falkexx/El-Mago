@@ -39,16 +39,12 @@ export class CategoryController {
   ): Promise<ApiResponse<CategoryEntity[]>> {
     const result =
       await this.categoryService.findWithPaginationAndFilters(paginationDto);
+
     return {
       data: result.data,
       message: 'success',
       status: 200,
-      meta: {
-        order: result.order,
-        page: result.page,
-        per_page: result.limit,
-        total: result.total,
-      },
+      meta: result.meta,
     };
   }
 }

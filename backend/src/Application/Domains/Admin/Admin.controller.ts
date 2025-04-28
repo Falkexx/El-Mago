@@ -82,10 +82,12 @@ export class AdminController {
       message: 'success',
       status: 200,
       meta: {
-        page: result.page,
-        per_page: result.limit,
-        total: result.total,
-        order: result.order ?? 'DESC',
+        total: result.meta.total,
+        page: result.meta.page,
+        limit: result.meta.limit,
+        order: result.meta.order ?? 'DESC',
+        remainingPages: result.meta.remainingPages,
+        totalPages: result.meta.totalPages,
       },
     };
   }
