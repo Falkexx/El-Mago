@@ -17,7 +17,7 @@ import { User } from '../Auth/decorators/User.decorator';
 import { ApiResponse, PayloadType } from '#types';
 import { ROLE, RolesDecorator } from 'src/utils/role';
 import { plainToInstance } from 'class-transformer';
-import { ItemEntity } from 'src/Application/Entities/Item.entity';
+import { ItemEntity } from 'src/Application/Entities/Item/Item.entity';
 import { AssignCategoryUseCase } from './UseCases/AssinCategory/AsssignCategory.usecase';
 import { AssignCategoryDto } from './UseCases/AssinCategory/AssignCategory.dto';
 import { GenericPaginationDto } from 'src/utils/validators';

@@ -9,7 +9,7 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { AffiliateEntity } from './Affiliate.entity';
-import { ItemEntity } from './Item.entity';
+import { ItemEntity } from './Item/Item.entity';
 import { CartEntity } from './Cart/Cart.entity';
 import { OrderEntity } from './Order.entity';
 import { RequestAffiliateEntity } from './Request-Affiliate.entity';

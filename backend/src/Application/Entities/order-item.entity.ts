@@ -1,8 +1,9 @@
 import { TABLE } from 'src/@metadata/tables';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { OrderEntity } from './Order.entity';
-import { ItemEntity } from './Item.entity';
+import { ItemEntity } from './Item/Item.entity';
 import { RequireOnlyOne } from '#types';
+import { ItemModel } from 'src/@metadata';
 
 @Entity({ name: TABLE.order_item })
 export class OrderItem {
@@ -41,8 +42,14 @@ export class OrderItem {
   @Column({ type: 'varchar' })
   itemId: string;
 
+  @Column({ type: 'varchar', enum: ItemModel })
+  itemModel: ItemModel;
+
   @Column({ type: 'jsonb', nullable: true, default: null })
   proofOfDelivery: any;
+
+  @Column({ type: 'varchar' })
+  server: string;
 }
 
 export type OrderItemUniqueRefs = RequireOnlyOne<Pick<OrderItem, 'id'>>;

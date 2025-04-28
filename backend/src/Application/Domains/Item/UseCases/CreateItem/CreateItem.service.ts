@@ -16,6 +16,7 @@ import { ICategoryRepositoryContract } from 'src/Application/Infra/Repositories/
 import { StorageService } from 'src/Application/Infra/Storage/Storage.service';
 import { env } from 'process';
 import { DataSource } from 'typeorm';
+import { IGameServerRepositoryContract } from 'src/Application/Infra/Repositories/GameServerRepository/IGameServer.repository-contract';
 
 export class CreateItemService {
   constructor(
@@ -27,6 +28,8 @@ export class CreateItemService {
     private readonly imageRepository: IIMageRepositoryContract,
     @Inject(KEY_INJECTION.CATEGORY_REPOSITORY)
     private readonly categoryRepository: ICategoryRepositoryContract,
+    @Inject(KEY_INJECTION.GAME_SERVER_REPOSITORY)
+    private readonly gameServerRepository: IGameServerRepositoryContract,
     private readonly storageService: StorageService,
     private readonly dataSource: DataSource,
   ) {}
@@ -61,6 +64,17 @@ export class CreateItemService {
 
       if (!category) {
         throw new NotFoundException('category not found');
+      }
+
+      const gameServer = await this.gameServerRepository.getBy(
+        {
+          name: createItemDto.server,
+        },
+        trx,
+      );
+
+      if (!gameServer) {
+        throw new NotFoundException('server not found');
       }
 
       const imageId = generateShortId(20);
@@ -103,12 +117,14 @@ export class CreateItemService {
           deletedAt: new Date(),
           createdAt: new Date(),
           updatedAt: new Date(),
+          itemModel: createItemDto.itemModel,
           imageUrl: imageCrated.url,
           tags: createItemDto.tags,
           Categories: [category],
           user: user,
           CartItems: undefined,
           OrderItem: undefined,
+          server: gameServer.name,
         },
         trx,
       );
