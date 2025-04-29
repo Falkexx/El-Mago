@@ -24,9 +24,11 @@ function ItemsSections({ title, options }: Props) {
   return (
     <section className="w-full py-4 px-6 bg-white bg-opacity-0 rounded-[10px] border border-Neutral-800">
       <section className="flex flex-col gap-4">
-        <h1 className="text-Neutral-100 text-base font-medium leading-normal">
+
+        {title == ""? "" : <h1 className="text-Neutral-100 text-base font-medium leading-normal">
           {title}
-        </h1>
+        </h1> }
+
 
         <div className="flex flex-row w-full gap-28 flex-wrap">
           {options.map((option) => (

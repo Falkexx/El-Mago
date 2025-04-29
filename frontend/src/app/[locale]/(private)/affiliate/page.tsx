@@ -1,10 +1,18 @@
-import Operation_steps from "../components/Affiliate/Operation_steps";
-import FinishOrder from "../components/Ui/Overlay/FinishOrder";
-import OrderOverlay from "../components/Ui/Overlay/OrderOverlay";
-import RegisterMarketplace from "../components/Ui/Overlay/RegisterMarketplage";
+import Operation_steps from "../../components/Affiliate/Operation_steps";
+import FinishOrder from "../../components/Ui/Overlay/FinishOrder";
+import OrderOverlay from "../../components/Ui/Overlay/OrderOverlay";
+import RegisterMarketplace from "../../components/Ui/Overlay/RegisterMarketplage";
 import Approved_Affiliate_page from "@/app/[locale]/components/Affiliate/Aproved_Affiliate_page/index"
+import {auth} from "@/lib/auth"
+import Affiliate_Unautorized from "@/app/[locale]/components/Ui/Unauthorized/Affiliate_Unauthorized"
 
-function page() {
+async function page() {
+
+  const session = await auth();
+
+  if (session) {
+    console.log(session)
+  }else{
 
   return <section>
 
@@ -24,6 +32,9 @@ function page() {
       </section>
     </main>
   </section>;
+
+  }
+
 }
 
 export default page;

@@ -17,10 +17,11 @@ async function Page() {
 
     const equipments_data = [
       "all",
-      "Legendary",
-      "Unique",
-      "Runes",
-      "Runes",
+      "Kill Summon Boss",
+      "Dungeons",
+      "Character Boosting",
+      "Infernal Hardes Compass",
+      "Nahantu Nightmare Dungeon",
     ];
     const items_data = [
       {
