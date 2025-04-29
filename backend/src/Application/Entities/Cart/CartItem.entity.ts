@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { ItemEntity } from '../Item.entity';
+import { ItemEntity } from '../Item/Item.entity';
 import { CartEntity } from './Cart.entity';
 import { TABLE } from 'src/@metadata/tables';
 import { RequireOnlyOne } from '#types';

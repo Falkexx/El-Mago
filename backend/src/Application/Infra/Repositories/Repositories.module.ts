@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from 'src/Application/Entities/User.entity';
 import { AffiliateEntity } from 'src/Application/Entities/Affiliate.entity';
 import { AffiliateTypeOrmRepository } from './AffiliateRepository/AffiliateTypeOrm.repository';
-import { ItemEntity } from 'src/Application/Entities/Item.entity';
+import { ItemEntity } from 'src/Application/Entities/Item/Item.entity';
 import { ImageEntity } from 'src/Application/Entities/Image.entity';
 import { ItemTypeOrmRepository } from './ItemRepository/ItemTypeOrm.repository';
 import { ImageTypeormRepository } from './ImageRepository/ImageTypeOrm.repository';
@@ -23,6 +23,11 @@ import { WalletEntity } from 'src/Application/Entities/Wallet.entity';
 import { TransactionEntity } from 'src/Application/Entities/Transactions.entity';
 import { WalletTypeOrmRepository } from './WalletRepository/WalletTypeOrm.repository';
 import { TransactionTypeOrmRepository } from './TransactionRepository/TransactionTypeOrm.repository';
+import { CaryRunTypeOrmRepository } from './CaryRunRepository/CaryRunTypeorm.repository';
+import { CaryRunEntity } from 'src/Application/Entities/CaryRun/CaryRun.entity';
+import { CaryRunCategoryEntity } from 'src/Application/Entities/CaryRun/CaryRunCategory.entity';
+import { GameServerTypeOrmRepository } from './GameServerRepository/GameServerTypeorm.repository';
+import { GameServerEntity } from 'src/Application/Entities/GameServer.entity';
 
 @Module({
   imports: [
@@ -40,9 +45,13 @@ import { TransactionTypeOrmRepository } from './TransactionRepository/Transactio
       OrderItem,
       WalletEntity,
       TransactionEntity,
+      CaryRunEntity,
+      CaryRunCategoryEntity,
+      GameServerEntity,
     ]),
   ],
   providers: [
+    SearchBuilderService,
     UserTypeOrmRepository,
     AffiliateTypeOrmRepository,
     ItemTypeOrmRepository,
@@ -50,9 +59,10 @@ import { TransactionTypeOrmRepository } from './TransactionRepository/Transactio
     CategoryTypeOrmRepository,
     CartTypeOrmRepository,
     OrderTypeOrmRepository,
-    SearchBuilderService,
     WalletTypeOrmRepository,
     TransactionTypeOrmRepository,
+    CaryRunTypeOrmRepository,
+    GameServerTypeOrmRepository,
   ],
   exports: [TypeOrmModule, SearchBuilderService, OrderTypeOrmRepository],
 })

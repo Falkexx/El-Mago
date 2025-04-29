@@ -6,14 +6,15 @@ import {
   ImageUpdateEntity,
 } from 'src/Application/Entities/Image.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
-import { PaginationResult } from '#types';
 import { IIMageRepositoryContract } from './IImage.repository-contract';
 import { splitKeyAndValue } from '#utils';
 import { TABLE } from 'src/@metadata/tables';
+import { SearchBuilderResult } from '#types';
+import { SearchBuilderService } from '../SearchBuilder.service';
 
 @Injectable()
 export class ImageTypeormRepository implements IIMageRepositoryContract {
-  constructor() {}
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
 
   async create(entity: ImageEntity, trx: QueryRunner): Promise<ImageEntity> {
     try {
@@ -138,43 +139,18 @@ export class ImageTypeormRepository implements IIMageRepositoryContract {
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<ImageEntity[]>> {
-    const { page, limit, search, filters, order } = paginationDto;
-
-    const queryBuilder = trx.manager.createQueryBuilder(
-      ImageEntity,
-      TABLE.image,
-    );
-
-    if (search) {
-      queryBuilder.andWhere(`SIMILARITY(${TABLE.image}.name, :search) > 0.3`, {
-        search: `%${search}%`,
-      });
-    }
-
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        queryBuilder.andWhere(`${TABLE.image}.${key} = :${key}`, {
-          [key]: value,
-        });
-      });
-    }
-
-    queryBuilder.orderBy(`${TABLE.image}.createdAt`, order || 'DESC');
-
+  ): Promise<SearchBuilderResult<ImageEntity>> {
     try {
-      const [images, total] = await queryBuilder
-        .take(limit)
-        .skip((page - 1) * limit)
-        .getManyAndCount();
+      const queryBuilder = trx.manager.createQueryBuilder();
 
-      return {
-        data: images,
-        page,
-        limit,
-        total,
-        order,
-      };
+      const result = await this.searchBuilderService.search(
+        paginationDto,
+        ImageEntity,
+        TABLE.image,
+        queryBuilder,
+      );
+
+      return result;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();

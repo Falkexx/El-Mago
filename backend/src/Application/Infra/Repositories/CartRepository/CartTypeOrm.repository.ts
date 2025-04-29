@@ -1,4 +1,3 @@
-import { PaginationResult } from '#types';
 import {
   CartEntity,
   CartUniqueRef,
@@ -17,9 +16,11 @@ import {
   UpdateCartItemEntity,
 } from 'src/Application/Entities/Cart/CartItem.entity';
 import { TABLE } from 'src/@metadata/tables';
+import { SearchBuilderService } from '../SearchBuilder.service';
+import { SearchBuilderResult } from '#types';
 
 export class CartTypeOrmRepository implements ICartRepositoryContract {
-  constructor() {}
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
 
   async create(entity: CartEntity, trx: QueryRunner): Promise<CartEntity> {
     try {
@@ -125,13 +126,22 @@ export class CartTypeOrmRepository implements ICartRepositoryContract {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getWithPaginationAndFilters<R extends keyof CartEntity>(
+  async getWithPaginationAndFilters<R extends keyof CartEntity>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<CartEntity[]>> {
+  ): Promise<SearchBuilderResult<CartEntity>> {
     try {
-      throw new Error('Method not implemented');
+      const queryBuilder = trx.manager.createQueryBuilder();
+
+      const result = await this.searchBuilderService.search(
+        paginationDto,
+        CartEntity,
+        TABLE.cart,
+        queryBuilder,
+      );
+
+      return result;
     } catch (e) {
       console.log(e);
       throw new InternalServerErrorException('internal server error');

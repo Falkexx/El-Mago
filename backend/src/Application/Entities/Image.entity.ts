@@ -1,6 +1,6 @@
 import { TABLE } from 'src/@metadata/tables';
 import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
-import { ItemEntity } from './Item.entity';
+import { ItemEntity } from './Item/Item.entity';
 import { STORAGE_PROVIDER } from 'src/@metadata';
 import { OrderItem } from './order-item.entity';
 

@@ -1,0 +1,15 @@
+const trx = this.dataSource.createQueryRunner();
+
+    try {
+      await trx.startTransaction();
+
+      // put the code
+
+      await trx.commitTransaction();
+
+      //return value
+    } catch (e) {
+      await trx.rollbackTransaction();
+    } finally {
+      await trx.release();
+    }

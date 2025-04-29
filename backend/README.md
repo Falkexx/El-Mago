@@ -11,8 +11,12 @@ As variáveis de ambiente são constantes que o sistema operacional da para que 
 Antes de iniciar o projeto, na pasta root do backend crie um arquivo chamado **.env** esse arquivo tem que ter as propriedades abaixo. Caso venha a não passar alguma propriedade, a aplicação vai crachar automaticamente.
 
 ```env
+# development | production
+DEVELOPMENT_STAGE=development
+
 # Secret
 JWT_SECRET="secret"
+JWT_EXPIRES_IN='1y'
 
 # Postgres
 POSTGRES_HOST="localhost"
@@ -43,7 +47,24 @@ PUBLIC_IMAGES_BUCKET_NAME=
 AWS_S3_ACCESS_KEY_ID=
 AWS_S3_SECRET_ACCESS_KEY_ID=
 
+# Paypal
+PAYPAL_BASE_URL=""
+PAYPAL_CLIENT_ID=""
+PAYPAL_SECRET=""
+WEB_HOOK_ID=""
+
+# MAIL > GMAIL | MAILTRAP
+MAIL_PROVIDER=MAILTRAP
+
+# MAIL (MAILTRAP)
+MAILTRAP_HOST=""
+MAILTRAP_PORT=2525
+MAILTRAP_USER=""
+MAILTRAP_PASS=""
+MAIL_COMPANY=""
+
 # GOOGLE CLOUD
+COMPANY_EMAIL=""
 GOOGLE_CLOUD_OAUTH_CLIENT_ID=""
 GOOGLE_CLOUD_OAUTH_CLIENT_SECRET=""
 GOOGLE_CLOUD_OAUTH_REFRESH_TOKEN=""

@@ -2,9 +2,7 @@ import {
   OrderEntity,
   OrderUniqueRefs,
 } from 'src/Application/Entities/Order.entity';
-import { DataSource, Repository } from 'typeorm';
 import { IOrderRepositoryContract } from './IOrderRepository.contract';
-import { PaginationResult } from '#types';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { splitKeyAndValue } from '#utils';
 import {
@@ -14,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { SearchBuilderService } from '../SearchBuilder.service';
 import { TABLE } from 'src/@metadata/tables';
-import { InjectRepository } from '@nestjs/typeorm';
 import { OrderStatus } from 'src/Application/Entities/order-status.entity';
 import {
   OrderItem,
@@ -22,19 +19,11 @@ import {
 } from 'src/Application/Entities/order-item.entity';
 import { Status } from 'src/@metadata';
 import { QueryRunner } from 'typeorm';
+import { SearchBuilderResult } from '#types';
 
 @Injectable()
 export class OrderTypeOrmRepository implements IOrderRepositoryContract {
-  constructor(
-    @InjectRepository(OrderEntity)
-    private readonly orderRepository: Repository<OrderEntity>,
-    @InjectRepository(OrderStatus)
-    private readonly orderStatusRepository: Repository<OrderStatus>,
-    @InjectRepository(OrderItem)
-    private readonly orderItemRepository: Repository<OrderItem>,
-    private readonly dataSource: DataSource,
-    private readonly searchBuilderService: SearchBuilderService,
-  ) {}
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
 
   async create(entity: OrderEntity, trx: QueryRunner): Promise<OrderEntity> {
     try {
@@ -186,22 +175,18 @@ export class OrderTypeOrmRepository implements IOrderRepositoryContract {
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<OrderEntity[]>> {
+  ): Promise<SearchBuilderResult<OrderEntity>> {
     try {
-      const queryBuilder = trx.manager.createQueryBuilder(
+      const queryBuilder = trx.manager.createQueryBuilder();
+
+      const result = await this.searchBuilderService.search(
+        paginationDto,
         OrderEntity,
         TABLE.order,
+        queryBuilder,
       );
 
-      return this.searchBuilderService.search(
-        paginationDto,
-        TABLE.order,
-        queryBuilder,
-        {
-          searchField: 'name',
-          createdField: 'createdAt',
-        },
-      );
+      return result;
     } catch (e) {
       console.error(e);
       throw new InternalServerErrorException();

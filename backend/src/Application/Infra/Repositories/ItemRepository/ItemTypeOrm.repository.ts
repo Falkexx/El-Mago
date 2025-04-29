@@ -8,17 +8,18 @@ import {
   ItemEntity,
   ItemUniquePrams,
   ItemUpdateEntity,
-} from 'src/Application/Entities/Item.entity';
+} from 'src/Application/Entities/Item/Item.entity';
 import { GenericPaginationDto } from 'src/utils/validators';
-import { PaginationResult, SelectFieldsWithRelations } from '#types';
+import { SearchBuilderResult, SelectFieldsWithRelations } from '#types';
 import { IItemRepositoryContract } from './IItem.repository-contract';
 import { splitKeyAndValue } from '#utils';
 import { TABLE } from 'src/@metadata/tables';
 import { CategoryEntity } from 'src/Application/Entities/Category.entity';
+import { SearchBuilderService } from '../SearchBuilder.service';
 
 @Injectable()
 export class ItemTypeOrmRepository implements IItemRepositoryContract {
-  constructor() {}
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
 
   async create(entity: ItemEntity, trx: QueryRunner): Promise<ItemEntity> {
     try {
@@ -147,59 +148,19 @@ export class ItemTypeOrmRepository implements IItemRepositoryContract {
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<ItemEntity[]>> {
-    const { page, limit, search, filters, order } = paginationDto;
-
-    const queryBuilder = trx.manager.createQueryBuilder(ItemEntity, TABLE.item);
-
-    if (search) {
-      queryBuilder.andWhere(`SIMILARITY(${TABLE.item}.name, :search) > 0.3`, {
-        search: `%${search}%`,
-      });
-    }
-
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        if (key !== 'categories') {
-          queryBuilder.andWhere(`${TABLE.item}.${key} = :${key}`, {
-            [key]: value,
-          });
-        }
-      });
-    }
-
-    if (filters) {
-      try {
-        const categoriesList = JSON.parse(filters.categories);
-
-        queryBuilder.andWhere('category.id IN (:...categoryIds)', {
-          categoryIds: categoriesList,
-        });
-      } catch {
-        throw new BadRequestException(
-          'error to put parameter list, see the doc',
-        );
-      }
-    }
-
-    queryBuilder
-      .orderBy(`${TABLE.item}.createdAt`, order || 'DESC')
-      .leftJoin(`${TABLE.item}.Categories`, 'category')
-      .addSelect(['category.id', 'category.name']);
-
+  ): Promise<SearchBuilderResult<ItemEntity>> {
     try {
-      const [items, total] = await queryBuilder
-        .take(limit)
-        .skip((page - 1) * limit)
-        .getManyAndCount();
+      // Initialize queryBuilder with entity and alias
+      const queryBuilder = trx.manager.createQueryBuilder();
 
-      return {
-        data: items,
-        page,
-        limit,
-        total,
-        order,
-      };
+      const result = await this.searchBuilderService.search(
+        paginationDto,
+        ItemEntity,
+        TABLE.item,
+        queryBuilder,
+      );
+
+      return result;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException();

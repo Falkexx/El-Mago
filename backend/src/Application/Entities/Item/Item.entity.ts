@@ -7,14 +7,13 @@ import {
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
-import { ImageEntity } from './Image.entity';
-import { ItemType } from 'src/@metadata';
+import { ItemModel, ItemType } from 'src/@metadata';
 import { TABLE } from 'src/@metadata/tables';
-import { UserEntity } from './User.entity';
+import { UserEntity } from '../User.entity';
 import { Exclude } from 'class-transformer';
-import { CategoryEntity } from './Category.entity';
-import { CartItemEntity } from './Cart/CartItem.entity';
-import { OrderItem } from './order-item.entity';
+import { CategoryEntity } from '../Category.entity';
+import { CartItemEntity } from '../Cart/CartItem.entity';
+import { OrderItem } from '../order-item.entity';
 
 @Entity(TABLE.item)
 export class ItemEntity {
@@ -27,8 +26,11 @@ export class ItemEntity {
   @Column({ type: 'varchar', nullable: true })
   description: string | null;
 
-  @Column({ type: 'varchar' })
-  type: ItemType;
+  @Column({ type: 'varchar', enum: ItemModel })
+  itemModel: keyof typeof ItemModel;
+
+  @Column({ type: 'varchar', enum: ItemType })
+  type: keyof typeof ItemType;
 
   @Column({ type: 'int', nullable: true })
   amount: number | null;
@@ -42,8 +44,8 @@ export class ItemEntity {
   @Column({ type: 'timestamptz', nullable: true, default: null })
   deletedAt: Date | null;
 
-  @Column({ type: 'varchar' })
-  imageUrl: string;
+  @Column({ type: 'varchar', nullable: true })
+  imageUrl: string | null;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
@@ -53,6 +55,9 @@ export class ItemEntity {
 
   @Column({ type: 'varchar', array: true })
   tags: string[];
+
+  @Column({ type: 'varchar', length: 40 })
+  server: string;
 
   @ManyToOne(() => UserEntity, (user) => user.items)
   @Exclude()
@@ -69,11 +74,6 @@ export class ItemEntity {
   OrderItem: OrderItem;
 }
 
-export class ItemUpdateEntity {
-  name: string;
-  type: ItemType;
-  price: number;
-  image: ImageEntity;
-}
+export type ItemUpdateEntity = Partial<ItemEntity>;
 
 export type ItemUniquePrams = Pick<ItemEntity, 'id'>;

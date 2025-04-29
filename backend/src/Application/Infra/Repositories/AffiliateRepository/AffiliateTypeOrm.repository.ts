@@ -6,16 +6,17 @@ import {
 } from 'src/Application/Entities/Affiliate.entity';
 import { QueryRunner } from 'typeorm';
 import { IAffiliateRepositoryContract } from './IAffiliate.repository-contract';
-import { PaginationResult } from '#types';
 import { splitKeyAndValue } from '#utils';
 import { GenericPaginationDto } from 'src/utils/validators';
 import { TABLE } from 'src/@metadata/tables';
+import { SearchBuilderResult } from '#types';
+import { SearchBuilderService } from '../SearchBuilder.service';
 
 @Injectable()
 export class AffiliateTypeOrmRepository
   implements IAffiliateRepositoryContract
 {
-  constructor() {}
+  constructor(private readonly searchBuilderService: SearchBuilderService) {}
 
   async create(
     entity: AffiliateEntity,
@@ -155,44 +156,22 @@ export class AffiliateTypeOrmRepository
   async getWithPaginationAndFilters(
     paginationDto: GenericPaginationDto,
     trx: QueryRunner,
-  ): Promise<PaginationResult<AffiliateEntity[]>> {
-    const { page, limit, search, filters, order } = paginationDto;
+  ): Promise<SearchBuilderResult<AffiliateEntity>> {
+    try {
+      const queryBuilder = trx.manager.createQueryBuilder();
 
-    const queryBuilder = trx.manager.createQueryBuilder(
-      AffiliateEntity,
-      TABLE.affiliate,
-    );
-    if (search) {
-      queryBuilder.andWhere(
-        `SIMILARITY(${TABLE.affiliate}.name, :search) > 0.3`,
-        {
-          search: `%${search}`,
-        },
+      const result = await this.searchBuilderService.search(
+        paginationDto,
+        AffiliateEntity,
+        TABLE.affiliate,
+        queryBuilder,
       );
+
+      return result;
+    } catch (e) {
+      console.error(e);
+      throw new InternalServerErrorException();
     }
-
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        queryBuilder.andWhere(`${TABLE.affiliate}.${key} = :${key}`, {
-          [key]: value,
-        });
-      });
-    }
-
-    queryBuilder.orderBy(`${TABLE.affiliate}.createdAt`, order || 'DESC');
-
-    const [affiliates, total] = await queryBuilder
-      .take(limit)
-      .skip((page - 1) * limit)
-      .getManyAndCount();
-
-    return {
-      data: affiliates,
-      page,
-      limit,
-      total,
-      order,
-    };
   }
 
   async findConflictingFields(

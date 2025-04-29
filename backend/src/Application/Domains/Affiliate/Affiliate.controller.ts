@@ -66,18 +66,19 @@ export class AffiliateController {
   async listAffiliatesOnHold(
     @Query() pagination: GenericPaginationDto,
   ): Promise<ApiResponse<RequestAffiliateEntity[]>> {
-    const listOfAffiliatesOnHold =
-      await this.listAffiliatesOnHoldUseCase.execute(pagination);
+    const result = await this.listAffiliatesOnHoldUseCase.execute(pagination);
 
     return {
-      data: listOfAffiliatesOnHold.data,
+      data: result.data,
       message: 'SUCCESS',
       status: 200,
       meta: {
-        order: listOfAffiliatesOnHold.order,
-        page: listOfAffiliatesOnHold.page,
-        per_page: listOfAffiliatesOnHold.limit,
-        total: listOfAffiliatesOnHold.total,
+        limit: result.meta.limit,
+        order: result.meta.order,
+        page: result.meta.page,
+        remainingPages: result.meta.remainingPages,
+        total: result.meta.total,
+        totalPages: result.meta.totalPages,
       },
     };
   }
